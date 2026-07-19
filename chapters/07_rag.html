@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="7" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 07 — Retrieval-Augmented Generation · Exponential AI Handbook</title>
+  <meta name="description" content="Connecting Exponential AI&#x27;s LLM to its knowledge: embeddings, vector search, ingestion vs query pipelines, chunking, reranking, hybrid search, and RAG vs fine-tuning." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 07 — Retrieval-Augmented Generation · Exponential AI Handbook" />
+  <meta property="og:description" content="Connecting Exponential AI&#x27;s LLM to its knowledge: embeddings, vector search, ingestion vs query pipelines, chunking, reranking, hybrid search, and RAG vs fine-tuning." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 07 — Retrieval-Augmented Generation · Exponential AI Handbook" />
+  <meta name="twitter:description" content="Connecting Exponential AI&#x27;s LLM to its knowledge: embeddings, vector search, ingestion vs query pipelines, chunking, reranking, hybrid search, and RAG vs fine-tuning." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 20 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-magnifying-glass-chart"></i> Chapter 07 · Grounded Answers</span>
+          <h1 class="chapter-title">Retrieval-Augmented Generation: connecting the model to Exponential AI's knowledge</h1>
+          <p class="chapter-lede">
+            An LLM knows language, not your business. RAG closes that gap by fetching the exact facts a
+            question needs — from millions of private, ever-changing records — and placing them in the
+            model's context before it answers. This chapter is where Exponential AI's fluent assistant
+            finally becomes <em>correct</em>.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            <a href="06_prompt_engineering.html">Chapter 6</a> made Exponential AI's prompts precise and
+            testable — but ran headfirst into a ceiling. Prompting can only use knowledge you can paste
+            into the window ahead of time. The assistant kept being asked about <em>this</em> customer's
+            order, <em>today's</em> stock level, the <em>exact</em> clause in a supplier contract — facts
+            that are private, current, and far too numerous to preload.
+          </p>
+          <p>
+            Retrieval-Augmented Generation solves this by splitting the job in two: a
+            <strong>retriever</strong> finds the handful of relevant facts from Exponential AI's own data,
+            and the <strong>generator</strong> (the LLM) answers using only those facts. Instead of
+            hoping the model memorised something, you fetch the truth and hand it over at query time. It
+            is the single most important pattern for making LLMs trustworthy in the enterprise, and it
+            directly attacks two of Chapter 5's three constraints: frozen knowledge and hallucination.
+          </p>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Explain embeddings and vector search; describe the ingest and query pipelines; choose chunking and retrieval strategies; reason about RAG vs fine-tuning; and see why a system that can <em>read</em> its knowledge still can't <em>act</em> on it — the gap Chapter 8 fills.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why the world invented RAG</h2>
+          <p>
+            RAG exists because two facts collide. First, an LLM's knowledge is <strong>frozen and
+            generic</strong> — it never saw Exponential AI's order database and can't know last night's
+            inventory. Second, its <strong>context window is finite</strong> — you can't just paste the
+            entire company into every prompt, even if you had it to hand. The obvious fix, retraining
+            the model on your data constantly, is slow, expensive, and still can't keep up with data
+            that changes by the second.
+          </p>
+          <p>
+            The insight of RAG is that you don't need the model to <em>memorise</em> your knowledge; you
+            need it to <em>look things up</em>. Store your knowledge in a searchable index, retrieve
+            only the few passages relevant to the current question, and inject them into the prompt.
+            The model's job shrinks to what it's genuinely good at — reading provided text and composing
+            an answer — while the facts stay fresh, private, and auditable in your own systems.
+          </p>
+          <p>
+            This separation of concerns has a governance payoff that enterprises care about deeply.
+            Because the knowledge lives in Exponential AI's own store rather than baked into a model's
+            weights, the company keeps full control: it can enforce who is allowed to see which
+            documents, redact sensitive fields, delete a record and have it vanish from answers
+            immediately, and prove <em>where</em> any given answer came from. None of that is possible
+            once facts are melted into billions of opaque parameters. In regulated retail — pricing
+            rules, warranty terms, data-privacy obligations — that auditability is often the deciding
+            reason RAG wins over fine-tuning, quite apart from cost or freshness.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given a user question and a corpus of millions of documents, select the small subset (that
+            fits the context window) most likely to contain the answer, and condition the LLM on it so
+            the answer is grounded in real sources. Two sub-problems dominate: <strong>retrieval
+            quality</strong> (did we fetch the right passages?) and <strong>generation
+            faithfulness</strong> (did the model answer <em>from</em> them rather than from its
+            imagination?).
+          </p>
+          <p>
+            The core technical enabler is the <strong>embedding</strong>: a model maps text to a vector
+            such that semantically similar text lands nearby in space. A question and the passage that
+            answers it end up close together even if they share no keywords. Retrieval becomes a
+            nearest-neighbour search in that vector space — fast, fuzzy, and meaning-aware, unlike brittle
+            keyword matching.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>Open-book exam</h4>
+              <p>Instead of answering from memory, the model gets to look up the relevant page first. It reads the passage, then writes the answer — so it's grounded in real material, not guessing.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Embed, index, retrieve, generate</h4>
+              <p>Documents are chunked, embedded, and stored in a vector database. At query time you embed the question, fetch the top-k nearest chunks, and pass them plus the question to the LLM.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>A retrieval system with an LLM on top</h4>
+              <p>RAG quality is dominated by classic information-retrieval concerns — chunking, ranking, recall, freshness — not by the LLM. Architect the pipeline; the generator is the easy part.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From keyword search to grounded generation</h2>
+          <p>
+            RAG married two mature fields — information retrieval and language generation — at exactly the
+            moment LLMs became good enough to trust with the "generation" half.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>Pre-2018 — Keyword search</h4><p>TF-IDF and BM25 match words, not meaning. Powerful, but blind to synonyms and phrasing.</p></div>
+              <div class="timeline-item"><h4>2018–20 — Dense embeddings</h4><p>Neural embeddings enable semantic search; meaning becomes geometry.</p></div>
+              <div class="timeline-item"><h4>2020 — The RAG paper</h4><p>Retrieval is formally combined with a generator, coining the pattern.</p></div>
+              <div class="timeline-item"><h4>2023+ — Enterprise RAG boom</h4><p>Vector databases, hybrid search, and rerankers make RAG the default way to put LLMs on private data.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>The two pipelines of RAG</h2>
+          <p>
+            A RAG system is really two pipelines. The <strong>ingestion pipeline</strong> runs offline:
+            documents are loaded, split into <strong>chunks</strong> of a few hundred tokens, passed
+            through an embedding model, and stored — vector plus original text plus metadata — in a
+            <strong>vector database</strong>. This is where most of the quality is won or lost: chunk too
+            large and retrieval is imprecise; too small and it loses context.
+          </p>
+          <p>
+            The <strong>query pipeline</strong> runs per request: embed the user's question with the same
+            model, perform a nearest-neighbour search to get the top-k chunks, optionally
+            <strong>rerank</strong> them with a more precise model, assemble them with the question into a
+            grounded prompt, and call the LLM. Increasingly this is <strong>hybrid</strong> — combining
+            semantic vector search with keyword search — because each catches what the other misses.
+            Crucially, the prompt instructs the model to answer <em>only</em> from the retrieved context
+            and to cite it, turning fluency into verifiable answers.
+          </p>
+          <p>
+            A useful mental model is that retrieval is a funnel with two competing goals.
+            <strong>Recall</strong> comes first — cast a wide net (say the top twenty candidates) so the
+            right passage is almost certainly <em>somewhere</em> in the set. Then <strong>precision</strong>
+            takes over — the reranker and the final top-k narrow that set to the few passages that truly
+            answer the question, so the model isn't distracted by near-misses and the token budget isn't
+            wasted. Get the balance wrong in either direction and quality suffers: too little recall and
+            the answer simply isn't retrievable; too little precision and the key fact drowns in noise.
+            This is why Exponential AI's team measures retrieval as its own metric, independently of the
+            LLM's output, and treats a retrieval regression as seriously as a code regression.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>How RAG answers "Where is my order #48122?"</h2>
+          <ol>
+            <li><strong>Embed the question</strong> into a query vector with the embedding model.</li>
+            <li><strong>Search</strong> the vector index for the nearest chunks (order records, shipping FAQ, policy).</li>
+            <li><strong>Rerank</strong> the candidates so the most relevant sit at the top.</li>
+            <li><strong>Assemble</strong> the top chunks + question + instructions into a grounded prompt.</li>
+            <li><strong>Generate</strong> an answer that uses only the retrieved facts, with citations.</li>
+            <li><strong>Return</strong> the answer plus its sources, so a human can verify it.</li>
+          </ol>
+          <p class="code-label">The query pipeline, as pseudocode</p>
+          <pre><code class="language-python">def rag_answer(question, k=5):
+    q_vec   = embed(question)
+    hits    = vector_db.search(q_vec, top_k=20)   # recall
+    top     = rerank(question, hits)[:k]          # precision
+    context = "\n\n".join(h.text for h in top)
+    prompt  = f"Answer ONLY from the context. Cite sources.\n\n{context}\n\nQ: {question}"
+    return llm(prompt), [h.source for h in top]</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture RAG</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-people-roof"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A researcher with a great memory for <em>how</em> to write but who always checks the archive before stating a fact. The library card catalogue is the vector index; the researcher is the LLM.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-building"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Exponential AI's assistant gains a badge to the company's filing cabinets. It no longer guesses policy; it pulls the exact clause and answers from it, with a citation the customer can trust.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-code"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A cache lookup before computation. Rather than recomputing (hallucinating) an answer, the system fetches authoritative data and formats it — separation of storage from presentation.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-sitemap"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A read replica for knowledge: the vector store is the queryable index; the LLM is the API layer that renders results into natural language.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>Vector retrieval, in plain text</h2>
+          <pre class="ascii">  INGEST (offline):
+    docs -> chunk -> embed -> [ vector DB: vec + text + metadata ]
+
+  QUERY (per request):
+    question -> embed -> q_vec
+                          |
+                          v   nearest-neighbour search
+       [ vector DB ] --> top-k chunks --> rerank --> best few
+                                                       |
+             question + best few + "answer only from this" 
+                                                       |
+                                                       v
+                                                   [  LLM  ] --> grounded answer + citations</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>The RAG pipeline, as a flow</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    subgraph Ingest["Ingestion (offline)"]
+      D["Documents"] --> CH["Chunk"]
+      CH --> EM["Embed"]
+      EM --> VDB[("Vector DB")]
+    end
+    subgraph Query["Query (per request)"]
+      Q["User question"] --> QE["Embed question"]
+      QE --> S["Vector search"]
+      VDB --> S
+      S --> RR["Rerank top-k"]
+      RR --> P["Grounded prompt"]
+      P --> L["LLM"]
+      L --> A["Answer + citations"]
+    end
+            </div>
+            <p class="diagram-caption">Figure 7.1 — Two pipelines meet at the vector DB; retrieval quality dominates.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>RAG vs fine-tuning</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Dimension</th><th>RAG</th><th>Fine-tuning</th></tr></thead>
+              <tbody>
+                <tr><td>Adds knowledge</td><td><strong>Yes — current &amp; private</strong></td><td>Poorly; bakes in stale facts</td></tr>
+                <tr><td>Freshness</td><td>Update the index anytime</td><td>Requires retraining</td></tr>
+                <tr><td>Best for</td><td>Facts, documents, Q&amp;A</td><td>Style, format, behaviour</td></tr>
+                <tr><td>Auditability</td><td>High (citations)</td><td>Low (opaque weights)</td></tr>
+                <tr><td>Cost to change</td><td>Low</td><td>High</td></tr>
+                <tr><td>Data leakage risk</td><td>Controllable (access rules)</td><td>Baked into model</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Keyword vs vector vs hybrid search</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Property</th><th>Keyword (BM25)</th><th>Vector (semantic)</th><th>Hybrid</th></tr></thead>
+              <tbody>
+                <tr><td>Matches</td><td>Exact terms</td><td>Meaning</td><td>Both</td></tr>
+                <tr><td>Handles synonyms</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+                <tr><td>Exact IDs/codes</td><td><strong>Excellent</strong></td><td>Weak</td><td>Excellent</td></tr>
+                <tr><td>Typical use</td><td>Codes, names</td><td>Natural questions</td><td><strong>Production default</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Chunking strategies</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Strategy</th><th>Pro</th><th>Con</th></tr></thead>
+              <tbody>
+                <tr><td>Fixed-size</td><td>Simple, predictable</td><td>Splits mid-idea</td></tr>
+                <tr><td>Sentence/paragraph</td><td>Respects meaning</td><td>Variable sizes</td></tr>
+                <tr><td>Overlapping windows</td><td>Preserves context at edges</td><td>More storage/tokens</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Strengths and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Fresh &amp; private</strong> knowledge without retraining.</li>
+                <li><strong>Reduces hallucination</strong> by grounding answers in sources.</li>
+                <li><strong>Auditable</strong> — answers come with citations.</li>
+                <li><strong>Access control</strong> stays in your data layer.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages</h3>
+              <ul>
+                <li><strong>Retrieval failures</strong> cap answer quality (garbage in, garbage out).</li>
+                <li><strong>Pipeline complexity</strong> — chunking, indexing, reranking to maintain.</li>
+                <li><strong>Latency &amp; token cost</strong> from injected context (Ch 16).</li>
+                <li><strong>Stale index</strong> if ingestion lags the source data.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Doing RAG well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Invest in retrieval</strong> — evaluate recall before blaming the LLM.</li>
+                <li><strong>Use hybrid search + a reranker</strong> for production quality.</li>
+                <li><strong>Instruct "answer only from context"</strong> and require citations.</li>
+                <li><strong>Keep the index fresh</strong> with incremental ingestion.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Dumping whole documents</strong> into the prompt instead of retrieving.</li>
+                <li><strong>Ignoring retrieval metrics</strong> and tuning only the prompt.</li>
+                <li><strong>One giant chunk size</strong> for every document type.</li>
+                <li><strong>No fallback</strong> when nothing relevant is found (better to say "I don't know").</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What is an embedding and why does it enable semantic search?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A vector representation of text where semantic similarity maps to geometric proximity, so a question and its answer are close even without shared keywords — enabling nearest-neighbour retrieval by meaning.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>RAG or fine-tuning for a company knowledge base?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>RAG. The knowledge is large, private, and changing; RAG keeps it fresh and auditable, while fine-tuning bakes in stale facts and offers no citations.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why add a reranker after vector search?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Vector search maximises recall but is imprecise. A cross-encoder reranker scores query–passage pairs more accurately, pushing the truly relevant chunks to the top of a small final set.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>The answer is wrong — how do you debug a RAG system?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>First check retrieval: were the right chunks fetched? If not, fix chunking/embeddings/search. If yes but the answer is still wrong, fix the generation prompt or grounding instruction.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">RAG trades <em>pipeline complexity</em> for <em>fresh, auditable, private knowledge</em>. The architect's key realisation: RAG is a retrieval problem wearing an LLM hat. Spend your effort on chunking, hybrid search, and reranking — the generator rarely is the bottleneck.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">Exponential AI indexes contracts as 5,000-token chunks. Retrieval returns the right document but the relevant clause is buried, so the model misquotes it. Smaller, overlapping chunks plus reranking fixes an "LLM problem" that was really a chunking problem.</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Blaming the LLM</strong> for what is actually a retrieval failure.</li>
+            <li><strong>No retrieval evaluation</strong> — flying blind on recall and precision.</li>
+            <li><strong>Over-stuffing context</strong>, raising cost and burying the key passage.</li>
+            <li><strong>Letting the index go stale</strong> so answers lag reality.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>RAG, fine-tuning, or plain prompting?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["What does the task need?"]) --> F{"Needs private or<br/>changing facts?"}
+    F -->|No| B{"Just behaviour/format?"}
+    B -->|Yes| P["Prompt (Ch 6) or fine-tune"]
+    F -->|Yes| L{"Large corpus?"}
+    L -->|Yes| RAG["Use RAG"]
+    L -->|Small &amp; static| CTX["Paste into prompt (small RAG-lite)"]
+    RAG --> Q{"Answer wrong?"}
+    Q -->|Retrieval off| FIXR["Fix chunking/search/rerank"]
+    Q -->|Retrieval ok| FIXG["Fix grounding prompt"]
+            </div>
+            <p class="diagram-caption">Figure 7.2 — Note how debugging always starts with retrieval, not the model.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before shipping a RAG system</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Chunking strategy chosen per document type.</li>
+            <li><i class="fa-solid fa-square-check"></i> Retrieval evaluated (recall/precision) on real queries.</li>
+            <li><i class="fa-solid fa-square-check"></i> Hybrid search and/or reranking considered.</li>
+            <li><i class="fa-solid fa-square-check"></i> Prompt instructs "answer only from context" with citations.</li>
+            <li><i class="fa-solid fa-square-check"></i> Freshness/ingestion cadence defined.</li>
+            <li><i class="fa-solid fa-square-check"></i> Access controls enforced at the data layer.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="RAG grounds answers in retrieved private/current facts.">
+              <p class="q-text">1. RAG's primary purpose is to…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Make the model larger</button>
+                <button class="quiz-option" data-correct="true">Ground answers in fresh, private facts fetched at query time</button>
+                <button class="quiz-option">Remove the need for a context window</button>
+                <button class="quiz-option">Replace prompting entirely</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Embeddings place similar meaning nearby, enabling semantic search.">
+              <p class="q-text">2. Semantic search works because embeddings…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Compress text to save space</button>
+                <button class="quiz-option" data-correct="true">Map similar meaning to nearby vectors</button>
+                <button class="quiz-option">Match exact keywords only</button>
+                <button class="quiz-option">Encrypt the documents</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="For large, changing, private knowledge, RAG beats fine-tuning.">
+              <p class="q-text">3. For a large, frequently-updated company knowledge base, prefer…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Fine-tuning</button>
+                <button class="quiz-option" data-correct="true">RAG</button>
+                <button class="quiz-option">A bigger temperature</button>
+                <button class="quiz-option">Zero-shot prompting</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Most RAG failures are retrieval failures; debug retrieval first.">
+              <p class="q-text">4. A RAG answer is wrong. Where do you look first?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Buy a bigger model</button>
+                <button class="quiz-option" data-correct="true">Whether retrieval fetched the right chunks</button>
+                <button class="quiz-option">Raise the temperature</button>
+                <button class="quiz-option">Add more few-shot examples</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            RAG turns a fluent-but-generic LLM into a grounded, trustworthy assistant by separating
+            knowledge from generation. An ingestion pipeline chunks and embeds Exponential AI's documents
+            into a vector store; a query pipeline retrieves the few relevant passages, reranks them, and
+            conditions the model to answer only from them, with citations. It directly counters frozen
+            knowledge and hallucination, and it keeps facts fresh, private, and auditable — which is why
+            it became the enterprise default for putting LLMs on real data.
+          </p>
+          <p>
+            Yet RAG only lets the model <em>read</em>. Ask it to actually issue the refund, update the
+            order, or email the supplier, and it stalls — retrieval fetches knowledge but takes no
+            action. Giving the model hands, not just eyes, is the next leap.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 8</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              Exponential AI's assistant can now find any fact and answer faithfully — but it is still a
+              read-only oracle. Customers don't just want to be <em>told</em> their order is eligible;
+              they want the refund <em>processed</em>. <strong>What if the model could call tools —
+              query systems, take actions, and loop until the job is done?</strong> That shift from
+              answering to acting is <a href="08_agents.html">Chapter 8 — AI Agents</a>, where
+              Exponential AI's AI grows hands.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 7 of 20 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

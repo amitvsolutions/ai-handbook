@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="2" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 02 — Machine Learning · Exponential AI Handbook</title>
+  <meta name="description" content="Exponential AI trains its first models to forecast demand and predict churn — supervised learning, the train/validate/test loop, overfitting, and the bias-variance trade-off." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 02 — Machine Learning · Exponential AI Handbook" />
+  <meta property="og:description" content="Exponential AI trains its first models to forecast demand and predict churn — supervised learning, the train/validate/test loop, overfitting, and the bias-variance trade-off." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 02 — Machine Learning · Exponential AI Handbook" />
+  <meta name="twitter:description" content="Exponential AI trains its first models to forecast demand and predict churn — supervised learning, the train/validate/test loop, overfitting, and the bias-variance trade-off." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 20 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-chart-line"></i> Chapter 02 · Learned Decisions</span>
+          <h1 class="chapter-title">Machine Learning: Exponential AI stops writing rules and starts learning them</h1>
+          <p class="chapter-lede">
+            When the rules you need can't be written by hand, you learn them from data. This chapter
+            follows Exponential AI as it trains its first models — to forecast demand and predict which
+            customers are about to churn — and unpacks how a machine turns history into foresight.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~17 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            <a href="01_history.html">Chapter 1</a> left Exponential AI staring at a wall: its most
+            valuable decisions — how much to stock, which customers will leave — depend on patterns no
+            human can write into a rule. The company had digitised a decade of transactions, tickets,
+            and web logs. It had the raw material. What it lacked was a way to turn that history into
+            decisions <em>automatically</em>.
+          </p>
+          <p>
+            Machine learning is that way. Instead of a programmer specifying "if the customer hasn't
+            bought in 60 days and opened no emails, they'll churn," Exponential AI shows an algorithm
+            hundreds of thousands of past customers — who stayed, who left — and lets it discover the
+            predictive pattern itself. This chapter is the pivot of the entire handbook: the move from
+            <em>writing logic</em> to <em>learning it</em>.
+          </p>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Explain the three families of ML, tell classification from regression, describe the train/validate/test loop, reason about overfitting and the bias–variance trade-off, and see why ML still couldn't read a product photo — the gap Chapter 3 fills.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why the world invented machine learning</h2>
+          <p>
+            ML exists because of the <strong>rule-writing bottleneck</strong> we hit in Chapter 1. For
+            a vast class of problems, the mapping from input to correct answer is real but too complex,
+            too fuzzy, or too fast-changing for a human to specify. Nobody can write the exact formula
+            for "how many umbrellas will this store sell next week" — it depends on weather, season,
+            price, local events, and trends in ways that interact nonlinearly.
+          </p>
+          <p>
+            But we <em>do</em> have thousands of past weeks where we know both the conditions and the
+            actual sales. ML flips the problem: rather than asking a human to derive the formula, it
+            searches for a function that best reproduces the historical input→output pairs, then uses
+            that function on new inputs. The insight is that <strong>data implicitly contains the
+            rules</strong>; ML is the machinery for extracting them.
+          </p>
+          <p>
+            There is a second, commercial reason ML exists: <strong>leverage</strong>. A hand-written
+            rule requires a human to anticipate a situation before it happens. A learned model, given
+            enough representative history, generalises to situations no one explicitly foresaw — and it
+            does so at the speed and scale of software. For Exponential AI, that meant scoring every one of
+            twelve million customers nightly for churn risk, a task that would have required an
+            impossible army of analysts. ML converts a fixed data asset into a renewable stream of
+            decisions, which is why it became the first pillar of the company's transformation rather
+            than a lab curiosity.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Formally: given a dataset of examples <code>(x, y)</code> — where <code>x</code> is a
+            feature vector (customer age, days since last order, email opens…) and <code>y</code> is
+            the outcome (churned / stayed) — find a function <code>f</code> such that
+            <code>f(x) ≈ y</code>, and, critically, such that it also works on <em>new</em> customers
+            never seen during training. That last clause — <strong>generalisation</strong> — is the
+            entire game.
+          </p>
+          <p>
+            Two failure modes bracket the problem. <strong>Underfitting</strong>: <code>f</code> is too
+            simple to capture the pattern (predict "nobody churns"). <strong>Overfitting</strong>:
+            <code>f</code> memorises the training data — including its noise — and collapses on new
+            data. The art of ML is finding the model that is exactly complex enough: the
+            <em>bias–variance</em> sweet spot.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>Learning from examples</h4>
+              <p>Show a child enough photos of cats and dogs and they learn the difference without a definition. ML learns the same way — from labelled examples, not rules.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Fit a function, minimise loss</h4>
+              <p>A model has parameters; a loss function measures how wrong its predictions are; an optimiser (e.g. gradient descent) nudges parameters to reduce loss over the training set — while you watch a held-out set to avoid overfitting.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>Generalisation under distribution shift</h4>
+              <p>A production model is only as good as the stability of the data distribution it was trained on. Architects design for drift, monitoring, and retraining — because the world moves after you ship.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>How machine learning matured</h2>
+          <p>
+            Machine learning is older than most assume; what changed in the 2000s was not the core
+            mathematics but the arrival of cheap storage, faster hardware, and — above all — vast
+            digitised datasets. Exponential AI's own ML programme only became viable once its data
+            warehouse existed. The timeline below shows how the field moved from theoretical promise to
+            an industrial discipline.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>1950s–60s — Perceptrons &amp; early learning</h4><p>The first trainable models; promising, then stalled by theoretical limits.</p></div>
+              <div class="timeline-item"><h4>1980s–90s — Statistical learning</h4><p>Decision trees, SVMs, and a rigorous theory of generalisation. ML becomes a science.</p></div>
+              <div class="timeline-item"><h4>2000s — Ensembles &amp; big data</h4><p>Random forests and gradient boosting dominate tabular problems; cheap storage makes large datasets normal.</p></div>
+              <div class="timeline-item"><h4>2010s — Feature engineering era</h4><p>ML is productionised across industry; success hinges on humans hand-crafting good features — the very limit deep learning will remove in Chapter 3.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>The anatomy of an ML system</h2>
+          <p>
+            An ML system is a pipeline, not just a model. Raw data flows through
+            <strong>feature engineering</strong> (turning messy records into numeric vectors), into a
+            <strong>learning algorithm</strong> that fits parameters by minimising a
+            <strong>loss function</strong>, evaluated on held-out data, and finally deployed behind an
+            <strong>inference</strong> API that scores new inputs.
+          </p>
+          <p>
+            The three families differ by what signal they learn from.
+            <strong>Supervised learning</strong> uses labelled examples (churn: yes/no) — Exponential AI's
+            bread and butter. <strong>Unsupervised learning</strong> finds structure without labels
+            (customer segments). <strong>Reinforcement learning</strong> learns from reward signals
+            through trial and error (dynamic pricing). Exponential AI's first two projects — churn and
+            demand — are both supervised, the safest place to start.
+          </p>
+          <p>
+            Within supervised learning, the choice of <em>algorithm</em> shapes everything downstream.
+            Linear and logistic regression are transparent and fast but assume simple relationships.
+            Decision trees capture nonlinearities and are easy to explain, but a single tree overfits.
+            <strong>Ensembles</strong> — random forests and gradient-boosted trees — average or stack
+            many weak trees into one strong, robust predictor, and for tabular enterprise data they
+            remain the workhorse to this day. Exponential AI's team deliberately chose gradient boosting
+            over a neural network for churn: on structured customer records it was more accurate, far
+            cheaper to train, and easier to defend to auditors — a reminder that the newest tool is
+            rarely the right one for tabular problems.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>Training Exponential AI's churn model</h2>
+          <ol>
+            <li><strong>Frame.</strong> Define the label: a customer who makes no purchase in 90 days = churned.</li>
+            <li><strong>Assemble features.</strong> For each customer, compute recency, frequency, monetary value, email engagement, support tickets.</li>
+            <li><strong>Split.</strong> Partition history into train / validation / test sets (e.g. 70/15/15), keeping time order to avoid leakage.</li>
+            <li><strong>Train.</strong> Fit a gradient-boosted tree; the optimiser minimises log-loss on the training set.</li>
+            <li><strong>Validate &amp; tune.</strong> Adjust hyperparameters against the validation set; stop when validation loss stops improving.</li>
+            <li><strong>Test &amp; ship.</strong> Report metrics on the untouched test set, then serve predictions to the retention team — with monitoring for drift.</li>
+          </ol>
+          <p class="code-label">The loop, as pseudocode</p>
+          <pre><code class="language-python">model = GradientBoostingClassifier()
+model.fit(X_train, y_train)                 # learn from labelled history
+
+val_score = roc_auc(y_val, model.predict_proba(X_val))
+# tune hyperparameters against val_score, then:
+test_score = roc_auc(y_test, model.predict_proba(X_test))  # honest estimate
+
+at_risk = model.predict_proba(X_live)[:, 1] > 0.6           # score new customers</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture machine learning</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-people-roof"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>An apprentice sommelier who tastes thousands of labelled wines. Nobody hands them a rulebook; after enough examples they can place a new glass by region and vintage. ML is that palate, formalised.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-building"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Exponential AI's best buyer, distilled. Their intuition for "this will sell" came from years of seeing outcomes. A demand model captures that intuition from the same history — and never retires.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-code"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Curve-fitting as configuration. Instead of writing branches, you fit parameters so the function reproduces observed behaviour — like auto-tuning a controller from logs rather than hand-setting gains.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-sitemap"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A compiler from data to decisions. Training is compilation (slow, offline); inference is execution (fast, online). Drift is bit-rot: the compiled artefact degrades as the world diverges from its training data.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>The ML pipeline, in plain text</h2>
+          <pre class="ascii">  raw data ── feature engineering ──> X (feature vectors), y (labels)
+                                          |
+                        +-----------------+------------------+
+                        |                 |                  |
+                     TRAIN            VALIDATION            TEST
+                        |                 |                  |
+                        v                 v                  v
+                  fit params  ---->  tune / early-stop --> honest score
+                        |
+                        v
+                 deploy model ──> inference on live inputs ──> decisions
+                        ^                                          |
+                        |________ monitor drift & retrain <________|</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>The supervised learning loop</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    D["Historical data (x, y)"] --> F["Feature engineering"]
+    F --> SPLIT{"Train / Val / Test split"}
+    SPLIT --> T["Train model<br/>(minimise loss)"]
+    T --> V["Validate &amp; tune"]
+    V -->|"not good enough"| T
+    V -->|"good"| E["Test on unseen data"]
+    E --> DEP["Deploy for inference"]
+    DEP --> MON["Monitor for drift"]
+    MON -->|"drift detected"| F
+            </div>
+            <p class="diagram-caption">Figure 2.1 — Training is a loop, and deployment feeds back into it.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>The three families of learning</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Aspect</th><th>Supervised</th><th>Unsupervised</th><th>Reinforcement</th></tr></thead>
+              <tbody>
+                <tr><td>Learns from</td><td>Labelled examples (x, y)</td><td>Unlabelled data (x)</td><td>Rewards from actions</td></tr>
+                <tr><td>Goal</td><td>Predict y for new x</td><td>Find structure/groups</td><td>Maximise long-run reward</td></tr>
+                <tr><td>Exponential AI example</td><td>Churn, demand forecast</td><td>Customer segmentation</td><td>Dynamic pricing</td></tr>
+                <tr><td>Main challenge</td><td>Getting labels</td><td>Validating results</td><td>Sample efficiency, safety</td></tr>
+                <tr><td>Maturity for enterprise</td><td><strong>High</strong></td><td>Medium</td><td>Emerging</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Classification vs regression</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Property</th><th>Classification</th><th>Regression</th></tr></thead>
+              <tbody>
+                <tr><td>Output</td><td>A category (churn: yes/no)</td><td>A number (units sold)</td></tr>
+                <tr><td>Typical loss</td><td>Cross-entropy / log-loss</td><td>Mean squared error</td></tr>
+                <tr><td>Typical metric</td><td>Accuracy, ROC-AUC, F1</td><td>RMSE, MAE, R²</td></tr>
+                <tr><td>Exponential AI use</td><td>Will this customer leave?</td><td>How many umbrellas next week?</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Where ML still fell short (why Chapter 3 exists)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Task</th><th>Classical ML</th><th>Needed instead</th></tr></thead>
+              <tbody>
+                <tr><td>Tabular churn / demand</td><td><strong>Excellent</strong></td><td>—</td></tr>
+                <tr><td>Reading a product photo</td><td>Poor (needs hand-crafted features)</td><td>Deep learning (Ch 3)</td></tr>
+                <tr><td>Understanding an email</td><td>Weak (bag-of-words only)</td><td>Transformers/LLMs (Ch 4–5)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Strengths and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Scales</strong> to millions of decisions at near-zero marginal cost.</li>
+                <li><strong>Consistent &amp; objective</strong> — same input, same output.</li>
+                <li><strong>Captures complex nonlinear patterns</strong> humans can't specify.</li>
+                <li><strong>Improves with more data</strong> and periodic retraining.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages</h3>
+              <ul>
+                <li><strong>Needs labelled data</strong>, which is costly to obtain.</li>
+                <li><strong>Feature engineering is manual</strong> and expertise-heavy.</li>
+                <li><strong>Drifts</strong> as the world changes; silent decay is real.</li>
+                <li><strong>Can encode bias</strong> present in historical data.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Doing ML well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Guard the test set</strong> — never tune on it; it's your only honest estimate.</li>
+                <li><strong>Respect time order</strong> to prevent data leakage in temporal problems.</li>
+                <li><strong>Start with a simple baseline</strong> before reaching for complex models.</li>
+                <li><strong>Monitor in production</strong> for drift and retrain on a schedule.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Data leakage</strong> — letting future information sneak into features.</li>
+                <li><strong>Chasing accuracy on a skewed dataset</strong> (99% "no churn" looks great, predicts nothing).</li>
+                <li><strong>Deploy-and-forget</strong> — ignoring drift until decisions rot.</li>
+                <li><strong>Over-engineering</strong> a deep net where a tree wins on tabular data.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What is overfitting and how do you detect it?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A model that fits training noise and fails to generalise. Detect it when training performance is high but validation/test performance is much lower; combat it with more data, regularisation, or a simpler model.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why keep a separate test set?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>The validation set gets "used up" during tuning. An untouched test set gives an unbiased estimate of real-world performance.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Explain the bias–variance trade-off.</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Bias = error from oversimplification (underfitting); variance = error from over-sensitivity to training data (overfitting). Total error is minimised at the balance point between them.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why is accuracy a poor metric for churn?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Churn is rare, so predicting "nobody churns" scores high accuracy while being useless. Use precision/recall, F1, or ROC-AUC on the minority class.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">The dominant cost of classical ML isn't the model — it's <em>features and labels</em>. An architect budgets for the data pipeline and labelling operation first. This bottleneck is precisely what deep learning (Ch 3) and later foundation models attack by learning features automatically.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">Exponential AI's demand model, trained pre-pandemic, silently collapses when buying behaviour shifts overnight. No error is thrown — just quietly wrong forecasts. The lesson: models decay; monitoring and retraining are not optional.</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Leaking the label</strong> into features (e.g. using "cancellation date" to predict churn).</li>
+            <li><strong>Ignoring class imbalance</strong> and trusting raw accuracy.</li>
+            <li><strong>Tuning on the test set</strong>, then being shocked by production performance.</li>
+            <li><strong>Assuming correlation is causation</strong> when acting on model outputs.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Which learning approach fits the task?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["What's the task?"]) --> L{"Do you have labels?"}
+    L -->|Yes| OUT{"Output type?"}
+    OUT -->|Category| CLS["Classification"]
+    OUT -->|Number| REG["Regression"]
+    L -->|No| G{"Want groups or actions?"}
+    G -->|Find structure| UNS["Unsupervised (clustering)"]
+    G -->|Optimise actions over time| RL["Reinforcement learning"]
+    CLS --> DATA{"Data type?"}
+    REG --> DATA
+    DATA -->|Tabular| ML["Classical ML (trees/boosting)"]
+    DATA -->|Images/text/audio| DL["Deep learning (Ch 3+)"]
+            </div>
+            <p class="diagram-caption">Figure 2.2 — The "images/text/audio" branch is the road to Chapter 3.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before shipping an ML model</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Problem framed with a clear label and success metric.</li>
+            <li><i class="fa-solid fa-square-check"></i> Train/validation/test split respects time order — no leakage.</li>
+            <li><i class="fa-solid fa-square-check"></i> A simple baseline beaten by the chosen model.</li>
+            <li><i class="fa-solid fa-square-check"></i> Metric appropriate for class balance (not raw accuracy).</li>
+            <li><i class="fa-solid fa-square-check"></i> Drift monitoring and a retraining schedule in place.</li>
+            <li><i class="fa-solid fa-square-check"></i> Fairness/bias reviewed on sensitive segments.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="Overfitting = great on training, poor on unseen data.">
+              <p class="q-text">1. A model scores 99% on training data but 62% on test data. This is…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Underfitting</button>
+                <button class="quiz-option" data-correct="true">Overfitting</button>
+                <button class="quiz-option">Data leakage by definition</button>
+                <button class="quiz-option">Perfect generalisation</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Predicting a number = regression.">
+              <p class="q-text">2. Forecasting how many units will sell next week is a…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Classification problem</button>
+                <button class="quiz-option" data-correct="true">Regression problem</button>
+                <button class="quiz-option">Clustering problem</button>
+                <button class="quiz-option">Reinforcement problem</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="The test set must stay untouched to give an honest estimate.">
+              <p class="q-text">3. Why must you not tune hyperparameters on the test set?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">It's too small.</button>
+                <button class="quiz-option" data-correct="true">It would no longer give an unbiased estimate of real performance.</button>
+                <button class="quiz-option">It slows down training.</button>
+                <button class="quiz-option">Test sets can't be labelled.</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Classical ML needs hand-crafted features; raw images defeat it — deep learning's opening.">
+              <p class="q-text">4. Why couldn't classical ML simply read Exponential AI's product photos?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Photos are too large to store.</button>
+                <button class="quiz-option" data-correct="true">It relied on hand-crafted features and couldn't learn directly from raw pixels.</button>
+                <button class="quiz-option">Classification can't handle images ever.</button>
+                <button class="quiz-option">There were no labels available.</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            Machine learning replaced hand-written rules with functions learned from data. Exponential AI's
+            first supervised models — churn classification and demand regression — turned a decade of
+            history into forward-looking decisions at a scale no team of analysts could match. The
+            craft lies in generalisation: splitting data honestly, balancing bias and variance, and
+            monitoring for the drift that quietly erodes every deployed model.
+          </p>
+          <p>
+            But classical ML carried a hidden dependency: it only worked once humans had hand-crafted
+            good <em>features</em>. On tabular data that was fine. On raw pixels and raw language, it
+            stalled — and Exponential AI's next ambition was exactly there.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 3</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              Exponential AI's churn and demand models are a hit — but the vision team hits a wall the
+              moment they try to sort product photos. Classical ML needs a human to define features
+              like "edges" and "colours," and photos are far too rich for that. <strong>What if a model
+              could learn the features themselves, straight from the pixels?</strong> That leap is
+              <a href="03_deep_learning.html">Chapter 3 — Deep Learning</a>, where Exponential AI teaches
+              computers to see.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 2 of 20 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

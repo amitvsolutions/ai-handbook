@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="13" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 13 — Agent-to-Agent (A2A) · Exponential AI Handbook</title>
+  <meta name="description" content="Google&#x27;s A2A protocol as the reference for peer agent communication: Agent Cards, task lifecycle, streamed artifacts over HTTP/JSON-RPC/SSE — complementary to MCP and framed within the ACP category." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 13 — Agent-to-Agent (A2A) · Exponential AI Handbook" />
+  <meta property="og:description" content="Google&#x27;s A2A protocol as the reference for peer agent communication: Agent Cards, task lifecycle, streamed artifacts over HTTP/JSON-RPC/SSE — complementary to MCP and framed within the ACP category." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 13 — Agent-to-Agent (A2A) · Exponential AI Handbook" />
+  <meta name="twitter:description" content="Google&#x27;s A2A protocol as the reference for peer agent communication: Agent Cards, task lifecycle, streamed artifacts over HTTP/JSON-RPC/SSE — complementary to MCP and framed within the ACP category." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 20 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-users-between-lines"></i> Chapter 13 · The Reference Peer Protocol</span>
+          <h1 class="chapter-title">A2A: Google's Agent-to-Agent protocol</h1>
+          <p class="chapter-lede">
+            Chapter 12 described the <em>category</em> of agent communication. A2A makes it concrete.
+            Google's Agent-to-Agent protocol gives peer agents a documented way to advertise themselves
+            (Agent Cards), exchange long-running tasks, and stream progress — all while complementing,
+            not replacing, MCP. This is the spec an architect at Exponential AI can actually read and
+            build against today.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            <a href="12_acp.html">Chapter 12</a> made the case that agents need to talk as peers, and
+            that "ACP" names an emerging <em>category</em> — discovery, capability profiles, async
+            tasks, identity — whose wire formats are still converging. We deliberately refused to crown
+            a single standard. But an architect can't build against a category; they need a documented
+            specification with concrete message shapes. <strong>A2A (Agent-to-Agent)</strong>, introduced
+            by Google in 2025 and since moved toward open governance, is the most fully realised of these
+            efforts, so we use it as our <em>reference</em>.
+          </p>
+          <p>
+            A2A takes the abstract building blocks of Chapter 12 and pins them down: agents publish an
+            <strong>Agent Card</strong> describing who they are and what they can do; a client agent
+            sends a <strong>task</strong> to a remote agent; the remote agent works asynchronously and
+            streams updates and <strong>artifacts</strong> back. Crucially, A2A is designed to sit
+            <em>alongside</em> MCP: MCP connects an agent to its tools, while A2A connects that agent to
+            other agents. Same enterprise, two complementary layers.
+          </p>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Emerging-terminology note</div>
+            <p style="margin:0">A2A is well-documented but still young and evolving. We treat it as the <strong>reference specification</strong> for peer agent communication and frame it against MCP (tools) and the broader ACP category (Ch 12). Specific field names may change as the spec matures — the concepts won't.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why A2A was created</h2>
+          <p>
+            A2A exists to make the ACP vision buildable now, with backing and documentation, so
+            enterprises stop inventing pairwise glue between agents. Google's framing is explicit: as
+            organisations deploy many specialised agents — often from different vendors and frameworks —
+            they need an <em>open</em>, vendor-neutral way for those agents to collaborate without
+            exposing their internal memory, tools, or reasoning. A2A is designed around that principle
+            of <strong>opaque agents</strong>: a peer interacts with what an agent <em>offers</em>, not
+            with how it works inside.
+          </p>
+          <p>
+            It also exists to reuse the boring, proven parts of the web instead of reinventing them. A2A
+            builds on familiar foundations — HTTP, JSON-RPC 2.0, and Server-Sent Events for streaming —
+            so it slots into existing enterprise infrastructure, auth, and observability. That
+            pragmatism is a big reason it became the reference: it feels like normal web engineering with
+            agent-shaped semantics layered on top, which is exactly what a company like Exponential AI
+            can adopt without a green-field rebuild.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Provide an open, transport-friendly protocol by which one agent can discover another,
+            understand its capabilities, delegate a possibly long-running task, receive streamed
+            progress and results, and do so across framework and organisational boundaries — without
+            either agent exposing its internal implementation.
+          </p>
+          <p>
+            The design tension A2A must resolve is <em>autonomy vs interoperability</em>. Agents should
+            remain opaque and independently built, yet still collaborate reliably. A2A's answer is a
+            small, well-defined surface — Agent Card for discovery, a task lifecycle for work, messages
+            and artifacts for content — that says everything two agents must agree on and nothing about
+            what happens inside either one. That minimal contract is what lets a Google-framework agent
+            and a Python agent and a supplier's agent all interoperate.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>A business card + a work ticket</h4>
+              <p>Each agent has a "business card" (what it does, how to reach it). To get help you hand a peer a "ticket," and it works on it and reports back — even if it takes a while.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Agent Card + task lifecycle over HTTP</h4>
+              <p>Agents publish a JSON Agent Card; clients send tasks via JSON-RPC over HTTP and receive streamed updates via SSE. Tasks carry state (submitted → working → completed) and artifacts.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>Opaque peers, complementary to MCP</h4>
+              <p>A2A standardises peer collaboration between opaque agents while MCP standardises tool access. Together they form the "agent uses tools + agents work together" stack.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From proprietary glue to an open reference</h2>
+          <p>
+            A2A is the point where the peer-communication category got a serious, documented anchor.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>2023–24 — In-framework only</h4><p>Multi-agent systems collaborate, but only inside one framework; cross-vendor is bespoke.</p></div>
+              <div class="timeline-item"><h4>Late 2024 — MCP</h4><p>Tool access standardised; agent↔agent left open on purpose.</p></div>
+              <div class="timeline-item"><h4>2025 — A2A launched</h4><p>Google publishes A2A with Agent Cards, tasks, and streaming; broad partner support.</p></div>
+              <div class="timeline-item"><h4>2025+ — Open governance</h4><p>A2A moves toward vendor-neutral stewardship; positioned as complementary to MCP.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>Inside A2A: cards, tasks, messages, artifacts</h2>
+          <p>
+            A2A has a few core objects. The <strong>Agent Card</strong> is a JSON document (conventionally
+            discoverable at a well-known URL) that advertises an agent's identity, capabilities/skills,
+            endpoint, and auth requirements — this is how a client discovers and decides to use a peer.
+            The interaction unit is a <strong>Task</strong>: a client creates one, and it moves through a
+            lifecycle (<em>submitted → working → input-required → completed / failed / canceled</em>).
+            Within a task, the parties exchange <strong>Messages</strong> (turns of the conversation),
+            and the working agent produces <strong>Artifacts</strong> (the concrete outputs — a document,
+            a structured result, a file).
+          </p>
+          <p>
+            The roles are a <strong>client agent</strong> (initiates) and a <strong>remote/server
+            agent</strong> (fulfils); either agent can play either role in different exchanges, which is
+            what makes it symmetric. Transport is deliberately ordinary: <strong>JSON-RPC 2.0 over
+            HTTP(S)</strong> for requests, and <strong>Server-Sent Events</strong> to stream task
+            updates and partial artifacts for long-running work. Because remote agents are
+            <strong>opaque</strong>, none of this exposes their tools, prompts, or memory — a client sees
+            capabilities and results, not internals. And note the clean division of labour with
+            Chapter 11: inside its own boundary, a remote agent may use <em>MCP</em> to call tools; across
+            the boundary, it speaks <em>A2A</em> to peers.
+          </p>
+          <p>
+            One design choice deserves emphasis because it drives everything else: A2A is
+            <strong>message- and task-centric rather than function-centric</strong>. MCP thinks in terms
+            of typed function calls with fixed input/output schemas — appropriate when the callee is a
+            deterministic tool. A2A instead exchanges <em>messages</em> made of parts (text, structured
+            data, files) within a task, because a peer agent may respond with prose, a partial result, a
+            question, or a document, and may change what it returns as the conversation develops. This is
+            why the protocol leans on streaming and a stateful lifecycle instead of a single typed
+            return value: it is modelling a collaboration, not a subroutine. For Exponential AI, that
+            distinction is practical — a supplier's pricing agent might negotiate, revise, and attach a
+            contract, none of which fits neatly into one function signature.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>Exponential AI delegates to a supplier's agent</h2>
+          <ol>
+            <li><strong>Discover.</strong> Exponential AI's procurement agent fetches the supplier agent's Agent Card.</li>
+            <li><strong>Check skills.</strong> The card lists a "restock_quote" skill with its input/output schema and auth.</li>
+            <li><strong>Create task.</strong> The client sends a JSON-RPC request opening a task with the SKU and quantity.</li>
+            <li><strong>Stream.</strong> The supplier agent returns <code>working</code> and streams updates via SSE.</li>
+            <li><strong>Clarify.</strong> It moves to <code>input-required</code> ("need delivery date"); the client replies with a message.</li>
+            <li><strong>Deliver.</strong> The task reaches <code>completed</code> with an artifact: a structured quote.</li>
+          </ol>
+          <p class="code-label">A2A-style task call (illustrative)</p>
+          <pre><code class="language-json">// client agent → remote agent (JSON-RPC 2.0 over HTTP)
+{"jsonrpc":"2.0","id":"7","method":"tasks/send",
+ "params":{"id":"task-42","message":{"role":"user",
+   "parts":[{"type":"text","text":"Quote 500 units of SKU-19 for restock"}]}}}
+
+// remote agent streams updates (SSE), then final artifact
+{"status":"working"}
+{"status":"input-required","message":"Delivery date?"}
+{"status":"completed","artifact":{"unit_price":4.20,"lead_days":9}}</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture A2A</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-id-card"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Hiring a contractor: you read their profile (Agent Card), send a job (task), get progress calls (streaming), answer questions (input-required), and receive deliverables (artifacts) — without watching how they work.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-building"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A purchase-order workflow between companies: a standard document format lets any buyer's system talk to any supplier's system without a custom integration each time.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-code"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>An OpenAPI/Swagger document for agents: the Agent Card is the discoverable contract, and JSON-RPC over HTTP is the familiar call mechanism.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-network-wired"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Microservices with service discovery: agents register cards, discover peers, and call each other with async, streamed responses — but the callees are reasoning agents, not CRUD services.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>A2A and MCP, side by side</h2>
+          <pre class="ascii">        ACROSS agents (A2A)              WITHIN an agent (MCP)
+  [Exponential AI agent] --A2A--> [Supplier agent]
+        |                                   |
+        | MCP                               | MCP
+        v                                   v
+   [Orders server]                    [Inventory server]
+
+  A2A  = discover (Agent Card) + task lifecycle + stream artifacts
+  MCP  = tools / resources / prompts for one agent's own capabilities</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>A2A task lifecycle</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+stateDiagram-v2
+    [*] --> submitted
+    submitted --> working
+    working --> input_required: needs info
+    input_required --> working: client replies
+    working --> completed: artifact ready
+    working --> failed: error
+    working --> canceled: client cancels
+    completed --> [*]
+    failed --> [*]
+    canceled --> [*]
+            </div>
+            <p class="diagram-caption">Figure 13.1 — A task is long-lived and streamable, not a single request/response.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>A2A vs MCP</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Dimension</th><th>MCP</th><th>A2A</th></tr></thead>
+              <tbody>
+                <tr><td>Connects</td><td>Agent ↔ tools/data</td><td>Agent ↔ agent (peers)</td></tr>
+                <tr><td>Symmetry</td><td>Asymmetric</td><td>Symmetric (client/remote roles swap)</td></tr>
+                <tr><td>Discovery unit</td><td>Server capability list</td><td>Agent Card</td></tr>
+                <tr><td>Work unit</td><td>Tool call</td><td>Task (lifecycle + artifacts)</td></tr>
+                <tr><td>Long-running</td><td>Not the focus</td><td>First-class (SSE streaming)</td></tr>
+                <tr><td>Exposes internals?</td><td>Exposes tools</td><td>Opaque agents</td></tr>
+                <tr><td>Relationship</td><td colspan="2"><strong>Complementary — use both together</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">A2A core objects</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Object</th><th>Purpose</th><th>Analogy</th></tr></thead>
+              <tbody>
+                <tr><td>Agent Card</td><td>Discovery + capabilities + auth</td><td>Business card / profile</td></tr>
+                <tr><td>Task</td><td>Unit of work with a lifecycle</td><td>Work ticket</td></tr>
+                <tr><td>Message</td><td>A turn in the exchange</td><td>Email in a thread</td></tr>
+                <tr><td>Artifact</td><td>Concrete output</td><td>Deliverable</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">A2A within the ACP category</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Question</th><th>Answer</th></tr></thead>
+              <tbody>
+                <tr><td>Is A2A "the" ACP standard?</td><td>No — it's the leading <em>reference</em>; the category is still converging</td></tr>
+                <tr><td>Does A2A replace MCP?</td><td>No — complementary layers</td></tr>
+                <tr><td>Transport?</td><td>JSON-RPC 2.0 over HTTP(S) + SSE</td></tr>
+                <tr><td>Governance?</td><td>Moving toward vendor-neutral/open</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Strengths and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Documented &amp; buildable now</strong>, with partner support.</li>
+                <li><strong>Web-native</strong> — HTTP, JSON-RPC, SSE fit existing infra.</li>
+                <li><strong>Opaque agents</strong> preserve autonomy and IP.</li>
+                <li><strong>Complements MCP</strong> cleanly (tools vs peers).</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages</h3>
+              <ul>
+                <li><strong>Still evolving</strong> — fields and details may change.</li>
+                <li><strong>Not yet universal</strong> — not every vendor speaks it.</li>
+                <li><strong>Cross-org trust/security</strong> remain hard.</li>
+                <li><strong>Operational weight</strong> for simple in-process cases.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Using A2A well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Keep agents opaque</strong>; expose skills, not internals.</li>
+                <li><strong>Use MCP inside, A2A across</strong> the boundary.</li>
+                <li><strong>Model long work as tasks</strong> with streamed updates.</li>
+                <li><strong>Secure Agent Cards &amp; endpoints</strong>; authenticate peers.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Leaking internal tools</strong> through the peer interface.</li>
+                <li><strong>Using A2A for plain tool calls</strong> (that's MCP).</li>
+                <li><strong>Blocking</strong> on long tasks instead of streaming.</li>
+                <li><strong>Trusting unverified Agent Cards.</strong></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>How do A2A and MCP relate?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>They're complementary layers. MCP connects an agent to its tools/data (asymmetric); A2A connects agents to each other as opaque peers (symmetric). An agent uses MCP inside and A2A across boundaries.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What is an Agent Card?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A JSON descriptor advertising an agent's identity, skills/capabilities, endpoint, and auth — the discovery mechanism a client uses to find and decide to call a peer.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why does A2A use tasks with a lifecycle?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Because agent work is long-running and interactive. A task carries state (submitted→working→input-required→completed/failed), supports clarifying turns, streams progress via SSE, and returns artifacts.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What does "opaque agent" mean and why care?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Peers interact with capabilities and results, not internal tools/prompts/memory. It preserves autonomy, protects IP, and lets independently built agents interoperate safely.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">A2A is the pragmatic bet: documented, web-native, complementary to MCP. Adopt it as your reference peer protocol, but keep it behind the same adapter you built in Ch 12 so the broader ACP category can still evolve underneath you. Use MCP inside each agent, A2A between agents.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">Exponential AI exposes an internal MCP tool directly to an external partner "to save time." The partner now has a raw handle into a backend system with no opaque boundary and weak audit. The fix: partners talk A2A to an opaque agent; that agent uses MCP internally under least privilege (Ch 18).</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Conflating A2A with MCP</strong> — using one where the other fits.</li>
+            <li><strong>Breaking opacity</strong> by exposing internal tools to peers.</li>
+            <li><strong>Ignoring the task lifecycle</strong> and blocking on long work.</li>
+            <li><strong>Trusting Agent Cards</strong> without verifying identity.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>A2A, MCP, or in-process?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["Agent needs capability X"]) --> A{"Is X another<br/>autonomous agent?"}
+    A -->|No, a tool/data| MCP["Use MCP (Ch 11)"]
+    A -->|Yes| B{"Same process<br/>&amp; owner?"}
+    B -->|Yes| LG["Wire in LangGraph (Ch 10)"]
+    B -->|No| C{"Need opaque, async,<br/>cross-boundary collab?"}
+    C -->|Yes| A2A["Use A2A (behind ACP adapter)"]
+    C -->|No| LG
+            </div>
+            <p class="diagram-caption">Figure 13.2 — A2A is for opaque, cross-boundary agent collaboration.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before exposing/consuming an A2A agent</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Agent Card advertises only intended skills.</li>
+            <li><i class="fa-solid fa-square-check"></i> Endpoints authenticated; cards verified.</li>
+            <li><i class="fa-solid fa-square-check"></i> Internal tools/memory stay behind the opaque boundary.</li>
+            <li><i class="fa-solid fa-square-check"></i> Long tasks stream progress; lifecycle handled.</li>
+            <li><i class="fa-solid fa-square-check"></i> MCP used internally, A2A across boundaries.</li>
+            <li><i class="fa-solid fa-square-check"></i> Adapter keeps the concrete spec swappable.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="A2A connects agents as peers; MCP connects an agent to tools. They complement each other.">
+              <p class="q-text">1. A2A and MCP are…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Competing replacements</button>
+                <button class="quiz-option" data-correct="true">Complementary (peers vs tools)</button>
+                <button class="quiz-option">The same protocol</button>
+                <button class="quiz-option">Both agent→tool only</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="The Agent Card is A2A's discovery/capability descriptor.">
+              <p class="q-text">2. In A2A, discovery happens via…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">A tools/list call</button>
+                <button class="quiz-option" data-correct="true">The Agent Card</button>
+                <button class="quiz-option">A DNS record only</button>
+                <button class="quiz-option">A vector database</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="A2A tasks are long-running and streamed via SSE over HTTP/JSON-RPC.">
+              <p class="q-text">3. A2A supports long-running work through…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">A single blocking call</button>
+                <button class="quiz-option" data-correct="true">A task lifecycle with streamed updates</button>
+                <button class="quiz-option">Polling a database</button>
+                <button class="quiz-option">Email only</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Opaque agents expose capabilities/results, not internal tools or memory.">
+              <p class="q-text">4. "Opaque agent" means peers see…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">All internal tools and prompts</button>
+                <button class="quiz-option" data-correct="true">Capabilities and results, not internals</button>
+                <button class="quiz-option">The raw model weights</button>
+                <button class="quiz-option">Nothing at all</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            A2A turns the ACP category into something an architect can build against. Agents publish an
+            Agent Card for discovery, exchange work as long-running tasks with a clear lifecycle, stream
+            updates over SSE, and return artifacts — all while staying opaque, so autonomy and IP are
+            preserved. It reuses web-native transports (HTTP, JSON-RPC, SSE) and, crucially, complements
+            MCP rather than competing with it: MCP inside an agent for tools, A2A between agents for
+            collaboration. For Exponential AI, that's the full connectivity stack — an agent that can
+            both <em>use</em> capabilities and <em>work with</em> other agents across boundaries.
+          </p>
+          <p>
+            And yet connectivity is not competence. MCP, ACP, and A2A make it <em>possible</em> for a
+            model to reach tools, data, and peers — but they say nothing about <em>what</em> information
+            you should actually place in front of the model on any given turn. A returns agent with
+            perfect protocols and a badly assembled context window still fails. Deciding what goes into
+            that finite window, and in what shape, is its own discipline.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 14</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              Here is the honest ordering bridge. Chapters 11–13 gave Exponential AI the plumbing:
+              access to tools (MCP) and communication with peers (ACP/A2A). But plumbing only
+              <em>delivers</em> information — it doesn't decide what belongs in the model's limited
+              attention. <strong>Context engineering</strong> is the deliberate discipline of assembling
+              exactly the right context — instructions, retrieved knowledge, tool results, memory — into
+              that finite window. <a href="14_context_engineering.html">Chapter 14 — Context
+              Engineering</a> is where protocols stop and craftsmanship begins.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 13 of 20 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

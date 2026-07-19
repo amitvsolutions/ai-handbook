@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="14" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 14 — Context Engineering · Exponential AI Handbook</title>
+  <meta name="description" content="Context engineering: treating the finite context window as a managed budget — selecting, compressing, ordering, and formatting instructions, retrieved knowledge, tool results, and memory so the model reasons well." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 14 — Context Engineering · Exponential AI Handbook" />
+  <meta property="og:description" content="Context engineering: treating the finite context window as a managed budget — selecting, compressing, ordering, and formatting instructions, retrieved knowledge, tool results, and memory so the model reasons well." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 14 — Context Engineering · Exponential AI Handbook" />
+  <meta name="twitter:description" content="Context engineering: treating the finite context window as a managed budget — selecting, compressing, ordering, and formatting instructions, retrieved knowledge, tool results, and memory so the model reasons well." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 20 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-layer-group"></i> Chapter 14 · Designing the Window</span>
+          <h1 class="chapter-title">Context Engineering: what goes in front of the model</h1>
+          <p class="chapter-lede">
+            Protocols can deliver any tool result, document, or peer message into an agent — but the
+            model only ever sees a finite context window. Context engineering is the deliberate
+            discipline of deciding <em>what</em> to put in that window, in what shape, and in what order,
+            on every single turn. It is where Exponential AI's plumbing turns into performance.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off — the ordering bridge</h2>
+          <p>
+            Chapters 11–13 built the connectivity stack: <a href="11_mcp.html">MCP</a> for tools and
+            data, <a href="12_acp.html">ACP</a> and <a href="13_a2a.html">A2A</a> for talking to other
+            agents. Notice what all three have in common — they make information <em>reachable</em>.
+            None of them decides what actually belongs in the model's attention on a given turn. That's
+            the honest reason context engineering appears <em>after</em> the protocols: only once you can
+            fetch anything from anywhere does the real problem become obvious — you can now fetch far
+            more than the model can use, and stuffing it all in makes things worse, not better.
+          </p>
+          <p>
+            The model's <strong>context window</strong> is a hard, finite budget of tokens. Everything
+            competes for it: the system prompt, instructions, retrieved documents, tool outputs,
+            conversation history, and memory. <strong>Context engineering</strong> is the practice of
+            curating that budget — selecting, compressing, ordering, and formatting exactly the right
+            information so the model can reason well. If <a href="06_prompt_engineering.html">prompt
+            engineering</a> (Ch 6) was about wording the instruction, context engineering is about
+            assembling the entire payload around it.
+          </p>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Treat the context window as a managed budget; assemble system + instructions + knowledge + tool results + memory deliberately; apply compression, selection, and ordering; avoid "lost in the middle"; and see where enterprise knowledge modeling (context ontology) fits.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why context engineering became a discipline</h2>
+          <p>
+            It exists because more context is not better context. As Exponential AI's agents gained
+            retrieval and tools, the naïve instinct was to pour everything in: the full policy manual,
+            the entire order history, every tool result. But long, noisy contexts degrade reasoning,
+            raise cost and latency (every token is paid for — Ch 16), and cause the model to miss the one
+            fact that mattered. The bottleneck moved from "can we get the information?" to "can we
+            present the <em>right</em> information clearly?"
+          </p>
+          <p>
+            There's also a reliability angle. Agents run many turns, and each turn re-assembles context.
+            Without discipline, history balloons, stale facts linger, retrieved chunks contradict each
+            other, and behaviour drifts unpredictably. Context engineering exists to make the assembled
+            input <em>deliberate and repeatable</em> — a designed artifact rather than an accidental pile
+            of whatever the plumbing happened to deliver.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given a finite context window and far more potentially-relevant information than fits, select,
+            compress, order, and format the subset that maximises the model's chance of producing a
+            correct, grounded response for this specific turn — repeatably, at acceptable cost and
+            latency, across long multi-turn interactions.
+          </p>
+          <p>
+            Two constraints make it hard. First, <strong>capacity</strong>: even large windows are finite,
+            and filling them costs money and time and can dilute attention. Second,
+            <strong>position sensitivity</strong>: models attend unevenly, often weighting the beginning
+            and end of the context more than the middle (the "lost in the middle" effect). So it isn't
+            only <em>what</em> you include but <em>where</em> — the same facts placed badly can be
+            effectively invisible.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>Packing a small backpack</h4>
+              <p>You can't take everything on the trip. Context engineering is choosing exactly the few items you'll actually need — and packing them so the important things are on top.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Assembling the payload</h4>
+              <p>Build the context from parts: system, instructions, few-shot, retrieved knowledge, tool results, memory. Select and compress each to fit the token budget; order for salience.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>A managed context pipeline</h4>
+              <p>Context becomes a first-class, versioned pipeline: retrieval + ranking + summarisation + memory policy + formatting, tuned against evals and cost, feeding every model call.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From prompt wording to context systems</h2>
+          <p>
+            The field grew as windows grew and as agents made context dynamic rather than static.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>Prompt era</h4><p>Focus on wording a single, mostly-static prompt (Ch 6).</p></div>
+              <div class="timeline-item"><h4>RAG era</h4><p>Retrieval injects dynamic knowledge (Ch 7) — now context is assembled, not written.</p></div>
+              <div class="timeline-item"><h4>Agent era</h4><p>Multi-turn tool use and memory make context change every step — curation becomes essential.</p></div>
+              <div class="timeline-item"><h4>Context engineering</h4><p>Named as its own discipline: selecting, compressing, ordering, and governing what fills the window.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>Anatomy of an assembled context</h2>
+          <p>
+            A well-engineered context is built from distinct layers, each with a job. The
+            <strong>system layer</strong> sets role, rules, and tone. The <strong>instruction
+            layer</strong> states the current task. <strong>Few-shot examples</strong> demonstrate
+            format and edge cases. The <strong>knowledge layer</strong> holds retrieved, ranked, and
+            compressed documents (from RAG, Ch 7). The <strong>tool-result layer</strong> carries recent
+            observations from MCP tool calls. The <strong>memory layer</strong> supplies relevant
+            long-term facts and a summarised conversation history. Finally a <strong>scratchpad</strong>
+            may hold the agent's working notes or plan.
+          </p>
+          <p>
+            The engineering is in the <em>policies</em> that fill each layer under a shared budget: how
+            many retrieved chunks and after what reranking; how aggressively to summarise history; which
+            memories to recall; how to order the layers for salience (typically stable instructions
+            first, the freshest and most task-critical material near the end). This is also where
+            <strong>context ontology</strong> lives — modeling enterprise knowledge (entities like
+            <em>order</em>, <em>customer</em>, <em>policy</em> and their relationships) so retrieval and
+            assembly pull coherent, correctly-scoped facts rather than random text. We treat ontology
+            here conservatively: it's enterprise knowledge modeling applied to context selection, not a
+            single prescriptive standard.
+          </p>
+          <p>
+            A useful way to see the whole architecture is as a competition for scarce space, arbitrated
+            by a budget. Every layer <em>wants</em> more room — retrieval would happily add ten more
+            chunks, history would keep every turn, tool output would paste its full JSON — but the budget
+            is fixed, so the assembler must rank layers against each other, not just within them. That
+            arbitration is the real engineering: it is not enough to summarise history well if doing so
+            frees space that then gets wasted on low-value documents. The best context pipelines treat
+            the window like a portfolio, continuously reallocating tokens to whichever layer yields the
+            most reasoning value for this specific turn, and they make that policy explicit and testable
+            rather than leaving it to whatever order the plumbing happened to append things in.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>Assembling context for a returns query</h2>
+          <ol>
+            <li><strong>Fix the budget.</strong> Reserve tokens for output; the rest is the input budget.</li>
+            <li><strong>Anchor.</strong> Add system rules + the current instruction (stable, near the top).</li>
+            <li><strong>Retrieve &amp; rank.</strong> Pull top policy/order chunks via RAG; rerank; keep the best few.</li>
+            <li><strong>Compress.</strong> Summarise long history and verbose tool output to fit.</li>
+            <li><strong>Recall memory.</strong> Add only the customer facts relevant to this turn.</li>
+            <li><strong>Order &amp; format.</strong> Place the most task-critical material last; label sections clearly.</li>
+          </ol>
+          <p class="code-label">A budgeted context assembler, sketched</p>
+          <pre><code class="language-python">def build_context(query, budget):
+    parts = [system_rules(), instruction(query)]        # stable, top
+    docs  = rerank(retrieve(query))[:MAX_DOCS]          # select
+    hist  = summarize(history) if too_long(history) else history
+    mem   = recall_relevant(query)                      # not everything
+    parts += [format(mem), format(docs), format(hist)]  # salient last
+    return trim_to(parts, budget)                       # enforce budget</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture context engineering</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-suitcase-rolling"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Briefing a busy expert: you don't dump every file on their desk. You hand them a one-page brief with exactly the relevant facts, most important first. That brief is engineered context.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-building"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>An executive summary: analysts distill mountains of data into the few decision-relevant points, structured so the executive can act without reading everything.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-microchip"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A CPU cache with a tiny budget: you can't hold all of memory, so you decide what's hot, evict the stale, and keep the working set that maximises hits.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-camera"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Framing a photograph: the skill isn't capturing everything, it's choosing what's in the frame and what's cropped out so the subject is unmistakable.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>The context window as a budget</h2>
+          <pre class="ascii">  |=================== CONTEXT WINDOW (finite tokens) ===================|
+  [ system ][ instruction ][ few-shot ][ retrieved+ranked docs ]
+                          [ summarized history ][ relevant memory ]
+                                            [ freshest / most critical ]  <-- near end
+  |----- reserved for OUTPUT -----|
+     goal: fit the RIGHT subset, salient items where the model looks</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>The context assembly pipeline</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart LR
+    Q["User / task turn"] --> R["Retrieve (RAG)"]
+    R --> K["Rerank + select"]
+    H["History"] --> S["Summarise"]
+    M["Long-term memory"] --> F["Recall relevant"]
+    K --> A["Assemble under token budget"]
+    S --> A
+    F --> A
+    SYS["System + instruction"] --> A
+    A --> O["Order for salience"] --> LLM(["Model call"])
+            </div>
+            <p class="diagram-caption">Figure 14.1 — Context is produced by a pipeline, not written by hand.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>Prompt engineering vs context engineering</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Aspect</th><th>Prompt engineering (Ch 6)</th><th>Context engineering</th></tr></thead>
+              <tbody>
+                <tr><td>Focus</td><td>Wording the instruction</td><td>Assembling the whole payload</td></tr>
+                <tr><td>Scope</td><td>Mostly one static prompt</td><td>Dynamic, per-turn assembly</td></tr>
+                <tr><td>Inputs</td><td>Instruction + a few examples</td><td>+ retrieval, tools, memory, history</td></tr>
+                <tr><td>Key constraint</td><td>Clarity</td><td>Token budget + position</td></tr>
+                <tr><td>Failure mode</td><td>Ambiguous ask</td><td>Overstuffed / lost-in-middle</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Context layers and their jobs</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Layer</th><th>Job</th><th>Typical technique</th></tr></thead>
+              <tbody>
+                <tr><td>System</td><td>Role, rules</td><td>Stable, cached</td></tr>
+                <tr><td>Instruction</td><td>This task</td><td>Specific, near top</td></tr>
+                <tr><td>Knowledge</td><td>Grounding facts</td><td>Retrieve + rerank + trim</td></tr>
+                <tr><td>Tool results</td><td>Fresh observations</td><td>Compress verbose output</td></tr>
+                <tr><td>Memory/history</td><td>Continuity</td><td>Summarise; recall relevant</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Techniques for fitting the budget</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Technique</th><th>When</th><th>Trade-off</th></tr></thead>
+              <tbody>
+                <tr><td>Selection/reranking</td><td>Too many candidates</td><td>May drop a needed fact</td></tr>
+                <tr><td>Summarisation</td><td>Long history/docs</td><td>Loses detail</td></tr>
+                <tr><td>Chunk sizing</td><td>Large documents</td><td>Granularity vs coherence</td></tr>
+                <tr><td>Ordering</td><td>Position sensitivity</td><td>Needs tuning per model</td></tr>
+                <tr><td>Pruning/eviction</td><td>Long-running agents</td><td>Risk forgetting</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Why it pays off — and where it bites</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Better accuracy</strong> — the right facts, clearly placed.</li>
+                <li><strong>Lower cost &amp; latency</strong> — fewer wasted tokens (Ch 16).</li>
+                <li><strong>More reliable agents</strong> over long runs.</li>
+                <li><strong>Reproducible behaviour</strong> — context is designed, not accidental.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages</h3>
+              <ul>
+                <li><strong>Extra pipeline</strong> to build, tune, and evaluate.</li>
+                <li><strong>Summarisation loss</strong> can drop the crucial detail.</li>
+                <li><strong>Model-specific tuning</strong> (windows, position effects) differs.</li>
+                <li><strong>Harder to debug</strong> — behaviour depends on assembled input.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Engineering context well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Budget explicitly</strong>; reserve output tokens first.</li>
+                <li><strong>Rerank then trim</strong> retrieved knowledge.</li>
+                <li><strong>Summarise history</strong> instead of letting it grow unbounded.</li>
+                <li><strong>Put the most critical facts</strong> where the model attends.</li>
+                <li><strong>Evaluate</strong> context changes against a test set (Ch 17).</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>"Stuff it all in"</strong> because the window is large.</li>
+                <li><strong>Unbounded history</strong> that grows every turn.</li>
+                <li><strong>Dumping raw tool output</strong> without compression.</li>
+                <li><strong>Ignoring position</strong> — burying key facts in the middle.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>How is context engineering different from prompt engineering?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Prompt engineering words the instruction; context engineering assembles the entire per-turn payload — system, instruction, retrieved knowledge, tool results, memory — under a finite token budget, ordered for salience.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What is "lost in the middle"?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Models tend to attend more to the start and end of the context than the middle, so information buried mid-context can be effectively ignored. Placement, not just inclusion, matters.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why isn't a bigger context window a full solution?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Bigger windows still cost more per token, add latency, and can dilute attention with noise. Curation usually beats brute-force stuffing even when the window is large.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Where does context ontology fit?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>As enterprise knowledge modeling — defining entities and relationships so retrieval and assembly select coherent, correctly-scoped facts. Treat it as a modeling aid, not a rigid standard.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">Treat context as a versioned pipeline with an explicit token budget, tuned against evals (Ch 17) and cost (Ch 16). The architect's job is to make "what the model sees" a controlled, observable artifact — because at Exponential AI's scale, a 10% context improvement compounds across millions of calls.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">To "be safe," a team injects the entire 40-page returns policy into every call. Cost triples, latency spikes, and accuracy <em>drops</em> because the one relevant clause is buried on page 30. Curation — three ranked, trimmed chunks — beats the whole manual.</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Equating a big window with "no need to curate."</strong></li>
+            <li><strong>Letting history grow unbounded</strong> across turns.</li>
+            <li><strong>Pasting raw, verbose tool output</strong> into context.</li>
+            <li><strong>Never measuring</strong> the effect of context changes.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>The context won't fit — what do you cut?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["Assembled context &gt; budget"]) --> H{"Is history the bulk?"}
+    H -->|Yes| SUM["Summarise / prune old turns"]
+    H -->|No| D{"Too many retrieved docs?"}
+    D -->|Yes| RR["Rerank; keep top-k, trim"]
+    D -->|No| T{"Verbose tool output?"}
+    T -->|Yes| C["Compress tool results"]
+    T -->|No| M["Drop low-relevance memory; re-order salient last"]
+            </div>
+            <p class="diagram-caption">Figure 14.2 — Cut by category, worst offender first; preserve the task-critical facts.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before shipping a context pipeline</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Explicit token budget, output reserved.</li>
+            <li><i class="fa-solid fa-square-check"></i> Retrieval reranked and trimmed to top-k.</li>
+            <li><i class="fa-solid fa-square-check"></i> History summarised, not unbounded.</li>
+            <li><i class="fa-solid fa-square-check"></i> Tool output compressed.</li>
+            <li><i class="fa-solid fa-square-check"></i> Critical facts placed for salience.</li>
+            <li><i class="fa-solid fa-square-check"></i> Context changes measured against evals.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="Context engineering assembles the whole per-turn payload under a token budget.">
+              <p class="q-text">1. Context engineering is mainly about…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Wording one static prompt</button>
+                <button class="quiz-option" data-correct="true">Assembling the right context under a token budget</button>
+                <button class="quiz-option">Training the model</button>
+                <button class="quiz-option">Choosing a GPU</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Models attend less to the middle — placement matters.">
+              <p class="q-text">2. "Lost in the middle" means…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">The model forgets its weights</button>
+                <button class="quiz-option" data-correct="true">Mid-context info is under-attended</button>
+                <button class="quiz-option">Tokens are dropped randomly</button>
+                <button class="quiz-option">RAG fails silently</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Curation usually beats stuffing even with big windows; tokens cost money and attention dilutes.">
+              <p class="q-text">3. A bigger context window means you can…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Stop curating entirely</button>
+                <button class="quiz-option" data-correct="true">Still benefit from curation (cost + focus)</button>
+                <button class="quiz-option">Ignore token cost</button>
+                <button class="quiz-option">Skip retrieval</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Ontology models entities/relationships to select coherent, scoped facts.">
+              <p class="q-text">4. Context ontology helps by…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Compressing images</button>
+                <button class="quiz-option" data-correct="true">Modeling knowledge so retrieval selects coherent facts</button>
+                <button class="quiz-option">Replacing the model</button>
+                <button class="quiz-option">Increasing the window size</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            Context engineering is the discipline that turns reachable information into effective
+            reasoning. The context window is a finite, paid-for budget; more is not better. By assembling
+            deliberate layers — system, instruction, ranked knowledge, compressed tool results, and
+            relevant memory — and ordering them for salience, Exponential AI gets more accurate, cheaper,
+            and more reliable agents. It appears after the protocols because only once you can fetch
+            anything does choosing <em>what</em> to show the model become the decisive skill; and it
+            extends prompt engineering from wording an instruction to designing the entire payload,
+            optionally guided by enterprise knowledge modeling (context ontology).
+          </p>
+          <p>
+            But there's a danger hiding in all this power. We can now reach any tool, talk to any agent,
+            and assemble any context — which means a mistake, an injection, or a bad instruction can now
+            <em>do</em> real things: issue refunds, email customers, change records. Capability without
+            constraint is a liability. Before Exponential AI lets agents act at scale, it needs to bound
+            what they're allowed to do.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 15</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              Connectivity (11–13) plus well-engineered context (14) makes Exponential AI's agents
+              genuinely capable — and therefore genuinely risky. An agent that can act needs
+              boundaries: input/output validation, policy enforcement, human approval on high-stakes
+              actions, and protection against prompt injection. <a href="15_guardrails.html">Chapter 15
+              — Guardrails</a> is where capability meets control.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 14 of 20 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

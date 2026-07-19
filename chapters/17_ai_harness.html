@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="17" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 17 — AI Harness &amp; Evaluations · Exponential AI Handbook</title>
+  <meta name="description" content="The AI harness: golden datasets, metrics, LLM-as-judge, offline eval as a CI regression gate, and online observability that turns probabilistic AI quality into a measured, regression-proof property." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 17 — AI Harness &amp; Evaluations · Exponential AI Handbook" />
+  <meta property="og:description" content="The AI harness: golden datasets, metrics, LLM-as-judge, offline eval as a CI regression gate, and online observability that turns probabilistic AI quality into a measured, regression-proof property." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 17 — AI Harness &amp; Evaluations · Exponential AI Handbook" />
+  <meta name="twitter:description" content="The AI harness: golden datasets, metrics, LLM-as-judge, offline eval as a CI regression gate, and online observability that turns probabilistic AI quality into a measured, regression-proof property." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 20 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-vials"></i> Chapter 17 · Knowing It Works</span>
+          <h1 class="chapter-title">The AI Harness: evaluation, testing, and observability</h1>
+          <p class="chapter-lede">
+            Every decision so far — routing to a cheaper model, trimming context, tuning a guardrail —
+            assumed Exponential AI can tell whether the system still works. Because LLMs are
+            probabilistic, "it looked fine" is not evidence. An evaluation harness turns AI quality into
+            something measured, regression-tested, and monitored in production — the difference between
+            hoping and knowing.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            The last two chapters repeated a phrase like a refrain: "validate on evals." Guardrails
+            (Ch 15) must be proven to catch what they claim; cost optimisations (Ch 16) must be proven not
+            to degrade quality. But we never said <em>how</em>. That's this chapter. Traditional software
+            is deterministic — the same input gives the same output, so a unit test either passes or
+            fails. LLMs are probabilistic: the same prompt can yield different answers, "correct" is often
+            a matter of degree, and a change that helps one case can silently break ten others.
+          </p>
+          <p>
+            An <strong>AI harness</strong> is the evaluation-and-observability infrastructure that makes
+            such a system manageable. It combines <strong>offline evaluation</strong> (run candidate
+            prompts/models against curated test sets before shipping), <strong>online evaluation and
+            observability</strong> (trace, sample, and score real production traffic), and
+            <strong>regression testing</strong> (block changes that make things worse). Without it, every
+            model swap or prompt tweak is a gamble; with it, Exponential AI can iterate quickly and safely
+            because it can always answer "did that change help or hurt?"
+          </p>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Build a golden test set; pick metrics (accuracy, groundedness, safety); use LLM-as-judge carefully; run offline vs online evals; wire evals into CI as regression gates; and trace production behaviour.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why evaluation is its own discipline</h2>
+          <p>
+            It exists because you cannot improve or even safely maintain what you cannot measure, and
+            measuring LLMs is genuinely hard. Outputs are open-ended, "correctness" is fuzzy, and quality
+            has many axes at once — is the answer accurate, grounded in the retrieved facts, safe,
+            on-policy, appropriately concise, and cheap? A single "looks good" glance captures none of
+            these reliably, and human review of every output doesn't scale to millions of interactions.
+          </p>
+          <p>
+            It also exists because AI systems <strong>regress in non-obvious ways</strong>. Swapping to a
+            cheaper model, editing the system prompt, or re-chunking the knowledge base can improve some
+            cases while quietly breaking others. Deterministic software catches this with unit tests; AI
+            needs its own analogue — a repeatable, quantitative harness — or teams fly blind and learn
+            about failures from angry customers instead of a dashboard.
+          </p>
+          <p>
+            There is one more reason the discipline earns its own chapter: evaluation is what makes AI
+            development <em>iterative</em> instead of superstitious. In a system where any change might
+            help or hurt in ways you can't eyeball, teams without a harness fall into cargo-cult habits —
+            "we added that sentence to the prompt and things felt better, so leave it." A harness replaces
+            folklore with a feedback loop tight enough to experiment: try a change, measure it, keep it or
+            revert it. That loop is the engine of improvement, and its absence is why so many promising AI
+            prototypes stall the moment they meet real, varied traffic.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given a non-deterministic AI system, provide repeatable, quantitative measures of its quality
+            (and safety and cost) that (a) can be run before deployment against representative cases,
+            (b) can score live production behaviour, (c) detect regressions when prompts/models/data
+            change, and (d) are trustworthy enough to gate releases — despite outputs being open-ended and
+            "correct" being partly subjective.
+          </p>
+          <p>
+            The hard sub-problem is <strong>the judge</strong>: who decides if an open-ended answer is
+            good? Exact-match works only for narrow tasks; humans are accurate but slow and costly;
+            <strong>LLM-as-judge</strong> (using a model to score outputs against a rubric) scales but has
+            its own biases and must itself be validated against human labels. A serious harness blends
+            these deliberately rather than trusting any one blindly.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>An exam with an answer key</h4>
+              <p>You give the AI a set of questions whose good answers you know, and grade how many it gets right — every time you change something.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Test sets + metrics + judges</h4>
+              <p>Curate golden datasets, define metrics (accuracy, groundedness, safety), score with rules/LLM-judge/humans, and run offline before release plus online in production.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>Evals as CI + observability</h4>
+              <p>Evals gate every change in CI; production traffic is traced and sampled for continuous scoring; regressions block releases. Quality becomes an engineered, monitored property.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From vibes to eval-driven development</h2>
+          <p>
+            AI evaluation matured from academic benchmarks into everyday production engineering.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>Benchmarks</h4><p>Academic datasets score models in general — but not your task.</p></div>
+              <div class="timeline-item"><h4>"Vibe checks"</h4><p>Teams eyeball a few outputs; unreliable and unrepeatable.</p></div>
+              <div class="timeline-item"><h4>Task-specific evals</h4><p>Golden sets + metrics tailored to the real workload appear.</p></div>
+              <div class="timeline-item"><h4>Eval-driven development</h4><p>LLM-as-judge, CI gates, and production tracing make evaluation continuous.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>Inside an evaluation harness</h2>
+          <p>
+            The foundation is the <strong>dataset</strong>: a curated, versioned set of representative
+            cases — real and synthetic queries, tricky edge cases, and known failures — often with
+            reference answers or rubrics ("golden set"). Then <strong>metrics</strong> define what good
+            means for this task: task accuracy, <em>groundedness/faithfulness</em> (does the answer stick
+            to retrieved facts?), hallucination rate, safety/policy compliance, format validity, plus
+            latency and cost. Then <strong>scorers</strong> apply those metrics: deterministic checks
+            (exact match, schema, regex), model-based judges (LLM-as-judge against a rubric), and human
+            review for the hardest or highest-stakes samples.
+          </p>
+          <p>
+            Around that core sit two runtimes. <strong>Offline evaluation</strong> runs a candidate
+            configuration over the dataset and reports scores, ideally wired into <strong>CI</strong> as a
+            regression gate so a prompt or model change that lowers a metric can't merge.
+            <strong>Online evaluation and observability</strong> traces production calls (inputs, context,
+            tool calls, outputs, cost, latency), samples them for scoring, watches live quality/safety
+            metrics, and feeds newly-discovered failures back into the dataset. A mature harness also
+            supports <strong>A/B tests</strong> to compare variants on real traffic and
+            <strong>red-teaming</strong> to probe for safety failures — which is exactly the bridge into
+            security next chapter.
+          </p>
+          <p>
+            A recurring design question is how the offline and online halves stay honest with each other.
+            The golden set is only as good as its coverage, and production always finds cases nobody
+            imagined — a customer phrasing a return in a new dialect, a product category that didn't exist
+            when the set was built. So the harness is a loop, not a pipeline: traces from production are
+            triaged, the interesting failures are labelled and promoted into the golden set, and the next
+            offline run is measured against a dataset that has grown to include yesterday's surprises.
+            Over time this makes the offline gate an increasingly faithful proxy for reality, which is the
+            whole point — you want the test that runs in seconds to predict the behaviour that would
+            otherwise take weeks of live traffic to reveal.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>Evaluating a change to the returns agent</h2>
+          <ol>
+            <li><strong>Curate.</strong> Assemble 200 representative returns queries with reference outcomes and edge cases.</li>
+            <li><strong>Define metrics.</strong> Resolution accuracy, groundedness, policy-safety, cost/latency.</li>
+            <li><strong>Baseline.</strong> Run the current config; record scores.</li>
+            <li><strong>Candidate.</strong> Run the proposed change (cheaper model + trimmed context).</li>
+            <li><strong>Compare &amp; gate.</strong> Accept only if quality holds within tolerance; CI blocks regressions.</li>
+            <li><strong>Monitor.</strong> After release, trace and sample live traffic; add new failures to the set.</li>
+          </ol>
+          <p class="code-label">An eval gate, sketched</p>
+          <pre><code class="language-python">def eval_suite(config, dataset):
+    scores = []
+    for case in dataset:
+        out = run(config, case.input)
+        scores.append({
+          "accuracy":  judge(out, case.reference),      # LLM-as-judge + rules
+          "grounded":  groundedness(out, case.context),
+          "safe":      policy_check(out),
+        })
+    return aggregate(scores)
+
+base, cand = eval_suite(CURRENT, DATA), eval_suite(CANDIDATE, DATA)
+assert cand["accuracy"] &gt;= base["accuracy"] - TOL   # regression gate</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture the harness</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-graduation-cap"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A standardised exam: the same question bank, graded the same way, lets you compare students (model versions) fairly and track improvement over time.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-industry"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Quality assurance on a production line: sample outputs, measure against spec, and stop the line when defect rates rise.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-flask-vial"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A test suite + CI: nothing merges without passing; but here tests are probabilistic, so you gate on aggregate scores and tolerances, not pass/fail per case.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-heart-pulse"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Observability/APM for AI: traces, metrics, and alerts — but the "errors" include hallucination, ungroundedness, and policy violations, not just exceptions.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>The eval loop</h2>
+          <pre class="ascii">  [ golden dataset ] --> [ run config ] --> [ scorers ]
+        ^                                    rules / LLM-judge / human
+        |                                         |
+        |                                         v
+   add new failures <---- [ production traces ] [ scores + report ]
+        (online)                                   |
+                                          CI gate: block regressions
+                                                    |
+                                              ship / rollback</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>Offline gate + online monitoring</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    Ch["Prompt/model/data change"] --> Off["Offline eval on golden set"]
+    Off --> G{"Scores &gt;= baseline?"}
+    G -->|No| Block["Block / iterate"]
+    G -->|Yes| Ship["Release"]
+    Ship --> Trace["Trace + sample production"]
+    Trace --> Score["Online scoring (judge + human)"]
+    Score --> Mon{"Live quality/safety OK?"}
+    Mon -->|No| Roll["Alert / rollback"]
+    Mon -->|Yes| Learn["Add failures to dataset"]
+    Learn --> Off
+            </div>
+            <p class="diagram-caption">Figure 17.1 — Evals gate releases and monitor production; production feeds the dataset.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>Offline vs online evaluation</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Aspect</th><th>Offline</th><th>Online</th></tr></thead>
+              <tbody>
+                <tr><td>When</td><td>Before release (CI)</td><td>In production</td></tr>
+                <tr><td>Data</td><td>Curated golden set</td><td>Real traffic (sampled)</td></tr>
+                <tr><td>Purpose</td><td>Gate regressions</td><td>Catch real-world drift</td></tr>
+                <tr><td>Speed of signal</td><td>Immediate</td><td>Continuous</td></tr>
+                <tr><td>Limitation</td><td>May miss real cases</td><td>Ground truth is scarce</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Scoring methods</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Method</th><th>Scales?</th><th>Accuracy</th><th>Best for</th></tr></thead>
+              <tbody>
+                <tr><td>Deterministic (rules)</td><td>Yes</td><td>Exact where applicable</td><td>Schema, exact-match, safety regex</td></tr>
+                <tr><td>LLM-as-judge</td><td>Yes</td><td>Good if validated</td><td>Open-ended quality, groundedness</td></tr>
+                <tr><td>Human review</td><td>No</td><td>Highest</td><td>High-stakes, judge validation</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Common metrics</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Metric</th><th>Question it answers</th></tr></thead>
+              <tbody>
+                <tr><td>Task accuracy</td><td>Did it get the right outcome?</td></tr>
+                <tr><td>Groundedness</td><td>Is it supported by retrieved facts?</td></tr>
+                <tr><td>Hallucination rate</td><td>How often does it invent things?</td></tr>
+                <tr><td>Safety/policy</td><td>Does it violate rules?</td></tr>
+                <tr><td>Cost / latency</td><td>Is it affordable and fast?</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Benefits and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Safe, fast iteration</strong> — change with confidence.</li>
+                <li><strong>Catches regressions</strong> before customers do.</li>
+                <li><strong>Enables cost work</strong> (Ch 16) without quality loss.</li>
+                <li><strong>Quantifies safety</strong> and compliance.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages</h3>
+              <ul>
+                <li><strong>Dataset effort</strong> — curating/maintaining golden sets.</li>
+                <li><strong>Judge bias</strong> — LLM-judges need validation.</li>
+                <li><strong>Metric myopia</strong> — optimising the measurable, missing the rest.</li>
+                <li><strong>Cost</strong> — evals themselves consume tokens/compute.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Evaluation done well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Build a task-specific golden set</strong> from real cases; version it.</li>
+                <li><strong>Validate LLM-judges</strong> against human labels.</li>
+                <li><strong>Gate CI on evals</strong>; block regressions.</li>
+                <li><strong>Trace production</strong> and feed failures back into the set.</li>
+                <li><strong>Track cost/latency</strong> alongside quality.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Vibe-check only</strong> — a few eyeballed outputs.</li>
+                <li><strong>Trusting a judge</strong> you never validated.</li>
+                <li><strong>Static dataset</strong> that never learns from production.</li>
+                <li><strong>Gaming one metric</strong> at the expense of others.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why can't you test an LLM like normal software?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>It's non-deterministic and outputs are open-ended, so pass/fail per case doesn't apply. You gate on aggregate scores over a representative dataset, with tolerances, not exact equality.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What is LLM-as-judge and its risk?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Using a model to score outputs against a rubric. It scales but has biases (verbosity, position, self-preference), so it must be validated against human labels and used with care.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Offline vs online evaluation?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Offline runs candidates against a curated set before release (regression gate); online traces and samples real traffic to catch drift and real-world failures. You need both.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What is groundedness and why measure it?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Whether an answer is actually supported by the retrieved context rather than invented. It's the key metric for RAG systems (Ch 7) and a direct proxy for hallucination risk.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">The harness is the enabler of everything else in this book: you can only route models, trim context, and tune guardrails aggressively <em>because</em> evals tell you whether quality held. Invest early — a good golden set and a validated judge pay for themselves the first time they block a bad release.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">To cut cost, a team swaps in a smaller model. It looks fine on ten manual checks and ships. Two weeks later, resolution rate has quietly dropped 8% and complaints spike. With an eval gate, the regression would have blocked the merge on day one.</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Shipping on "vibe checks"</strong> instead of measured evals.</li>
+            <li><strong>Never validating the LLM-judge</strong> against humans.</li>
+            <li><strong>A dataset that never grows</strong> from production failures.</li>
+            <li><strong>Optimising one metric</strong> and regressing others.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>How should I score this output?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["Need to score outputs"]) --> D{"Objective/exact answer?"}
+    D -->|Yes| Rules["Deterministic check"]
+    D -->|No| H{"High-stakes or judge<br/>not yet validated?"}
+    H -->|Yes| Human["Human review"]
+    H -->|No| Judge["LLM-as-judge (validated) + spot human checks"]
+    Rules --> CI["Wire into CI regression gate"]
+    Judge --> CI
+    Human --> CI
+            </div>
+            <p class="diagram-caption">Figure 17.2 — Match the scorer to the task; always gate CI on the result.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before trusting an AI change</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Versioned golden dataset of real + edge cases.</li>
+            <li><i class="fa-solid fa-square-check"></i> Metrics cover quality, safety, cost, latency.</li>
+            <li><i class="fa-solid fa-square-check"></i> LLM-judge validated against human labels.</li>
+            <li><i class="fa-solid fa-square-check"></i> Offline eval gates CI; regressions block.</li>
+            <li><i class="fa-solid fa-square-check"></i> Production traced and sampled for scoring.</li>
+            <li><i class="fa-solid fa-square-check"></i> New failures fed back into the dataset.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="LLMs are non-deterministic and open-ended, so you gate on aggregate scores, not per-case pass/fail.">
+              <p class="q-text">1. AI evals differ from unit tests because…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">They never fail</button>
+                <button class="quiz-option" data-correct="true">Outputs are probabilistic; gate on aggregate scores</button>
+                <button class="quiz-option">They don't use data</button>
+                <button class="quiz-option">They run only in production</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="LLM-as-judge scales but must be validated against human labels.">
+              <p class="q-text">2. LLM-as-judge should always be…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Trusted blindly</button>
+                <button class="quiz-option" data-correct="true">Validated against human labels</button>
+                <button class="quiz-option">Avoided entirely</button>
+                <button class="quiz-option">Used only offline</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Groundedness measures whether an answer is supported by retrieved context.">
+              <p class="q-text">3. Groundedness measures whether an answer is…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Short</button>
+                <button class="quiz-option" data-correct="true">Supported by the retrieved facts</button>
+                <button class="quiz-option">Fast</button>
+                <button class="quiz-option">Cheap</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Offline gates regressions pre-release; online catches real-world drift. Use both.">
+              <p class="q-text">4. You need offline AND online evaluation because…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Offline is enough alone</button>
+                <button class="quiz-option" data-correct="true">One gates releases, the other catches real-world drift</button>
+                <button class="quiz-option">Online replaces testing</button>
+                <button class="quiz-option">They measure cost only</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            An AI harness turns quality from an opinion into a measurement. Its core is a versioned golden
+            dataset, task-specific metrics (accuracy, groundedness, safety, cost, latency), and scorers
+            that blend deterministic rules, validated LLM-as-judge, and human review. Offline evaluation
+            gates releases in CI so regressions can't merge; online evaluation and observability trace
+            production, catch drift, and feed new failures back into the dataset. This harness is what
+            made every earlier chapter's advice actionable — you can route models, trim context, and tune
+            guardrails aggressively precisely because you can prove quality held.
+          </p>
+          <p>
+            And notice where the harness naturally points: to make a system robust you deliberately probe
+            it with hard and adversarial cases — red-teaming. Doing that seriously means thinking like an
+            attacker: what inputs make the agent leak data, exceed its authority, or get hijacked? That
+            adversarial mindset is the doorway to security.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 18</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              Evaluation and red-teaming force Exponential AI to ask "how could this go wrong on purpose?"
+              — which is precisely the security question. Agents that read untrusted text, call tools, and
+              talk to other agents present novel attack surfaces: prompt injection, data exfiltration,
+              tool abuse, and over-privileged access. <a href="18_ai_security.html">Chapter 18 — AI
+              Security</a> turns the adversarial mindset into a defensive architecture.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 17 of 20 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

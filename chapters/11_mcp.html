@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="11" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 11 — Model Context Protocol · Exponential AI Handbook</title>
+  <meta name="description" content="MCP: one open client-server standard that turns the M×N tool-integration explosion into M+N — tools, resources, and prompts for connecting any model to any tool or data source at Exponential AI." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 11 — Model Context Protocol · Exponential AI Handbook" />
+  <meta property="og:description" content="MCP: one open client-server standard that turns the M×N tool-integration explosion into M+N — tools, resources, and prompts for connecting any model to any tool or data source at Exponential AI." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 11 — Model Context Protocol · Exponential AI Handbook" />
+  <meta name="twitter:description" content="MCP: one open client-server standard that turns the M×N tool-integration explosion into M+N — tools, resources, and prompts for connecting any model to any tool or data source at Exponential AI." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 20 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-plug"></i> Chapter 11 · The Universal Plug</span>
+          <h1 class="chapter-title">Model Context Protocol: one standard for tools and data</h1>
+          <p class="chapter-lede">
+            Every agent Exponential AI built reached its tools and data through bespoke, one-off
+            integrations — a new adapter for every model-and-system pair. MCP replaces that M×N sprawl
+            with a single open protocol: a universal plug that lets any model talk to any tool or data
+            source through one well-defined interface. This is the chapter that tames the mess agents
+            created.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off — and why MCP comes now</h2>
+          <p>
+            Let's be honest about the ordering. Agents (<a href="08_agents.html">Chapter 8</a>), agentic
+            systems (<a href="09_agentic_ai.html">Chapter 9</a>), and LangGraph orchestration
+            (<a href="10_langgraph.html">Chapter 10</a>) all quietly assumed the same thing: that an agent
+            can <em>reach</em> a tool or data source. Each of those connections was hand-built — a custom
+            wrapper around the orders API here, a bespoke database client there, a different auth dance
+            for every system. MCP appears <em>after</em> agents not because it logically follows them,
+            but because the pain it solves only becomes unbearable <em>once you have many agents and
+            many tools</em>. The mess had to exist before the standard made sense.
+          </p>
+          <p>
+            And the mess is quadratic. With <em>M</em> AI applications and <em>N</em> tools/data sources,
+            naïve integration means up to <em>M×N</em> custom connectors, each written, secured, and
+            maintained separately. The <strong>Model Context Protocol (MCP)</strong> — an open standard
+            introduced by Anthropic in late 2024 — collapses that to <em>M+N</em>: every tool exposes
+            itself once as an MCP <em>server</em>, every app speaks MCP once as a <em>client</em>, and
+            any client can use any server. It is, deliberately, "the USB-C of AI integrations."
+          </p>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Explain the M×N → M+N argument; describe MCP's client–server model and its three primitives (tools, resources, prompts); contrast MCP with bespoke REST integrations; and see the boundary MCP <em>doesn't</em> cross — agent-to-agent communication — which sets up Chapters 12–13.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why the world invented MCP</h2>
+          <p>
+            MCP exists because integration was quietly becoming the dominant cost of building with LLMs.
+            Every team re-solved the same problems: how to describe a tool to a model, how to pass
+            arguments and get results back, how to expose a document or database read-only, how to
+            handle auth and errors. Each solution was subtly different, none were portable, and a tool
+            built for one framework couldn't be reused by another. The industry was rebuilding the same
+            adapters over and over.
+          </p>
+          <p>
+            History rhymes here. Before USB, every peripheral had its own connector; before ODBC, every
+            application wrote a driver per database; before HTTP, networked apps invented bespoke
+            protocols. In each case a shared standard turned an M×N explosion into an M+N ecosystem and
+            unlocked an explosion of interoperability. MCP is that move for AI tool-and-data access:
+            standardise the interface once, and a tool written by anyone becomes usable by any
+            MCP-speaking application — including Exponential AI's agents, no matter which framework they
+            happen to run on.
+          </p>
+          <p>
+            There is a second, subtler reason MCP exists: <strong>separation of ownership</strong>.
+            When the orders team, the CRM team, and the security team each publish their own MCP server,
+            they own the contract for their system — its scopes, its audit logging, its rate limits —
+            independently of whichever AI application happens to consume it. The bespoke world coupled
+            every integration to a specific app's release cycle and a specific engineer's memory. MCP
+            makes the integration a first-class, independently versioned product with a clear owner, so
+            Exponential AI can evolve its agents and its systems on separate schedules without either
+            side breaking the other.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given many AI applications and many external tools/data sources, provide a single,
+            model-agnostic, framework-agnostic protocol for (a) discovering what a tool offers,
+            (b) invoking actions with typed arguments, (c) exposing read-only context (documents, rows,
+            files), and (d) doing all this with consistent auth, transport, and error semantics — so an
+            integration written once works everywhere.
+          </p>
+          <p>
+            The subtlety is <strong>discovery and self-description</strong>. It isn't enough to call a
+            function; a client must be able to ask a server "what can you do?" and receive a
+            machine-readable catalogue the model can reason about at runtime. MCP therefore defines not
+            just a calling convention but a way for servers to advertise their capabilities, so agents
+            can adapt to new tools without code changes. That dynamic, negotiated interface is what
+            separates a real protocol from yet another SDK.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>A universal power socket</h4>
+              <p>Instead of a different plug for every device, one standard socket fits them all. MCP is that socket for AI: any tool that "fits" can be used by any AI app, no custom wiring.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Client–server over JSON-RPC</h4>
+              <p>An MCP client (in the AI app) connects to MCP servers that expose tools, resources, and prompts. Messages use JSON-RPC; the client discovers capabilities and invokes them uniformly.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>An interoperability layer</h4>
+              <p>MCP decouples AI apps from integrations. Tools become reusable, independently governed services; the M×N connector matrix becomes an M+N ecosystem with consistent security boundaries.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From bespoke wrappers to an open protocol</h2>
+          <p>
+            MCP is young, but it landed on a well-worn path: capability explodes, integration cost
+            explodes with it, then a standard emerges to absorb the chaos.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>2023 — Function calling</h4><p>Models gain structured tool calls — but each tool is wired per app, per framework.</p></div>
+              <div class="timeline-item"><h4>Early 2024 — Plugin sprawl</h4><p>Every platform ships its own plugin/tool format; nothing is portable across ecosystems.</p></div>
+              <div class="timeline-item"><h4>Late 2024 — MCP announced</h4><p>Anthropic open-sources MCP: a client–server standard with tools, resources, and prompts.</p></div>
+              <div class="timeline-item"><h4>2025 — Ecosystem growth</h4><p>MCP servers appear for filesystems, databases, SaaS, and internal systems; multiple vendors adopt the client side.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>Inside MCP: hosts, clients, servers, primitives</h2>
+          <p>
+            MCP uses a <strong>client–server</strong> model. A <strong>host</strong> is the AI
+            application (an IDE assistant, a chat app, one of Exponential AI's agents). Inside it runs
+            one or more <strong>MCP clients</strong>, each maintaining a connection to an <strong>MCP
+            server</strong>. A server is a small program that wraps a specific system — the orders
+            database, a filesystem, a SaaS API — and exposes its capabilities through the protocol.
+            Communication is <strong>JSON-RPC</strong> messages over a transport (local stdio for local
+            servers, or HTTP-based streaming for remote ones).
+          </p>
+          <p>
+            Servers expose three <strong>primitives</strong>. <strong>Tools</strong> are actions the
+            model can invoke (functions with typed inputs/outputs — "issue_refund", "search_orders").
+            <strong>Resources</strong> are read-only data the client can fetch and feed as context
+            (files, records, documents). <strong>Prompts</strong> are reusable templates a server offers
+            to guide the model for common tasks. A client first <strong>discovers</strong> what a server
+            offers, then uses these primitives uniformly — the same way regardless of what system sits
+            behind them. That uniformity is the whole point: the agent's code doesn't change when the
+            tool does.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>An Exponential AI agent uses an MCP server</h2>
+          <ol>
+            <li><strong>Connect.</strong> The agent's MCP client opens a connection to the "orders" MCP server.</li>
+            <li><strong>Discover.</strong> Client asks for capabilities; server returns tools (search_orders, issue_refund) and resources (policy docs).</li>
+            <li><strong>Plan.</strong> The model, seeing the catalogue, decides to call <code>search_orders</code>.</li>
+            <li><strong>Invoke.</strong> Client sends a JSON-RPC tool call with typed args; server executes and returns a result.</li>
+            <li><strong>Ground.</strong> The agent fetches a policy <em>resource</em> and adds it to context.</li>
+            <li><strong>Act.</strong> After checks, it calls <code>issue_refund</code> — the same protocol, a different tool.</li>
+          </ol>
+          <p class="code-label">A capability handshake, sketched</p>
+          <pre><code class="language-json">// client → server
+{"jsonrpc":"2.0","id":1,"method":"tools/list"}
+
+// server → client
+{"jsonrpc":"2.0","id":1,"result":{"tools":[
+  {"name":"search_orders","description":"Find orders by customer or id",
+   "inputSchema":{"type":"object","properties":{"query":{"type":"string"}}}},
+  {"name":"issue_refund","description":"Refund an order (idempotent)",
+   "inputSchema":{"type":"object","properties":{"order_id":{"type":"integer"}}}}
+]}}</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture MCP</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-plug-circle-bolt"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>USB-C. Once every laptop and every peripheral speaks the same port, you stop buying a special cable for each device. MCP is the USB-C port for connecting models to tools and data.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-building"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A standard integration bus. Exponential AI's systems each expose one MCP server; any current or future agent plugs into the bus instead of every team re-integrating every system.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-code"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>ODBC/JDBC for AI tools: a common driver interface so applications talk to many backends through one contract, instead of a bespoke client per backend.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-sitemap"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>The Language Server Protocol (LSP) pattern: one protocol let every editor talk to every language's tooling. MCP does the same for models and external capabilities.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>M×N vs M+N, in plain text</h2>
+          <pre class="ascii">  BEFORE (bespoke):  M apps x N tools = M*N custom connectors
+      app1 --+--x-- orders      app2 --+--x-- orders
+             +--x-- files              +--x-- files
+             +--x-- CRM                +--x-- CRM      ...tangle...
+
+  WITH MCP:          M clients + N servers = M+N
+      app1(client) --\                 /-- [orders server]
+      app2(client) ---+--- MCP --------+-- [files server]
+      app3(client) --/    (one         \-- [CRM server]
+                           protocol)         each tool exposed ONCE</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>MCP client–server topology</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart LR
+    subgraph Host["Host app (Exponential AI agent)"]
+      C1["MCP client A"]
+      C2["MCP client B"]
+    end
+    C1 -->|JSON-RPC| S1["MCP server: Orders"]
+    C1 -->|JSON-RPC| S2["MCP server: Files"]
+    C2 -->|JSON-RPC| S3["MCP server: CRM"]
+    S1 --> O[("Orders DB")]
+    S2 --> F[("File store")]
+    S3 --> R[("CRM API")]
+    S1 -. tools/resources/prompts .-> C1
+            </div>
+            <p class="diagram-caption">Figure 11.1 — One client can use many servers; one server serves many clients.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>MCP vs bespoke REST/custom integration</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Dimension</th><th>Bespoke REST wrappers</th><th>MCP</th></tr></thead>
+              <tbody>
+                <tr><td>Connectors needed</td><td>M×N (per pair)</td><td><strong>M+N</strong></td></tr>
+                <tr><td>Discovery</td><td>Manual, read the docs</td><td>Runtime capability listing</td></tr>
+                <tr><td>Reusability</td><td>Locked to one app/framework</td><td>Any MCP client</td></tr>
+                <tr><td>Tool description</td><td>Ad-hoc per integration</td><td>Standard schema</td></tr>
+                <tr><td>Auth/transport</td><td>Reinvented each time</td><td>Consistent</td></tr>
+                <tr><td>Maintenance</td><td>Grows quadratically</td><td>Grows linearly</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">The three MCP primitives</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Primitive</th><th>What it is</th><th>Direction</th><th>Example</th></tr></thead>
+              <tbody>
+                <tr><td>Tools</td><td>Callable actions</td><td>Model acts</td><td><code>issue_refund</code></td></tr>
+                <tr><td>Resources</td><td>Read-only data/context</td><td>Model reads</td><td>Policy PDF, order row</td></tr>
+                <tr><td>Prompts</td><td>Reusable templates</td><td>Server suggests</td><td>"Draft refund reply"</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Where MCP sits vs neighbours</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Concern</th><th>Standardised by</th><th>Chapter</th></tr></thead>
+              <tbody>
+                <tr><td>Agent ↔ tools/data</td><td><strong>MCP</strong></td><td>11</td></tr>
+                <tr><td>Agent ↔ agent (comms category)</td><td>ACP (emerging)</td><td>12</td></tr>
+                <tr><td>Agent ↔ agent (reference spec)</td><td>Google A2A</td><td>13</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Strengths and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>M+N, not M×N</strong> — integration cost grows linearly.</li>
+                <li><strong>Reusable tools</strong> across apps and frameworks.</li>
+                <li><strong>Runtime discovery</strong> — agents adapt to new tools without code changes.</li>
+                <li><strong>Consistent security boundary</strong> per server.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages</h3>
+              <ul>
+                <li><strong>Young standard</strong> — tooling and patterns still maturing.</li>
+                <li><strong>Extra moving part</strong> — servers to run, monitor, secure.</li>
+                <li><strong>New attack surface</strong> — a malicious/over-scoped server is dangerous (Ch 18).</li>
+                <li><strong>Overkill</strong> for a single app with one or two tools.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Using MCP well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Scope servers narrowly</strong> — least privilege per system.</li>
+                <li><strong>Write precise tool schemas &amp; descriptions</strong> (they drive the model).</li>
+                <li><strong>Make write tools idempotent</strong> and audited.</li>
+                <li><strong>Vet third-party servers</strong> before granting access.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>One god-server</strong> exposing everything with broad rights.</li>
+                <li><strong>Trusting unknown servers</strong> with sensitive scopes.</li>
+                <li><strong>Leaking secrets</strong> through resource exposure.</li>
+                <li><strong>Reinventing MCP</strong> with a private, non-portable format.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What problem does MCP solve?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>The M×N integration explosion. Instead of a custom connector per app-and-tool pair, tools expose one MCP server and apps use one MCP client, turning M×N into M+N with runtime discovery.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Name and contrast MCP's three primitives.</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Tools (callable actions the model invokes), resources (read-only context the client fetches), and prompts (reusable templates the server offers). Tools act; resources inform; prompts guide.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why does MCP appear after agents in the story?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Because the integration pain it removes only becomes severe once you have many agents and tools. MCP is a response to sprawl that agents created, not a prerequisite for a single agent.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What does MCP NOT standardise?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Agent-to-agent communication. MCP connects a model to tools and data; how independent agents discover and talk to each other is the domain of ACP (Ch 12) and A2A (Ch 13).</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">MCP trades <em>a new operational component</em> for <em>linear, reusable integration</em>. The architect treats each MCP server as a governed micro-boundary: least-privilege scope, audited writes, and a clear owner. The payoff compounds as the number of agents grows.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">Exponential AI installs a convenient third-party MCP server with broad read scope; it quietly exposes customer PII as resources to every connected agent. MCP's power to connect is also a new attack surface — vetting and least-privilege are non-negotiable (Ch 18).</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Building a single over-privileged server</strong> instead of scoped ones.</li>
+            <li><strong>Vague tool schemas</strong> that mislead the model.</li>
+            <li><strong>Skipping server vetting</strong> and trusting unknown code.</li>
+            <li><strong>Using MCP where a single inline function</strong> would do.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Should you expose this via MCP?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["Need to connect a model to a tool/data"]) --> R{"Reused by more than<br/>one app/agent?"}
+    R -->|No| F["A local function/tool call is fine"]
+    R -->|Yes| P{"Portability / third-party<br/>reuse matters?"}
+    P -->|No| F
+    P -->|Yes| M{"Can you scope it<br/>with least privilege?"}
+    M -->|Yes| MCP["Expose as an MCP server"]
+    M -->|No| FIX["Fix scoping first, then MCP"]
+            </div>
+            <p class="diagram-caption">Figure 11.2 — MCP pays off with reuse; scope it before you ship it.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before shipping an MCP integration</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Servers are scoped to least privilege.</li>
+            <li><i class="fa-solid fa-square-check"></i> Tools have precise schemas and descriptions.</li>
+            <li><i class="fa-solid fa-square-check"></i> Write tools are idempotent and audited.</li>
+            <li><i class="fa-solid fa-square-check"></i> Resources don't leak secrets or PII.</li>
+            <li><i class="fa-solid fa-square-check"></i> Third-party servers vetted and pinned.</li>
+            <li><i class="fa-solid fa-square-check"></i> Auth and transport configured securely.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="MCP turns M×N bespoke connectors into M+N via one protocol.">
+              <p class="q-text">1. MCP's core value is turning integration from…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">M+N into M×N</button>
+                <button class="quiz-option" data-correct="true">M×N into M+N</button>
+                <button class="quiz-option">Linear into quadratic</button>
+                <button class="quiz-option">Static into dynamic prompts</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Tools act, resources inform, prompts guide.">
+              <p class="q-text">2. Which is a read-only MCP primitive?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Tools</button>
+                <button class="quiz-option" data-correct="true">Resources</button>
+                <button class="quiz-option">Refunds</button>
+                <button class="quiz-option">Transports</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="MCP standardises agent↔tools/data, not agent↔agent.">
+              <p class="q-text">3. MCP does NOT standardise…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Tool invocation</button>
+                <button class="quiz-option">Capability discovery</button>
+                <button class="quiz-option" data-correct="true">Agent-to-agent communication</button>
+                <button class="quiz-option">Read-only resource access</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="A broad, unvetted server is a serious new attack surface.">
+              <p class="q-text">4. The biggest security risk with MCP is…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">JSON-RPC is slow</button>
+                <button class="quiz-option" data-correct="true">An over-privileged or malicious server</button>
+                <button class="quiz-option">Too few tools</button>
+                <button class="quiz-option">Linear scaling</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            MCP is the universal plug for AI: an open client–server protocol that lets any model reach
+            any tool or data source through one interface. By having tools expose themselves once as
+            servers (offering tools, resources, and prompts) and apps speak the protocol once as
+            clients, it turns the M×N integration explosion into an M+N ecosystem with runtime
+            discovery and consistent security boundaries. For Exponential AI it ends the era of bespoke,
+            throwaway connectors — and it appears after agents precisely because that sprawl is what made
+            a standard necessary.
+          </p>
+          <p>
+            But notice the shape of everything MCP does: it connects <em>one model</em> to its tools and
+            data. It says nothing about how <em>two independent agents</em> — perhaps built by different
+            teams, or different companies — discover each other, describe their capabilities, and
+            collaborate. As Exponential AI's agents multiply and start needing to delegate to
+            <em>each other</em>, a different kind of standard is required.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 12</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              MCP gave every agent a clean way to reach tools — but Exponential AI's agents increasingly
+              need to reach <em>each other</em>: the returns agent asking the fraud agent for a risk
+              score, or an internal agent calling a supplier's agent. <strong>What standard lets
+              autonomous agents communicate as peers, rather than as apps calling tools?</strong> That
+              is the emerging category of agent communication protocols —
+              <a href="12_acp.html">Chapter 12 — ACP</a>, where we look at the intent, IBM's ACP, and why
+              the wire formats are still converging.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 11 of 20 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>
