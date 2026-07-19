@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="20" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 20 — The AI Development Lifecycle · Exponential AI Handbook</title>
+  <meta name="description" content="How Exponential AI runs AI projects as a discipline: problem framing, data, experimentation, and evaluation-driven iteration — and how the AI lifecycle differs from the spec-driven software SDLC." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 20 — The AI Development Lifecycle · Exponential AI Handbook" />
+  <meta property="og:description" content="How Exponential AI runs AI projects as a discipline: problem framing, data, experimentation, and evaluation-driven iteration — and how the AI lifecycle differs from the spec-driven software SDLC." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 20 — The AI Development Lifecycle · Exponential AI Handbook" />
+  <meta name="twitter:description" content="How Exponential AI runs AI projects as a discipline: problem framing, data, experimentation, and evaluation-driven iteration — and how the AI lifecycle differs from the spec-driven software SDLC." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 24 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-diagram-project"></i> Chapter 20 · The Operational Act Begins</span>
+          <h1 class="chapter-title">The AI Development Lifecycle: running AI as a discipline</h1>
+          <p class="chapter-lede">
+            AI-native engineering (Ch 19) changed how Exponential AI's engineers build. But a pile of
+            AI features is not a repeatable practice. The AI development lifecycle is the methodology
+            umbrella — how you frame a problem, get the data, experiment, and let evaluation drive
+            iteration — and, above all, how this differs from the classic, spec-driven software SDLC.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            <a href="19_ai_native_engineering.html">Chapter 19</a> changed how Exponential AI's engineers
+            <em>build</em>: AI became a first-class teammate that drafts, reviews, and tests code, and the
+            human role shifted toward specification and judgment. That answered "how do individuals work,"
+            but not "how does the organisation run an AI initiative from idea to reliable product." A
+            forecasting model, a product-image classifier, and a returns agent were each built by a
+            different team with a different definition of "done." Without a shared discipline, quality
+            drifted and lessons weren't reused.
+          </p>
+          <p>
+            The <strong>AI development lifecycle (AI SDLC)</strong> is that shared discipline: the
+            methodology that governs how AI work is framed, resourced, experimented on, evaluated, and
+            iterated. Its single most important lesson is that building learned, probabilistic systems is
+            fundamentally different from building deterministic software — it is <em>data-centric</em>,
+            <em>experimental</em>, <em>non-deterministic</em>, and <em>evaluation-driven</em> rather than
+            spec-driven. Get that mental shift wrong and every downstream stage inherits the mistake.
+          </p>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-road-barrier"></i> What this chapter owns — and what it hands off</div>
+            <p style="margin:0">
+              This chapter is the <strong>methodology umbrella</strong>: problem framing, data,
+              experimentation, evaluation-driven iteration, and roles. It deliberately does
+              <strong>not</strong> cover the mechanics of <em>shipping</em> models and prompts — CI/CD,
+              registries, canary/blue-green, rollback — that is <a href="21_aiops.html">Chapter 21 ·
+              AIOps</a>. Nor does it cover <em>operating</em> live systems — observability, SLOs,
+              incidents, drift — that is <a href="22_ai_sre.html">Chapter 22 · AI-SRE</a>. Here we treat
+              deployment and operations only as <em>stages inside the lifecycle</em>, not as mechanics.
+            </p>
+          </div>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart LR
+    A["Ch 20 · AI SDLC<br/>frame · data · experiment · evaluate"] --> B["Ch 21 · AIOps<br/>build &amp; ship"]
+    B --> C["Ch 22 · AI-SRE<br/>operate &amp; keep reliable"]
+    C -. "evals + incidents feed back" .-> A
+    style A fill:#6366f1,stroke:#4338ca,color:#ffffff
+            </div>
+            <p class="diagram-caption">Figure 20.1 — One lifecycle, three acts. This chapter owns the first (methodology); AIOps and AI-SRE own the next two.</p>
+          </div>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Frame an AI problem and pick the right approach (rules vs ML vs LLM); design a data and experimentation plan; build an evaluation-driven iteration loop; define "good enough to ship" for a probabilistic system; and explain exactly how the AI lifecycle differs from the traditional software SDLC.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why AI needs its own lifecycle</h2>
+          <p>
+            The classic software development lifecycle assumes you can <em>specify</em> correct behaviour
+            in advance: gather requirements, design, implement to the spec, test against it, ship, and
+            maintain. The specification is the source of truth, and a passing test suite means the system
+            is correct. AI breaks that assumption at the root. You cannot write a spec that says "classify
+            this product photo correctly" as a set of rules; the behaviour is <em>learned from data</em>
+            and is only ever correct <em>on average</em>, with a distribution of errors you can measure but
+            not eliminate. The artefact you ship is not code that implements a spec — it is a model (or a
+            prompt-plus-model system) that approximates a target you can only define through examples.
+          </p>
+          <p>
+            That single difference cascades. Because behaviour comes from data, <strong>data quality and
+            representativeness become the primary lever</strong> — often more than model choice. Because
+            results are probabilistic, "does it work?" becomes "how well, on which slices, at what
+            confidence?" — a measurement question, not a yes/no. Because you cannot reason your way to the
+            answer, progress is <strong>experimental</strong>: you form hypotheses, run trials, and keep
+            what the numbers reward. And because the world drifts and the target is fuzzy, the system is
+            <strong>never truly finished</strong> — it is continuously re-evaluated and improved. A
+            lifecycle that ignores these realities (treating a model like a feature you build once and
+            mark done) produces demos that impress and production systems that quietly rot.
+          </p>
+          <p>
+            A third reason the discipline exists is coordination. An AI initiative pulls together product
+            managers, domain experts, data engineers, applied scientists, ML and software engineers, and —
+            later — the platform and reliability teams. Each has a different notion of success and a
+            different rhythm. The lifecycle exists to give them one shared spine: a common way to frame the
+            problem, agree on evaluation, and decide when something is ready to move from notebook to
+            product. Without it, Exponential AI relearns the same lessons on every project.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given a business goal that is fuzzy ("reduce refund-handling time"), data that is imperfect,
+            and a solution space that is probabilistic, define a repeatable process that turns the goal
+            into a well-scoped AI problem, produces evidence about whether a solution is good enough, and
+            keeps that solution good as the world changes — all while coordinating many roles and managing
+            the risk that a non-deterministic system will behave unexpectedly.
+          </p>
+          <p>
+            The organising principle is <strong>evaluation drives everything</strong>. In spec-driven
+            software the spec is the anchor; in AI the <em>evaluation set and metrics</em> are the anchor.
+            Before building, you define how you will measure success on realistic data, including the
+            slices that matter (new customers, rare product categories, non-English queries). Every
+            experiment is judged against that harness (Ch 17), every iteration is a hypothesis tested by
+            it, and "ready to ship" is a threshold on it. If you cannot measure it, you cannot manage it —
+            and you almost certainly cannot ship it responsibly.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>Cooking, not assembling</h4>
+              <p>Building software is like assembling furniture from instructions. Building AI is like developing a recipe: you taste, adjust, and taste again. The tasting — evaluation — is the whole job.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Data + experiments + evals</h4>
+              <p>Curate representative data, run experiments against a fixed evaluation set, track results, and iterate. Ship when the metric clears a threshold on the slices that matter — not when a checklist is done.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>A measurable, continuous loop</h4>
+              <p>Design the lifecycle so evaluation is the source of truth from framing to production, data and models are versioned, and monitoring feeds the next iteration. The system is never "done," only currently good enough.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From waterfall to eval-driven AI</h2>
+          <p>
+            The way teams organise software work evolved toward AI's needs in recognisable steps.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>Waterfall SDLC</h4><p>Specify, build, test, ship. Works when behaviour can be fully specified in advance.</p></div>
+              <div class="timeline-item"><h4>Agile / iterative</h4><p>Short cycles and feedback accept that requirements change — but the artefact is still deterministic code.</p></div>
+              <div class="timeline-item"><h4>CRISP-DM &amp; data science</h4><p>Explicit data-understanding and modelling phases acknowledge that data, not just code, drives outcomes.</p></div>
+              <div class="timeline-item"><h4>MLOps &amp; eval-driven LLM development</h4><p>Data/model versioning, experiment tracking, and evaluation harnesses make the probabilistic lifecycle repeatable and continuous.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>Inside the lifecycle</h2>
+          <p>
+            The AI lifecycle has recognisable phases, but they form a <em>loop</em>, not a line.
+            <strong>Framing</strong>: translate a business goal into an AI problem, decide feasibility, and
+            define success metrics and their acceptable thresholds. <strong>Data</strong>: source, clean,
+            label, and split data; build the evaluation set first and guard it against leakage.
+            <strong>Experimentation</strong>: try approaches — a rule baseline, a fine-tuned model, a
+            prompted LLM, a RAG system — each measured against the harness and logged so results are
+            reproducible. <strong>Evaluation</strong>: judge candidates on aggregate metrics <em>and</em>
+            on the slices that matter, plus qualitative review and red-teaming (Ch 17–18).
+          </p>
+          <p>
+            Then the lifecycle hands off to the next acts and receives their feedback.
+            <strong>Deployment</strong> is a <em>stage</em> here — "get the chosen candidate into
+            production safely" — but its mechanics (packaging, CI/CD, canary, rollback) belong to AIOps
+            (Ch 21). <strong>Operation</strong> is likewise a stage — "keep it healthy" — but observability,
+            SLOs, incidents, and drift detection belong to AI-SRE (Ch 22). What the SDLC owns is the
+            <em>connective tissue</em>: versioned data and models so any result is reproducible; an
+            experiment registry so knowledge compounds; a definition of done expressed as evaluation
+            thresholds; and a feedback path so production signals (quality regressions, new failure modes,
+            incidents) re-enter framing as the next hypothesis. The architecture is a governed loop whose
+            heartbeat is measurement.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>Exponential AI builds a refund-triage model the disciplined way</h2>
+          <ol>
+            <li><strong>Frame.</strong> Goal: cut refund-handling time. AI problem: triage incoming refund requests into auto-approve / auto-deny / human-review. Success: ≥95% precision on auto-decisions, measured per product category.</li>
+            <li><strong>Build the eval set first.</strong> Sample 5,000 historical requests, label the correct outcome, and freeze a held-out test set (guarded against leakage) before any modelling.</li>
+            <li><strong>Baseline.</strong> Start with a simple rules baseline so every later experiment has something to beat.</li>
+            <li><strong>Experiment.</strong> Try a prompted LLM, a RAG variant grounded in policy, and a fine-tuned classifier — each scored on the same frozen set and logged with its config.</li>
+            <li><strong>Evaluate on slices.</strong> Check not just overall precision but performance on rare categories and new customers; inspect failures qualitatively.</li>
+            <li><strong>Decide.</strong> The RAG variant clears the threshold overall and on key slices → it is the ship candidate. (How it ships safely is Chapter 21's job.)</li>
+            <li><strong>Close the loop.</strong> Production feedback and incidents (Chapter 22's job to detect) return here as the next iteration's hypotheses.</li>
+          </ol>
+          <p class="code-label">A tiny evaluation-driven iteration harness</p>
+          <pre><code class="language-python">EVAL = load_frozen_eval_set("refund_triage_v3")   # versioned, leakage-guarded
+
+def evaluate(candidate):
+    preds = [candidate(x) for x in EVAL.inputs]
+    return {
+        "precision": precision(preds, EVAL.labels),
+        "by_slice": precision_by_slice(preds, EVAL),   # rare cats, new custs
+    }
+
+def promote_if_ready(candidate, bar=0.95):
+    m = evaluate(candidate)
+    ok = m["precision"] >= bar and min(m["by_slice"].values()) >= bar - 0.05
+    log_experiment(candidate.config, m)               # knowledge compounds
+    return "ship-candidate" if ok else "iterate"</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture the AI lifecycle</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-utensils"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Developing a recipe for a restaurant. You don't write the dish once; you cook, taste against a standard, tweak the ingredients (data) and technique (model), and re-taste until it reliably pleases — then keep checking as suppliers change.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-flask"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Pharmaceutical R&amp;D: hypotheses, trials, and pre-registered endpoints. You cannot argue a drug into working; you measure it against a protocol — exactly how AI is measured against an evaluation set.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-code-branch"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Test-driven development, but the "tests" are statistical: you write the evaluation set first, then iterate until the system passes to a threshold rather than a boolean pass/fail.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-arrows-spin"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A control loop with a setpoint: the evaluation metric is the setpoint, experiments are the actuator, and production monitoring is the sensor that feeds the next correction.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>The lifecycle as a loop</h2>
+          <pre class="ascii">        +-----------> FRAME (goal -> AI problem + metrics) ----+
+        |                                                      v
+   feedback from                                        DATA (curate,
+   production &amp;                                          label, split,
+   incidents                                            freeze eval set)
+        ^                                                      |
+        |                                                      v
+   EVALUATE <---- EXPERIMENT (baseline, prompt, RAG, fine-tune)
+        |   (score vs frozen eval set, on slices)
+        |
+        +--> good enough? --yes--> [ ship candidate -> Ch 21 AIOps ]
+                     |                        |
+                     no                 [ operate -> Ch 22 AI-SRE ]
+                     |                        |
+                     +<-------- iterate <-----+</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>Evaluation-driven iteration</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    G["Business goal<br/>(fuzzy)"] --> F["Frame: AI problem<br/>+ success metric"]
+    F --> D["Curate data<br/>+ freeze eval set"]
+    D --> E["Experiment:<br/>baseline / prompt / RAG / fine-tune"]
+    E --> M{"Clears threshold<br/>on key slices?"}
+    M -->|No| E
+    M -->|Yes| S["Ship candidate<br/>(mechanics: Ch 21)"]
+    S --> O["Operate &amp; monitor<br/>(mechanics: Ch 22)"]
+    O -. "regressions, incidents,<br/>drift signals" .-> F
+            </div>
+            <p class="diagram-caption">Figure 20.2 — Evaluation is the anchor; production feedback re-enters framing. Deployment and operations are stages owned by the next two chapters.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>How the AI lifecycle differs</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Dimension</th><th>Traditional software SDLC</th><th>AI development lifecycle</th></tr></thead>
+              <tbody>
+                <tr><td>Source of truth</td><td>Specification</td><td><strong>Evaluation set + metrics</strong></td></tr>
+                <tr><td>Primary lever</td><td>Code logic</td><td><strong>Data</strong> (quality, coverage)</td></tr>
+                <tr><td>Behaviour</td><td>Deterministic</td><td>Probabilistic / non-deterministic</td></tr>
+                <tr><td>Progress model</td><td>Implement to plan</td><td>Experiment &amp; measure</td></tr>
+                <tr><td>Definition of done</td><td>Tests pass (boolean)</td><td>Metric ≥ threshold on slices</td></tr>
+                <tr><td>Lifecycle shape</td><td>Build then maintain</td><td>Never done; continuous re-eval</td></tr>
+                <tr><td>Main risk</td><td>Bugs</td><td>Drift, bias, silent quality loss</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Choosing an approach for a problem</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Approach</th><th>Best when</th><th>Cost / effort</th></tr></thead>
+              <tbody>
+                <tr><td>Rules / heuristics</td><td>Logic is knowable and stable</td><td>Low; fully predictable</td></tr>
+                <tr><td>Prompted LLM</td><td>Language task, fast start, little labelled data</td><td>Low build, per-call cost (Ch 16)</td></tr>
+                <tr><td>RAG</td><td>Needs grounding in your knowledge</td><td>Medium; retrieval to maintain</td></tr>
+                <tr><td>Fine-tune / train</td><td>Stable, high-volume, needs quality data</td><td>High build; cheaper at scale</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Roles across the lifecycle</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Role</th><th>Owns</th><th>Peak phase</th></tr></thead>
+              <tbody>
+                <tr><td>Product / domain expert</td><td>Framing, success metrics</td><td>Frame</td></tr>
+                <tr><td>Data engineer</td><td>Pipelines, labelling, splits</td><td>Data</td></tr>
+                <tr><td>Applied scientist / ML eng</td><td>Experiments, modelling</td><td>Experiment</td></tr>
+                <tr><td>Eval / QA</td><td>Harness, slices, red-team</td><td>Evaluate</td></tr>
+                <tr><td>Platform / SRE</td><td>Ship &amp; run (Ch 21–22)</td><td>Deploy / operate</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Adopting a disciplined lifecycle: benefits and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Reproducible</strong> results via versioned data/models.</li>
+                <li><strong>Comparable</strong> experiments; knowledge compounds.</li>
+                <li><strong>Objective</strong> ship decisions tied to evaluation.</li>
+                <li><strong>Resilient</strong> to drift via the feedback loop.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages / realities</h3>
+              <ul>
+                <li><strong>Upfront cost</strong> of building good eval sets.</li>
+                <li><strong>Cultural shift</strong> from "done" to "good enough now."</li>
+                <li><strong>Data burden</strong> — labelling and governance are real work.</li>
+                <li><strong>Never finished</strong> — ongoing investment required.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>The lifecycle done well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Write the eval set before the model;</strong> guard it against leakage.</li>
+                <li><strong>Always keep a baseline</strong> so gains are measurable.</li>
+                <li><strong>Version data and models;</strong> log every experiment.</li>
+                <li><strong>Evaluate on slices,</strong> not just aggregate metrics.</li>
+                <li><strong>Define "good enough" as a threshold</strong> agreed with stakeholders.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Demo-driven development</strong> — impressive once, unmeasured.</li>
+                <li><strong>Chasing model choice</strong> while ignoring data quality.</li>
+                <li><strong>Evaluating on training data</strong> (leakage) — inflated scores.</li>
+                <li><strong>"Ship it, it's done"</strong> with no monitoring plan.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>How does the AI lifecycle differ from the traditional SDLC?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>It is data-centric, experimental, non-deterministic, and evaluation-driven rather than spec-driven. The evaluation set replaces the spec as the source of truth, data is the primary lever, "done" is a metric threshold, and the system is continuously re-evaluated rather than finished.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why build the evaluation set first?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Because it is the anchor for every decision. Defining success on realistic, leakage-free data before modelling prevents you from moving the goalposts to fit a favourite model and makes ship decisions objective.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What does "never done" mean in practice?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Data distributions drift and targets evolve, so a model that clears the bar today can degrade silently. The lifecycle keeps a feedback loop from production back to framing, so the system is continuously re-evaluated and improved.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Where do deployment and operations fit?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>As stages within the lifecycle. The SDLC decides <em>what</em> to ship and <em>when</em> it's good enough; the mechanics of shipping are AIOps (Ch 21) and of running it are AI-SRE (Ch 22).</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">Invest disproportionately in evaluation infrastructure. A great model with a weak eval set is unshippable (you can't prove it's safe); a mediocre model with a rigorous eval set is manageable (you know exactly where it fails). Evaluation is the highest-leverage artefact in the entire lifecycle — treat it as a first-class product, versioned and owned.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">A demand-forecasting model is validated on data that accidentally includes future information (leakage). It scores brilliantly, ships, and collapses in production. A frozen, leakage-guarded eval set built during framing would have caught the fantasy before launch.</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>No baseline</strong>, so nobody can tell if the model actually helps.</li>
+            <li><strong>Optimising the wrong metric</strong> (aggregate accuracy while a key slice fails).</li>
+            <li><strong>Confusing a demo with a product</strong> — no eval, no monitoring plan.</li>
+            <li><strong>Blurring the boundaries</strong> — trying to solve deployment and operations here instead of framing the discipline.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Is this AI project ready to move to the build-and-ship act?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["AI project idea"]) --> A{"Problem framed with<br/>a success metric?"}
+    A -->|No| F1["Go back to framing"]
+    A -->|Yes| B{"Frozen, leakage-free<br/>eval set exists?"}
+    B -->|No| F2["Build the eval set first"]
+    B -->|Yes| C{"Candidate clears<br/>threshold on key slices?"}
+    C -->|No| F3["Iterate: data or model"]
+    C -->|Yes| D{"Monitoring &amp; feedback<br/>plan defined?"}
+    D -->|No| F4["Define signals before shipping"]
+    D -->|Yes| Go["Hand off to AIOps (Ch 21)"]
+            </div>
+            <p class="diagram-caption">Figure 20.3 — The lifecycle's exit gate. Passing it means the methodology is satisfied; shipping mechanics start next chapter.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before an AI project leaves the methodology stage</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Business goal translated into a scoped AI problem with metrics.</li>
+            <li><i class="fa-solid fa-square-check"></i> Frozen, representative, leakage-guarded evaluation set exists.</li>
+            <li><i class="fa-solid fa-square-check"></i> A baseline is in place for comparison.</li>
+            <li><i class="fa-solid fa-square-check"></i> Experiments are logged; data and models are versioned.</li>
+            <li><i class="fa-solid fa-square-check"></i> "Good enough" is a threshold agreed with stakeholders, checked on slices.</li>
+            <li><i class="fa-solid fa-square-check"></i> A feedback/monitoring plan is defined (to be implemented by AIOps/AI-SRE).</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="In AI, the evaluation set and metrics replace the specification as the anchor for decisions.">
+              <p class="q-text">1. In the AI lifecycle, the source of truth is…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">The specification document</button>
+                <button class="quiz-option" data-correct="true">The evaluation set and metrics</button>
+                <button class="quiz-option">The deployment script</button>
+                <button class="quiz-option">The model's parameter count</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Behaviour is learned from data, so data quality and coverage are usually the biggest lever.">
+              <p class="q-text">2. The primary lever on AI behaviour is usually…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Picking a trendier model</button>
+                <button class="quiz-option" data-correct="true">Data quality and representativeness</button>
+                <button class="quiz-option">A longer system prompt</button>
+                <button class="quiz-option">More GPUs</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Deployment and operations are stages within the lifecycle; their mechanics belong to AIOps and AI-SRE.">
+              <p class="q-text">3. Deployment mechanics (CI/CD, canary) are owned by…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">This chapter (SDLC)</button>
+                <button class="quiz-option" data-correct="true">Chapter 21 (AIOps)</button>
+                <button class="quiz-option">Chapter 22 (AI-SRE)</button>
+                <button class="quiz-option">Nobody</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Because data drifts and targets evolve, the system is continuously re-evaluated rather than finished.">
+              <p class="q-text">4. "Never done" means…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">The project failed</button>
+                <button class="quiz-option" data-correct="true">The system is continuously re-evaluated as the world changes</button>
+                <button class="quiz-option">You skip evaluation</button>
+                <button class="quiz-option">You never ship</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            The AI development lifecycle is the methodology umbrella over Exponential AI's AI work. Its
+            defining insight is that building learned systems is data-centric, experimental,
+            non-deterministic, and evaluation-driven — the opposite of the spec-driven software SDLC. The
+            evaluation set replaces the specification as the source of truth; data is the primary lever;
+            "done" becomes a metric threshold checked on the slices that matter; and the system is never
+            finished, only continuously re-evaluated as the world drifts. Deployment and operations appear
+            here only as <em>stages</em> — the methodology decides what to ship and when it is good enough.
+          </p>
+          <p>
+            That decision now needs mechanics. Once a candidate clears the lifecycle's exit gate, how do
+            you actually package it, version it, and get it into production safely — with the ability to
+            roll back the moment something looks wrong? That is the build-and-ship act.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 21</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              The lifecycle produced a ship-ready candidate and a definition of "good enough." Turning that
+              into a live service — repeatably, safely, and reversibly — is an engineering discipline of its
+              own. <a href="21_aiops.html">Chapter 21 — AIOps: Building &amp; Deploying AI Software</a> owns
+              the mechanics this chapter deliberately handed off: CI/CD for models and prompts, versioning
+              and registries, and deployment patterns like canary, blue-green, shadow, and rollback. It
+              stops where the system goes live; keeping it healthy afterwards is Chapter 22's job.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 20 of 24 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="19" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 19 — AI-Native Engineering · Exponential AI Handbook</title>
+  <meta name="description" content="AI-native engineering: building software with AI as a first-class teammate — the shift from writing code to specifying intent and verifying outcomes, and how context, guardrails, evals, and security turn inward." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 19 — AI-Native Engineering · Exponential AI Handbook" />
+  <meta property="og:description" content="AI-native engineering: building software with AI as a first-class teammate — the shift from writing code to specifying intent and verifying outcomes, and how context, guardrails, evals, and security turn inward." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 19 — AI-Native Engineering · Exponential AI Handbook" />
+  <meta name="twitter:description" content="AI-native engineering: building software with AI as a first-class teammate — the shift from writing code to specifying intent and verifying outcomes, and how context, guardrails, evals, and security turn inward." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 24 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-code-branch"></i> Chapter 19 · The Practice Changes</span>
+          <h1 class="chapter-title">AI-Native Engineering: building software with AI as a teammate</h1>
+          <p class="chapter-lede">
+            The full stack is in place — models, retrieval, agents, protocols, context, guardrails,
+            economics, evaluation, security. Now the technology turns back on its makers: when AI can
+            generate, review, test, and secure code, the roles, workflows, and skills of Exponential AI's
+            engineers themselves change. This chapter is about how software gets built when AI is a
+            first-class teammate, not just a tool.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            Chapters 1–18 built up the technical capability to make AI safe, affordable, measurable, and
+            secure. <a href="18_ai_security.html">Chapter 18</a> closed the technical arc: agents can now
+            be trusted with real power because their blast radius is contained. But a capable, safe agent
+            that can write and review code is not just a product feature — it's a change to how the
+            engineering organisation itself works. The same agents Exponential AI deploys for customers can
+            be pointed inward, at the software development lifecycle.
+          </p>
+          <p>
+            <strong>AI-native engineering</strong> is the practice of building software with AI woven into
+            every phase: specifying, generating, reviewing, testing, documenting, and operating. The shift
+            is not "autocomplete got better." It's that the engineer's centre of gravity moves from
+            <em>writing</em> code to <em>specifying intent and verifying outcomes</em> — deciding what
+            should be built, giving the AI the right context, and rigorously checking what comes back. The
+            skills that matter most become judgment, specification, review, and system design, precisely
+            because generation is increasingly cheap.
+          </p>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Describe the AI-native SDLC; explain the shift from writing to specifying/verifying; decide what to delegate to agents vs keep human; and apply the earlier stack (context, guardrails, evals, security) to your own engineering process.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why engineering practice must change</h2>
+          <p>
+            It changes because the economics of producing code changed. When generating a plausible
+            implementation, a test suite, or a refactor drops from hours to seconds, the bottleneck moves
+            downstream — to understanding the problem, specifying it precisely, reviewing the output, and
+            verifying correctness and safety. A process optimised for the old bottleneck (typing code)
+            wastes the new leverage and chokes on the new bottleneck (validating a flood of AI-generated
+            changes).
+          </p>
+          <p>
+            It also changes because AI introduces new failure modes into the SDLC itself: plausible-but-wrong
+            code, subtle security regressions, and over-trust in confident output. The disciplines this
+            book already established for AI <em>products</em> — context engineering, guardrails,
+            evaluation, security — apply equally to AI <em>in development</em>. AI-native engineering is
+            largely the act of turning those same practices inward.
+          </p>
+          <p>
+            There is also a human reason the practice must change deliberately rather than by accident. If
+            a team simply bolts coding agents onto old habits, two things quietly go wrong: reviewers,
+            faced with more change than they can absorb, start approving on trust; and junior engineers,
+            who used to learn by writing, lose the reps that build the very judgment senior review depends
+            on. Neither problem is technological — both are about how the organisation chooses to work. So
+            AI-native engineering is as much an operating-model decision as a tooling one: it asks the
+            enterprise to consciously move effort toward specification and review, and to protect the ways
+            people build and keep the skills that make them good reviewers.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given AI that can generate, review, and test code far faster than humans can write it,
+            redesign the engineering workflow to maximise the leverage (speed, coverage, exploration)
+            while managing the new risks (plausible-but-wrong output, security regressions, skill erosion,
+            over-trust) — reallocating human effort to where it adds the most value: intent, judgment,
+            review, and design.
+          </p>
+          <p>
+            The central tension is <strong>velocity vs verification</strong>. AI can produce more change
+            than a team can safely review with old habits. The answer isn't to slow generation down; it's
+            to industrialise verification — strong tests and evals, automated review, tight specs, and
+            clear ownership — so that trust in AI output is <em>earned by evidence</em>, not granted by
+            default.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>From typist to director</h4>
+              <p>You stop typing every line and start directing a very fast junior teammate — telling it what you want and carefully checking its work.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Spec → generate → verify</h4>
+              <p>Write clear specs and tests, let AI generate implementations, and gate everything through review, tests, and evals before it merges.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>Verification as the moat</h4>
+              <p>Since generation is cheap, competitive advantage moves to specification quality, review rigor, test/eval infrastructure, and system design judgment.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From autocomplete to agentic development</h2>
+          <p>
+            AI's role in the SDLC deepened in stages, each moving the human further up the value chain.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>Autocomplete</h4><p>Line- and block-level suggestions speed typing.</p></div>
+              <div class="timeline-item"><h4>Chat assistants</h4><p>Explain, refactor, and draft functions on request.</p></div>
+              <div class="timeline-item"><h4>Coding agents</h4><p>Take a task, edit across files, run tests, and open a PR.</p></div>
+              <div class="timeline-item"><h4>AI-native workflow</h4><p>Humans specify and verify; agents generate, review, and test at scale.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>The AI-native SDLC</h2>
+          <p>
+            Map the change onto the lifecycle. <strong>Specify</strong>: humans write clear intent —
+            requirements, interfaces, acceptance criteria — because the quality of AI output is bounded by
+            the quality of the spec and context it's given (context engineering, Ch 14, applied to code).
+            <strong>Generate</strong>: coding agents implement across files, propose designs, and draft
+            tests and docs. <strong>Verify</strong>: this is where human effort concentrates — code
+            review, running the test suite, and evals for AI-in-the-loop features (Ch 17). <strong>Guard</strong>:
+            AI-specific security review (Ch 18) plus guardrails on any autonomous dev agents (Ch 15).
+            <strong>Operate</strong>: AI assists triage, on-call, and incident summarisation, with the same
+            observability discipline.
+          </p>
+          <p>
+            The human roles rebalance rather than disappear. The engineer becomes part
+            <strong>specifier</strong> (turning fuzzy needs into crisp intent), part
+            <strong>reviewer</strong> (judging correctness, security, and fit), and part
+            <strong>architect</strong> (owning the system design AI can't be trusted to own). Routine
+            generation, boilerplate, first-draft tests, and mechanical refactors delegate well to agents;
+            architecture, ambiguous trade-offs, security-critical decisions, and final accountability stay
+            human. The connective tissue is <strong>verification infrastructure</strong> — tests, evals,
+            CI, review automation — which is what lets a team safely accept a high volume of AI-generated
+            change. Without it, AI-native engineering is just faster ways to ship bugs.
+          </p>
+          <p>
+            It's worth being concrete about what "verification infrastructure" means here, because it is
+            the part teams most often under-build. It is the fast, trustworthy test suite that a reviewer
+            can rely on instead of re-reading every line; the eval harness (Ch 17) that scores any
+            AI-in-the-loop behaviour against a golden set before merge; the CI gates that block regressions
+            automatically; the automated first-pass review that flags obvious issues so humans spend their
+            attention on the subtle ones; and the observability that catches what all of the above missed
+            once code is live. Each of these existed before AI, but AI raises their importance sharply,
+            because they are now the only thing standing between a firehose of generated change and
+            production. In an AI-native shop, strengthening this infrastructure is not overhead — it is the
+            direct enabler of how fast the team can safely move.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>Shipping a feature the AI-native way</h2>
+          <ol>
+            <li><strong>Specify.</strong> An engineer writes the intent: "Add partial-refund support to the returns agent," with acceptance criteria and constraints.</li>
+            <li><strong>Context.</strong> The agent is given the relevant code, conventions, and policies (curated context).</li>
+            <li><strong>Generate.</strong> The agent edits across files, adds tests, and opens a PR.</li>
+            <li><strong>Verify.</strong> CI runs tests + evals; a human reviews correctness, security, and design fit.</li>
+            <li><strong>Guard.</strong> Security review checks for injection/exfiltration risks in the new tool.</li>
+            <li><strong>Merge &amp; operate.</strong> Ship behind evals/monitoring; the engineer owns the outcome.</li>
+          </ol>
+          <p class="code-label">Human effort shifts, not vanishes</p>
+          <pre><code class="language-text">OLD:  think(10%) -> write(70%) -> review(20%)
+NEW:  specify(30%) -> [AI generates] -> verify+review(55%) -> design(15%)
+       ^ intent & context              ^ tests, evals, security, judgment</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture AI-native engineering</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-clapperboard"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A film director vs a camera operator: you stop operating every camera and start directing — casting intent, judging takes, and owning the final cut.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-people-group"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A manager with a fast, capable team: leverage comes from clear briefs and good review, not from doing every task yourself. Accountability stays with you.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-industry"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Compilers vs assembly: raising the abstraction didn't remove engineers — it moved them to higher-value problems and made verification (types, tests) more important.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-scale-balanced"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Design review boards: as generation scales, the leverage is in the review gate and the spec — the places where judgment prevents expensive mistakes.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>Where human effort goes now</h2>
+          <pre class="ascii">  TRADITIONAL                     AI-NATIVE
+  spec    [##]                    spec    [######]     <- more, clearer
+  write   [##############]        write   [###]        <- AI does most
+  test    [####]                  test    [######]     <- AI drafts, human curates
+  review  [####]                  review  [##########] <- the new bottleneck
+  design  [###]                   design  [######]     <- higher leverage
+
+  leverage moves from typing --> specifying + verifying</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>The AI-native loop</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    H["Human: specify intent + context"] --> A["AI agent: generate code + tests"]
+    A --> PR["Pull request"]
+    PR --> CI{"Tests + evals + security pass?"}
+    CI -->|No| A
+    CI -->|Yes| Rev{"Human review:<br/>correct, secure, well-designed?"}
+    Rev -->|Changes| A
+    Rev -->|Approve| Merge["Merge + monitor"]
+    Merge --> Ops["AI-assisted operate"]
+            </div>
+            <p class="diagram-caption">Figure 19.1 — Humans bookend the loop with intent and judgment; AI does the volume.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>Traditional vs AI-native SDLC</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Phase</th><th>Traditional</th><th>AI-native</th></tr></thead>
+              <tbody>
+                <tr><td>Spec</td><td>Often informal</td><td>Explicit, drives generation</td></tr>
+                <tr><td>Implementation</td><td>Human-written</td><td>AI-generated, human-directed</td></tr>
+                <tr><td>Testing</td><td>Human-written, partial</td><td>AI-drafted, human-curated, broader</td></tr>
+                <tr><td>Review</td><td>Peer review</td><td>Primary human effort + AI review</td></tr>
+                <tr><td>Bottleneck</td><td>Writing code</td><td>Verifying change</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">What to delegate vs keep human</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Delegate to AI</th><th>Keep human</th></tr></thead>
+              <tbody>
+                <tr><td>Boilerplate, scaffolding</td><td>Architecture &amp; system design</td></tr>
+                <tr><td>First-draft tests &amp; docs</td><td>Ambiguous trade-offs</td></tr>
+                <tr><td>Mechanical refactors</td><td>Security-critical decisions</td></tr>
+                <tr><td>Exploration of options</td><td>Final accountability</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Shifting engineer skills</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Rising in value</th><th>Falling in relative value</th></tr></thead>
+              <tbody>
+                <tr><td>Specification &amp; problem framing</td><td>Rote syntax recall</td></tr>
+                <tr><td>Code review &amp; judgment</td><td>Boilerplate authoring</td></tr>
+                <tr><td>System design</td><td>Manual repetitive edits</td></tr>
+                <tr><td>Testing/eval design</td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Benefits and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Massive velocity</strong> and broader test coverage.</li>
+                <li><strong>Cheaper exploration</strong> of designs and options.</li>
+                <li><strong>Engineers focus</strong> on high-value judgment and design.</li>
+                <li><strong>Lower toil</strong> — less boilerplate and drudgery.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages / risks</h3>
+              <ul>
+                <li><strong>Plausible-but-wrong</strong> code and over-trust.</li>
+                <li><strong>Review overload</strong> if verification doesn't scale.</li>
+                <li><strong>Skill erosion</strong> if fundamentals atrophy.</li>
+                <li><strong>Security regressions</strong> from unreviewed generation.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>AI-native engineering done well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Invest in verification</strong> — tests, evals, CI, review automation.</li>
+                <li><strong>Write clear specs</strong> and give agents good context.</li>
+                <li><strong>Review AI output critically;</strong> never merge on trust.</li>
+                <li><strong>Keep humans accountable</strong> for design and security.</li>
+                <li><strong>Maintain fundamentals</strong> so review judgment stays sharp.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Merging AI code unreviewed.</strong></li>
+                <li><strong>No spec</strong> — "vibe-coding" complex systems.</li>
+                <li><strong>Letting verification lag</strong> generation.</li>
+                <li><strong>Abdicating design</strong> to the model.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>How does the engineer's role change in AI-native development?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>The centre of gravity moves from writing code to specifying intent and verifying outcomes — more specification, review, and design; less manual authoring. Accountability stays human.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why does verification become the bottleneck?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Because generation gets cheap and fast, so the constraint moves to reviewing and validating a much larger volume of change. Teams must industrialise tests, evals, and review to keep up.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What should stay human?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Architecture, ambiguous trade-offs, security-critical decisions, and final accountability. Delegate boilerplate, first-draft tests, mechanical refactors, and option exploration.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>How do earlier chapters apply to development itself?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Context engineering → give agents good context; guardrails → constrain dev agents; evals → gate AI-assisted changes; security → review AI code for injection/exfiltration. Same disciplines, turned inward.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">When generation is cheap, your competitive moat is verification and specification, not typing speed. Invest disproportionately in tests, evals, review tooling, and clear intent — those are what let you safely convert AI velocity into shipped value instead of shipped bugs. Protect engineers' fundamentals so their review judgment stays trustworthy.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">A team adopts coding agents but not verification discipline. Velocity spikes, then incidents do too: plausible-but-wrong code and a subtle auth regression reach production because reviews were rubber-stamped. The fix wasn't less AI — it was scaling verification to match generation.</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Trusting AI output</strong> without rigorous review.</li>
+            <li><strong>Skipping specs</strong> and hoping the model guesses intent.</li>
+            <li><strong>Under-investing in tests/evals</strong> while over-investing in generation.</li>
+            <li><strong>Letting fundamentals atrophy</strong> until review quality drops.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Should this task go to an agent?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["Engineering task"]) --> Spec{"Can you spec it clearly?"}
+    Spec -->|No| Human1["Human: frame the problem first"]
+    Spec -->|Yes| Risk{"Security/architecture critical?"}
+    Risk -->|Yes| HumanLed["Human-led, AI-assisted + deep review"]
+    Risk -->|No| Ver{"Strong tests/evals exist?"}
+    Ver -->|No| Build["Build verification first"]
+    Ver -->|Yes| Agent["Delegate to agent; verify + review"]
+            </div>
+            <p class="diagram-caption">Figure 19.2 — Delegate where intent is clear and verification is strong.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Adopting AI-native engineering</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Verification (tests, evals, CI, review) scaled to match generation.</li>
+            <li><i class="fa-solid fa-square-check"></i> Clear specs and curated context for agents.</li>
+            <li><i class="fa-solid fa-square-check"></i> AI output reviewed critically; never merged on trust.</li>
+            <li><i class="fa-solid fa-square-check"></i> Humans own architecture, security, and accountability.</li>
+            <li><i class="fa-solid fa-square-check"></i> Security review for AI-generated code.</li>
+            <li><i class="fa-solid fa-square-check"></i> Fundamentals maintained to keep review judgment sharp.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="The engineer's focus shifts from writing code to specifying intent and verifying outcomes.">
+              <p class="q-text">1. In AI-native engineering, the engineer's centre of gravity moves to…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Typing faster</button>
+                <button class="quiz-option" data-correct="true">Specifying intent and verifying outcomes</button>
+                <button class="quiz-option">Avoiding review</button>
+                <button class="quiz-option">Writing more boilerplate</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Cheap generation pushes the constraint to verifying a larger volume of change.">
+              <p class="q-text">2. The new bottleneck is…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Writing code</button>
+                <button class="quiz-option" data-correct="true">Verifying/reviewing change</button>
+                <button class="quiz-option">Compiling</button>
+                <button class="quiz-option">Naming variables</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Architecture, ambiguous trade-offs, security decisions, and accountability stay human.">
+              <p class="q-text">3. Which should stay human?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Boilerplate scaffolding</button>
+                <button class="quiz-option" data-correct="true">Architecture &amp; security-critical decisions</button>
+                <button class="quiz-option">First-draft tests</button>
+                <button class="quiz-option">Mechanical refactors</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Without scaled verification, AI just ships bugs faster.">
+              <p class="q-text">4. Adopting coding agents without verification discipline leads to…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Guaranteed quality</button>
+                <button class="quiz-option" data-correct="true">Faster shipping of bugs and regressions</button>
+                <button class="quiz-option">No change at all</button>
+                <button class="quiz-option">Lower velocity</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            AI-native engineering turns the handbook's technology back on the organisation that built it.
+            Because generating code becomes cheap, the engineer's role shifts from writing to specifying
+            intent and verifying outcomes, and value concentrates in specification, review, system design,
+            and test/eval infrastructure. The whole earlier stack applies inward: context engineering to
+            brief agents, guardrails to constrain them, evaluation to gate their output, and security to
+            review it. The winning teams industrialise verification so AI velocity becomes shipped value
+            rather than shipped bugs, and keep humans firmly accountable for architecture and safety.
+          </p>
+          <p>
+            Zoom out one final level. If agents can serve customers, collaborate with each other, and even
+            help build the software, what does the <em>enterprise itself</em> become? The pieces point
+            toward an operating model where AI is woven through every function — and where the human role
+            is to set direction, judgment, and values. That is the destination of Exponential AI's story.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 20</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              AI-native engineering changed how Exponential AI's engineers <em>build</em>. But a
+              scattered set of AI features is not yet a repeatable discipline: how do you frame an AI
+              problem, run experiments, decide when a model is good enough, and manage the fact that
+              the output is data-driven and non-deterministic rather than spec-driven? That practice —
+              the methodology umbrella over the whole effort — is
+              <a href="20_sdlc.html">Chapter 20 — The AI Development Lifecycle</a>, which reframes the
+              classic software SDLC for systems that are learned, evaluated, and never quite finished.
+              It opens the operational act (SDLC → AIOps → AI-SRE) that carries Exponential AI from
+              "we built something" to "we run it in production every day."
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 19 of 24 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

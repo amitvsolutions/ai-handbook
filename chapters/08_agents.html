@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="8" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 08 — AI Agents · Exponential AI Handbook</title>
+  <meta name="description" content="Giving the LLM hands: tool/function calling, the ReAct reason-act-observe loop, agent components, safety guards, and agent vs fixed workflow — Exponential AI resolves tickets end-to-end." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 08 — AI Agents · Exponential AI Handbook" />
+  <meta property="og:description" content="Giving the LLM hands: tool/function calling, the ReAct reason-act-observe loop, agent components, safety guards, and agent vs fixed workflow — Exponential AI resolves tickets end-to-end." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 08 — AI Agents · Exponential AI Handbook" />
+  <meta name="twitter:description" content="Giving the LLM hands: tool/function calling, the ReAct reason-act-observe loop, agent components, safety guards, and agent vs fixed workflow — Exponential AI resolves tickets end-to-end." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 24 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-robot"></i> Chapter 08 · The Model Grows Hands</span>
+          <h1 class="chapter-title">AI Agents: from answering questions to taking action</h1>
+          <p class="chapter-lede">
+            A RAG system can tell a customer their refund is eligible; an agent can actually process it.
+            By giving an LLM tools and a loop — think, act, observe, repeat — Exponential AI turns a
+            read-only oracle into a system that queries records, calls APIs, and completes tasks
+            end-to-end. This is where AI stops talking and starts doing.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            <a href="07_rag.html">Chapter 7</a> connected Exponential AI's LLM to its knowledge: the
+            assistant could now find the right fact and answer faithfully, with citations. But it
+            remained a read-only oracle. A customer asking "refund my damaged order" got a correct
+            explanation of <em>whether</em> they qualified — and then a human still had to open three
+            systems and actually do it. Knowing is not doing.
+          </p>
+          <p>
+            An <strong>agent</strong> closes that gap. Give the LLM a set of <strong>tools</strong>
+            (functions it can call — query the order DB, issue a refund, send an email) and wrap it in a
+            <strong>loop</strong> where it reasons about what to do, calls a tool, observes the result,
+            and decides the next step until the goal is met. The model becomes the controller of a small
+            program it writes on the fly. This chapter introduces the single-agent tool-use pattern; the
+            next scales it into planning and autonomy.
+          </p>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Explain tool/function calling and the reason–act (ReAct) loop; describe an agent's core components (LLM, tools, memory, control loop); reason about when an agent is warranted vs a fixed workflow; and see why multi-step autonomy demands the planning and orchestration of Chapters 9–10.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why the world invented agents</h2>
+          <p>
+            Agents exist because real tasks are <strong>multi-step and stateful</strong>, and their
+            steps depend on intermediate results you can't know in advance. "Resolve this support
+            ticket" might require looking up the order, checking the policy, verifying stock for a
+            replacement, issuing a refund, and emailing the customer — and which steps apply depends on
+            what each lookup returns. A single prompt can't express that; you need a loop that decides
+            as it goes.
+          </p>
+          <p>
+            The enabling breakthrough is <strong>tool calling</strong>: modern LLMs can be given a
+            catalogue of functions with typed arguments and will emit a structured request to call one
+            when appropriate. That single capability transforms the model from a text generator into a
+            reasoning core that can reach out, affect the world, read the consequences, and continue.
+            Everything else in an agent is scaffolding around that loop.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given a high-level goal, no fixed script, and a set of tools, produce a correct sequence of
+            actions that achieves the goal — deciding at each step what to do next based on
+            observations, and knowing when to stop. This is fundamentally different from RAG's
+            single-shot "retrieve then answer"; it is a closed-loop control problem where the LLM is the
+            policy.
+          </p>
+          <p>
+            The hard parts are <strong>reliability</strong> and <strong>safety</strong>. The loop can go
+            wrong in ways a one-shot answer cannot: it can loop forever, call the wrong tool, misread an
+            observation, or take an irreversible action (a real refund) based on a hallucinated premise.
+            So an agent is not just an LLM plus tools — it is an LLM plus tools plus guardrails, limits,
+            and often a human checkpoint, themes that recur through Chapters 15 and 18.
+          </p>
+          <p>
+            There is also a compounding-error problem unique to loops. If a single LLM step is right 95%
+            of the time, a one-shot answer is quite reliable — but an eight-step agent multiplies those
+            odds, and 0.95 to the eighth power is only about 66%. Errors accumulate, and worse, a mistake
+            early in the loop poisons every observation that follows. This is why mature agent design
+            leans so heavily on verification at each step, on tools that fail loudly rather than
+            silently returning nonsense, and on keeping the number of autonomous steps as small as the
+            task allows. Reliability is not a feature you add at the end; it is the constraint that
+            shapes the whole architecture.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>An assistant that can use apps</h4>
+              <p>Instead of only chatting, the AI can click the buttons: look up an order, issue a refund, send an email — doing the task, not just describing it.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>LLM + tools + a reason–act loop</h4>
+              <p>The model receives tool schemas, decides which to call with what arguments, gets the result back as an observation, and iterates. The loop ends on success, failure, or a step limit.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>An LLM as a control policy</h4>
+              <p>The agent is a closed-loop controller with a stochastic policy. Design for bounded steps, idempotent/reversible tools, observability, and human approval on irreversible actions.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From chatbots to tool-using agents</h2>
+          <p>
+            The agent idea is old in AI, but it only became practical once LLMs could reliably follow
+            instructions and emit structured tool calls.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>Pre-2022 — Scripted bots</h4><p>Rule-based chatbots follow fixed decision trees; any unforeseen path breaks them.</p></div>
+              <div class="timeline-item"><h4>2022 — ReAct</h4><p>Interleaving reasoning and actions lets an LLM plan and use tools in a loop — the template for modern agents.</p></div>
+              <div class="timeline-item"><h4>2023 — Function calling</h4><p>Model providers add native, structured tool calling, making agents robust enough for production.</p></div>
+              <div class="timeline-item"><h4>2023+ — Agent frameworks</h4><p>Libraries standardise tools, memory, and loops; the door opens to multi-step and multi-agent systems (Ch 9–10).</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>Inside an agent</h2>
+          <p>
+            An agent has four parts. The <strong>LLM</strong> is the reasoning core that decides what to
+            do. <strong>Tools</strong> are typed functions it may call — each with a name, description,
+            and argument schema — that connect it to the world (databases, APIs, calculators, other
+            models). <strong>Memory</strong> holds the running transcript of thoughts, actions, and
+            observations so the model keeps context across steps, plus optionally longer-term state. The
+            <strong>control loop</strong> orchestrates the cycle and enforces limits.
+          </p>
+          <p>
+            The dominant pattern is <strong>ReAct</strong>: the model produces a <em>Thought</em>
+            (reasoning), then an <em>Action</em> (a tool call), the system executes it and returns an
+            <em>Observation</em>, and the cycle repeats until the model emits a final answer. The
+            <strong>tool descriptions are part of the prompt</strong>, so writing them well — clear
+            names, precise argument docs — is as important as any code. Poor tool descriptions are one of
+            the most common reasons agents misbehave.
+          </p>
+          <p>
+            Memory deserves special attention because it is where the finite context window (Chapter 5)
+            bites hardest. Every thought, action, and observation is appended to the transcript, so a
+            long task steadily fills the window — and a full window means rising cost, rising latency, and
+            eventually forgotten early context. Practical agents therefore <em>manage</em> memory rather
+            than just accumulating it: summarising older steps, dropping stale observations, and keeping
+            only what the next decision needs. That discipline — deciding what belongs in the model's
+            working memory at each moment — is important enough that Exponential AI will eventually treat it
+            as its own engineering practice, the subject of Chapter 14.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>An agent resolves a refund ticket</h2>
+          <ol>
+            <li><strong>Goal in.</strong> "Customer says order #48122 arrived damaged; resolve it."</li>
+            <li><strong>Thought → Action.</strong> "I need the order" → call <code>get_order(48122)</code>.</li>
+            <li><strong>Observation.</strong> Delivered 12 days ago, marked damaged.</li>
+            <li><strong>Thought → Action.</strong> "Check policy" → call <code>get_policy("damaged")</code>.</li>
+            <li><strong>Observation.</strong> Full refund within 30 days — eligible.</li>
+            <li><strong>Action (guarded).</strong> Call <code>issue_refund(48122)</code> — requires approval if &gt; threshold.</li>
+            <li><strong>Finish.</strong> Email the customer and return a summary. Loop ends.</li>
+          </ol>
+          <p class="code-label">The ReAct loop, as pseudocode</p>
+          <pre><code class="language-python">def agent(goal, tools, max_steps=8):
+    memory = [system_prompt(tools), user(goal)]
+    for _ in range(max_steps):
+        step = llm(memory)                 # Thought + (Action | Final)
+        if step.is_final:
+            return step.answer
+        result = call_tool(step.action)    # execute the chosen tool
+        memory.append(step)
+        memory.append(observation(result)) # feed result back in
+    return "stopped: step limit reached"   # safety bound</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture an agent</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-people-roof"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A capable intern with access to the company's systems and a task list. They don't need every step spelled out — they figure out the next action from what they just found, and ask for sign-off on big moves.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-building"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Exponential AI's tier-1 support rep, automated: it reads the ticket, checks the systems, applies policy, and completes the resolution — escalating to a human only on exceptions.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-code"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A REPL driven by the LLM: it writes a call, sees the output, and writes the next call. The difference from a script is that the control flow is generated at runtime, not written in advance.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-sitemap"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A feedback control loop where the LLM is the controller and tools are actuators and sensors. Observations close the loop; step limits and guards keep it stable.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>The reason–act loop, in plain text</h2>
+          <pre class="ascii">        +----------------------- goal ----------------------+
+        |                                                   |
+        v                                                   |
+   [  LLM  ] --Thought--> "what next?"                      |
+        |                                                   |
+        |--Action--> call tool(args) ---> [ TOOLS/APIs ]    |
+        |                                     |             |
+        |<---------- Observation -------------+             |
+        |                                                   |
+        +-- repeat until Final answer OR step limit --------+
+                              |
+                              v
+                       Final result (+ actions taken)</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>Agent control flow</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    G["Goal"] --> T["LLM: Thought"]
+    T --> D{"Need a tool?"}
+    D -->|Yes| A["Action: call tool"]
+    A --> O["Observation: result"]
+    O --> T
+    D -->|No| G2{"Irreversible action?"}
+    G2 -->|Yes| H["Human approval"]
+    H --> F["Final answer + actions"]
+    G2 -->|No| F
+    T -.->|step limit| STOP["Stop safely"]
+            </div>
+            <p class="diagram-caption">Figure 8.1 — The loop, with a human gate on irreversible actions and a step-limit escape.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>Chatbot vs RAG vs Agent</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Capability</th><th>Plain chatbot</th><th>RAG</th><th>Agent</th></tr></thead>
+              <tbody>
+                <tr><td>Answers from</td><td>Model memory</td><td>Retrieved facts</td><td>Tools + retrieval</td></tr>
+                <tr><td>Can take actions</td><td>No</td><td>No</td><td><strong>Yes</strong></td></tr>
+                <tr><td>Multi-step</td><td>No</td><td>Usually single-shot</td><td><strong>Yes (loop)</strong></td></tr>
+                <tr><td>Main risk</td><td>Hallucination</td><td>Retrieval miss</td><td>Wrong/irreversible action</td></tr>
+                <tr><td>Exponential AI use</td><td>FAQ</td><td>Grounded Q&amp;A</td><td>Resolve the ticket</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Agent vs fixed workflow</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Property</th><th>Agent (LLM decides)</th><th>Fixed workflow (you decide)</th></tr></thead>
+              <tbody>
+                <tr><td>Flexibility</td><td>High — handles novel paths</td><td>Low — only known paths</td></tr>
+                <tr><td>Predictability</td><td>Lower (stochastic)</td><td><strong>High</strong></td></tr>
+                <tr><td>Best for</td><td>Open-ended, variable tasks</td><td>Stable, well-defined processes</td></tr>
+                <tr><td>Cost/latency</td><td>Higher (many LLM calls)</td><td>Lower</td></tr>
+                <tr><td>Debuggability</td><td>Harder</td><td>Easier</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Common tool types</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tool type</th><th>Example</th><th>Risk level</th></tr></thead>
+              <tbody>
+                <tr><td>Read</td><td><code>get_order</code>, search</td><td>Low</td></tr>
+                <tr><td>Compute</td><td>calculator, code run</td><td>Low–medium</td></tr>
+                <tr><td>Write / act</td><td><code>issue_refund</code>, send email</td><td><strong>High (irreversible)</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Strengths and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Completes tasks</strong>, not just answers questions.</li>
+                <li><strong>Handles variable paths</strong> without a hard-coded script.</li>
+                <li><strong>Composes tools</strong> — DB, APIs, retrieval, code.</li>
+                <li><strong>Extensible</strong> — add a capability by adding a tool.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages</h3>
+              <ul>
+                <li><strong>Less predictable</strong> — stochastic control flow.</li>
+                <li><strong>Can take wrong/irreversible actions</strong> without guards.</li>
+                <li><strong>Costly &amp; slower</strong> — many LLM calls per task.</li>
+                <li><strong>Harder to debug &amp; test</strong> than fixed code.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Building agents well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Write excellent tool descriptions</strong> — they are prompt, not afterthought.</li>
+                <li><strong>Bound the loop</strong> with step limits and timeouts.</li>
+                <li><strong>Gate irreversible actions</strong> behind approval or dry-run.</li>
+                <li><strong>Make tools idempotent</strong> and log every action for audit.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Using an agent for a fixed process</strong> a workflow would do reliably.</li>
+                <li><strong>Unbounded loops</strong> with no step or cost limit.</li>
+                <li><strong>Giving write access</strong> with no human checkpoint.</li>
+                <li><strong>Too many tools</strong>, overwhelming the model's choice.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What distinguishes an agent from a RAG system?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>RAG retrieves and answers in one shot; an agent runs a loop, calling tools to take actions and using observations to decide the next step until the goal is complete.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Describe the ReAct loop.</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Thought (reason) → Action (tool call) → Observation (result), repeated. Interleaving reasoning with acting lets the model plan and adapt to intermediate results.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>How do you make an agent safe?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Bound steps and cost, make tools idempotent, require approval for irreversible actions, validate tool inputs/outputs, and log everything for audit and rollback.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>When should you NOT use an agent?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>When the process is stable and well-defined — a deterministic workflow is cheaper, faster, and more predictable than letting an LLM decide each step.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">Agents trade <em>predictability</em> for <em>autonomy</em>. The architect's rule of thumb: use the least autonomy that solves the problem. If the path is known, script it; reserve agentic loops for genuinely open-ended tasks, and always wrap them in limits and audit.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">An unguarded agent misreads an observation and issues duplicate refunds in a loop. Idempotent tools, a per-task action limit, and human approval above a dollar threshold would each have stopped it — which is why they are non-negotiable for write tools.</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Vague tool descriptions</strong> that lead the model to misuse tools.</li>
+            <li><strong>No loop bounds</strong>, causing runaway cost or infinite loops.</li>
+            <li><strong>Granting write access</strong> without approval gates or dry-runs.</li>
+            <li><strong>Reaching for an agent</strong> where a simple workflow is safer and cheaper.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Do you actually need an agent?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["Task to automate"]) --> M{"Multi-step with<br/>data-dependent branching?"}
+    M -->|No| WF["Use a fixed workflow / single LLM call"]
+    M -->|Yes| K{"Path knowable in advance?"}
+    K -->|Yes| WF
+    K -->|No| AC{"Needs to take actions?"}
+    AC -->|No| RAG["RAG is enough (Ch 7)"]
+    AC -->|Yes| AG["Use an agent — with guards &amp; limits"]
+            </div>
+            <p class="diagram-caption">Figure 8.2 — Autonomy is a cost; only pay it when the task truly needs it.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before shipping an agent</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Each tool has a clear name, description, and typed schema.</li>
+            <li><i class="fa-solid fa-square-check"></i> Loop has step, time, and cost limits.</li>
+            <li><i class="fa-solid fa-square-check"></i> Irreversible actions require approval or a dry-run.</li>
+            <li><i class="fa-solid fa-square-check"></i> Tools are idempotent; inputs/outputs validated.</li>
+            <li><i class="fa-solid fa-square-check"></i> Every action is logged for audit and rollback.</li>
+            <li><i class="fa-solid fa-square-check"></i> An agent is genuinely warranted over a fixed workflow.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="Tool/function calling lets the LLM act on the world.">
+              <p class="q-text">1. The capability that turns an LLM into an agent is…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">A bigger context window</button>
+                <button class="quiz-option" data-correct="true">Tool / function calling</button>
+                <button class="quiz-option">A higher temperature</button>
+                <button class="quiz-option">More parameters</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="ReAct = Thought, Action, Observation, repeated.">
+              <p class="q-text">2. The ReAct loop cycles through…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Encode, decode, sample</button>
+                <button class="quiz-option" data-correct="true">Thought, Action, Observation</button>
+                <button class="quiz-option">Chunk, embed, retrieve</button>
+                <button class="quiz-option">Train, validate, test</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Irreversible write actions need approval gates.">
+              <p class="q-text">3. Which action most needs a human approval gate?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Reading an order record</button>
+                <button class="quiz-option">Searching the FAQ</button>
+                <button class="quiz-option" data-correct="true">Issuing a large refund</button>
+                <button class="quiz-option">Calculating a total</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Fixed, well-defined processes are better as deterministic workflows.">
+              <p class="q-text">4. When is an agent the wrong choice?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">When the task is open-ended</button>
+                <button class="quiz-option" data-correct="true">When the process is stable and fully knowable in advance</button>
+                <button class="quiz-option">When actions are needed</button>
+                <button class="quiz-option">When tools are available</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            An agent is an LLM given tools and a loop: it reasons, acts, observes, and repeats until a
+            goal is met. Tool calling is the enabling breakthrough, and the ReAct pattern — Thought,
+            Action, Observation — is its beating heart. For Exponential AI this turned a read-only assistant
+            into a system that resolves tickets end-to-end. But autonomy is a cost: agents are less
+            predictable and can take irreversible actions, so bounded loops, idempotent tools, audit
+            logs, and human gates are essential, not optional.
+          </p>
+          <p>
+            This chapter covered a <em>single</em> agent handling a bounded task. Real enterprise goals
+            are bigger: plan a multi-stage project, coordinate specialised sub-tasks, recover from
+            failures over long horizons. Scaling from one tool-using loop to genuine, planning-driven
+            autonomy is the next step.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 9</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              Exponential AI's single agent resolves one ticket beautifully — but ask it to run an entire
+              returns-and-restocking operation and the simple loop strains: it needs to plan, break work
+              into sub-goals, remember across long horizons, and recover from failure. <strong>What
+              separates a tool-using loop from a system that pursues open-ended goals on its own?</strong>
+              That is <a href="09_agentic_ai.html">Chapter 9 — Agentic AI</a>, where planning, memory,
+              and autonomy come together.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 8 of 24 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

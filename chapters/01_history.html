@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="1" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 01 — The Pre-AI Enterprise · Exponential AI Handbook</title>
+  <meta name="description" content="Meet Exponential AI before its first algorithm: how a global retailer ran on people, paper, and gut feel — and the evolution of computing that made AI inevitable." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 01 — The Pre-AI Enterprise · Exponential AI Handbook" />
+  <meta property="og:description" content="Meet Exponential AI before its first algorithm: how a global retailer ran on people, paper, and gut feel — and the evolution of computing that made AI inevitable." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 01 — The Pre-AI Enterprise · Exponential AI Handbook" />
+  <meta name="twitter:description" content="Meet Exponential AI before its first algorithm: how a global retailer ran on people, paper, and gut feel — and the evolution of computing that made AI inevitable." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 24 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <!-- ===== CHAPTER HERO ===== -->
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-landmark"></i> Chapter 01 · The Manual Enterprise</span>
+          <h1 class="chapter-title">Before intelligence: how Exponential AI ran on people, paper, and gut feel</h1>
+          <p class="chapter-lede">
+            Every AI story starts somewhere un-intelligent. This chapter introduces
+            <strong>Exponential AI</strong> — our global retailer — at the moment before its first
+            algorithm, and traces the evolution of computing that made everything after it
+            inevitable. To understand <em>why</em> AI was invented, you first have to feel the pain
+            it was invented to remove.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~16 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <!-- 1. RECAP + INTRO -->
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Meet Exponential AI</h2>
+          <p>
+            There is no previous chapter to recap, so let us set the stage that the entire handbook
+            will build on. <strong>Exponential AI</strong> is a fictional global retailer: 1,200 stores
+            across four continents, a growing e-commerce arm, 40,000 employees, and a catalogue of
+            two million SKUs. It is successful, profitable — and, in the year our story opens,
+            almost entirely <em>manual</em>. Demand is forecast in spreadsheets. Customer emails are
+            answered by hand. Product photos are sorted by interns. Fraud is caught, when it is
+            caught, by an analyst noticing something odd on a Tuesday.
+          </p>
+          <p>
+            We begin here deliberately. Across the next nineteen chapters you will watch this exact
+            company transform — machine learning, then deep learning, then transformers, LLMs, RAG,
+            agents, and ultimately an autonomous enterprise. But transformation only makes sense
+            against a baseline. This chapter is that baseline: the pre-AI enterprise, and the long
+            arc of computing history that primed it for change.
+          </p>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Place every later technology on a single evolutionary timeline, articulate why rule-based automation hit a wall, and recognise the three "waves" of AI that set up machine learning — the subject of Chapter 2.</p>
+          </div>
+        </section>
+
+        <!-- 2. WHY EXISTS -->
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why computing — and eventually AI — had to exist</h2>
+          <p>
+            Every wave of computing was invented to remove a specific human bottleneck. Manual
+            ledgers didn't scale, so we built <strong>computers</strong> to calculate. Repetitive
+            calculation didn't scale, so we built <strong>programming</strong> to encode procedures
+            once and run them forever. Hand-written procedures couldn't cover every case, so we built
+            <strong>automation</strong> and <strong>expert systems</strong> that captured human rules.
+          </p>
+          <p>
+            And then those hit their own wall — the wall this whole handbook is about. Rules only
+            work when a human can <em>write the rule</em>. Exponential AI could write "flag any order over
+            $10,000 for review," but it could not write a rule for "recognise a fraudulent order that
+            looks completely normal," or "predict which customer is about to leave," or "understand
+            what this angry email is actually asking for." Those tasks have patterns, but no human can
+            enumerate them. AI exists precisely to learn the rules we cannot write.
+          </p>
+        </section>
+
+        <!-- 3. PROBLEM -->
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Exponential AI's operational problems in the pre-AI era share a common shape: they are
+            <strong>high-volume, pattern-rich, and rule-resistant</strong>. Consider three:
+          </p>
+          <ol>
+            <li><strong>Demand forecasting.</strong> Buyers guess how many units to stock. Guess high, capital rots in a warehouse; guess low, shelves go empty. The pattern (seasonality, promotions, weather, trends) is real but too complex for a spreadsheet formula.</li>
+            <li><strong>Customer churn.</strong> Thousands of customers quietly stop buying each month. The signals exist in the data, but no analyst can watch every account.</li>
+            <li><strong>Support triage.</strong> 8,000 emails a day, each needing to be read, understood, categorised, and routed — work that is simultaneously mind-numbing and genuinely cognitive.</li>
+          </ol>
+          <p>
+            The formal problem: <em>we need systems that map complex inputs to good decisions, where
+            the mapping is learned from data rather than hand-specified.</em> That single sentence is
+            the seed of machine learning — and every chapter that follows.
+          </p>
+        </section>
+
+        <!-- THREE LEVELS -->
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <p>The core idea of this chapter — that intelligence is a response to bottlenecks — at three depths.</p>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>Tools follow pain</h4>
+              <p>Humans invent a tool whenever a job becomes too big to do by hand. Calculators followed arithmetic pain; software followed calculation pain; AI follows "judgement" pain — decisions too subtle to write down.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>From procedures to patterns</h4>
+              <p>Traditional software is <em>procedural</em>: a human specifies the logic. AI flips this — you specify examples and desired outcomes, and the system infers the logic. The unit of work shifts from "write code" to "curate data."</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>Capability boundaries move</h4>
+              <p>Each computing wave redrew the line between "what only humans can do" and "what machines can do." An architect's job is to track where that boundary is <em>this year</em> and design systems that sit just inside it — never over-trusting the frontier.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. HISTORY -->
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>The long road to intelligence</h2>
+          <p>The evolution below is the spine of the whole handbook; every later chapter is a point further along it.</p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>1940s–50s — Computers</h4><p>Machines that calculate faster than humans. Pure arithmetic, no autonomy.</p></div>
+              <div class="timeline-item"><h4>1950s–70s — Programming &amp; automation</h4><p>Encode a procedure once, run it forever. Exponential AI's payroll and inventory ledgers move onto mainframes.</p></div>
+              <div class="timeline-item"><h4>1970s–80s — Expert systems</h4><p>Capture human expertise as thousands of hand-written IF-THEN rules. Powerful, but brittle and impossible to maintain at scale.</p></div>
+              <div class="timeline-item"><h4>1990s–2010s — Machine learning</h4><p>Stop writing rules; learn them from data. The pivot this handbook is built around (Chapter 2).</p></div>
+              <div class="timeline-item"><h4>2012+ — Deep learning</h4><p>Learn the features too, not just the rules. Vision and speech fall (Chapter 3).</p></div>
+              <div class="timeline-item"><h4>2017+ — Transformers &amp; foundation models</h4><p>One architecture, pretrained at scale, generalising across tasks (Chapters 4–5 onward).</p></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. ARCHITECTURE -->
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>How the pre-AI enterprise was wired</h2>
+          <p>
+            To appreciate what AI changes, look at how decisions actually flowed at Exponential AI. The
+            architecture was <strong>human-in-the-middle by default</strong>: data landed in systems
+            of record (ERP, CRM, spreadsheets), and every non-trivial decision required a person to
+            read it, interpret it, and act. Software stored and moved information; humans supplied all
+            the judgement.
+          </p>
+          <p>
+            Three structural properties defined this era. First, <strong>throughput was capped by
+            headcount</strong> — to handle more, you hired more. Second, <strong>quality was
+            inconsistent</strong> — two analysts facing the same data reached different conclusions.
+            Third, <strong>knowledge was trapped in people</strong> — when an expert buyer retired,
+            their intuition walked out the door. Machine learning attacks all three at once, which is
+            why the transition, once it started, was so fast.
+          </p>
+        </section>
+
+        <!-- 6. STEP BY STEP -->
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>A day in the manual life: one support email</h2>
+          <ol>
+            <li><strong>Arrival.</strong> A customer emails: "My order #48122 arrived damaged, I want a refund." It lands in a shared inbox with 8,000 siblings.</li>
+            <li><strong>Read &amp; classify.</strong> A human agent reads it, mentally tags it "refund / damaged goods," and checks the order system.</li>
+            <li><strong>Look up.</strong> The agent switches to the ERP, finds order #48122, confirms it shipped, and reads the returns policy PDF.</li>
+            <li><strong>Decide.</strong> Using judgement and policy, the agent decides the refund qualifies.</li>
+            <li><strong>Act.</strong> The agent issues the refund in a third system and writes a reply.</li>
+            <li><strong>Repeat.</strong> ~40 times an hour, per agent, forever.</li>
+          </ol>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> The bottleneck, made concrete</div>
+            <p style="margin:0">Steps 2, 4, and 5 are pure cognition — reading intent, applying policy, composing language. Every later chapter chips away at automating exactly these steps, culminating in agents that do all six.</p>
+          </div>
+        </section>
+
+        <!-- 7. ANALOGIES -->
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture the pre-AI enterprise</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-people-roof"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A newsroom that sets every headline by hand. It works at small scale, but when the news doubles, the only lever is more journalists. There is no printing press yet — that press is machine learning.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-building"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Exponential AI's operations are a giant lookup table maintained by people: input arrives, a human finds the matching response. It scales linearly with staff and degrades under load.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-code"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>It's a codebase where every branch is hand-written. Expert systems tried to add more branches; the combinatorial explosion of edge cases made the code unmaintainable — the classic "big ball of if-statements."</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-sitemap"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A system with no cache and no index — every request triggers a full manual scan by a human worker. AI adds the learned "index" that maps inputs to answers without a linear human scan.</p></div>
+          </div>
+        </section>
+
+        <!-- 8. ASCII -->
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>Decision flow, before AI</h2>
+          <pre class="ascii">      DATA (ERP / CRM / spreadsheets / inbox)
+                    |
+                    v
+        +-------------------------+
+        |        HUMAN            |   <- reads, interprets, judges
+        |  (analyst / agent /     |      the ONLY place logic lives
+        |   buyer / reviewer)     |
+        +-------------------------+
+                    |
+                    v
+              ACTION (refund, order, route, flag)
+                    |
+              throughput = f(headcount)   <- the wall</pre>
+        </section>
+
+        <!-- 9. MERMAID -->
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>The evolution of intelligence, as a flow</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart LR
+    A["Human intuition"] --> B["Computers"]
+    B --> C["Programming"]
+    C --> D["Automation"]
+    D --> E["Expert systems<br/>(hand-written rules)"]
+    E -->|"rules don't scale"| F["Machine Learning<br/>(learned rules)"]
+    F --> G["Deep Learning"]
+    G --> H["Transformers &amp; LLMs"]
+    H --> I["Agents &amp; Autonomy"]
+            </div>
+            <p class="diagram-caption">Figure 1.1 — Each arrow is a bottleneck removed. This handbook walks from E onward.</p>
+          </div>
+        </section>
+
+        <!-- 10. COMPARISON TABLES (>=2) -->
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>Manual vs rules vs learning</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Dimension</th><th>Manual process</th><th>Rule-based automation</th><th>Machine learning</th></tr></thead>
+              <tbody>
+                <tr><td>Who writes the logic</td><td>Nobody (in a person's head)</td><td>A human, explicitly</td><td><strong>Learned from data</strong></td></tr>
+                <tr><td>Scales with volume</td><td>No (needs headcount)</td><td>Yes, if cases are known</td><td><strong>Yes</strong></td></tr>
+                <tr><td>Handles unseen edge cases</td><td>Sometimes (judgement)</td><td>No (falls through)</td><td>Often (generalises)</td></tr>
+                <tr><td>Consistency</td><td>Low</td><td>High</td><td>High</td></tr>
+                <tr><td>Maintenance cost</td><td>Training people</td><td>Editing rules (explodes)</td><td>Retraining on new data</td></tr>
+                <tr><td>Best for</td><td>Rare, high-judgement work</td><td>Stable, well-defined rules</td><td><strong>High-volume pattern tasks</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">The three waves of AI</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Wave</th><th>Core idea</th><th>Strength</th><th>Fatal limitation</th></tr></thead>
+              <tbody>
+                <tr><td>Symbolic / Expert systems</td><td>Encode human rules as logic</td><td>Transparent, explainable</td><td>Brittle; can't handle ambiguity or scale</td></tr>
+                <tr><td>Statistical / Machine learning</td><td>Learn patterns from labelled data</td><td>Generalises; scales</td><td>Needs features &amp; labelled data</td></tr>
+                <tr><td>Connectionist / Deep learning</td><td>Learn features <em>and</em> rules via neural nets</td><td>Handles raw images/text/audio</td><td>Data- &amp; compute-hungry; opaque</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 11 & 12 ADV/DIS -->
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Was the manual enterprise all bad?</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages of the manual era</h3>
+              <ul>
+                <li><strong>Full accountability</strong> — a named human owns every decision.</li>
+                <li><strong>Judgement &amp; empathy</strong> — nuance machines still struggle with.</li>
+                <li><strong>No model risk</strong> — nothing silently drifts or hallucinates.</li>
+                <li><strong>Simplicity</strong> — no training data, pipelines, or GPUs.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages</h3>
+              <ul>
+                <li><strong>Linear cost</strong> — growth means proportional hiring.</li>
+                <li><strong>Inconsistency</strong> — outcomes vary by who is on shift.</li>
+                <li><strong>Knowledge loss</strong> — expertise leaves with people.</li>
+                <li><strong>Slow &amp; un-scalable</strong> — no leverage on volume.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 13 & 14 -->
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Modernising a manual enterprise — well and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Digitise before you learn.</strong> Clean, captured data is the prerequisite for any ML.</li>
+                <li><strong>Start where volume is high and judgement is low.</strong> Forecasting and triage before nuanced disputes.</li>
+                <li><strong>Keep humans in the loop early.</strong> Augment decisions before you automate them.</li>
+                <li><strong>Measure the baseline first</strong> so you can prove the model helped.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Automating a broken process</strong> — you just make bad decisions faster.</li>
+                <li><strong>Buying AI with no data strategy</strong> — models starve without clean inputs.</li>
+                <li><strong>Encoding ever-more rules</strong> to dodge the real shift to learning.</li>
+                <li><strong>Removing humans before trust is earned.</strong></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 15 INTERVIEW -->
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why did expert systems fail to scale?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>They required humans to hand-write every rule. Real-world edge cases explode combinatorially, making the rule base brittle and impossible to maintain — the motivation for learning rules from data instead.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What fundamentally distinguishes ML from traditional software?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Traditional software: humans write the logic. ML: humans provide examples and the system infers the logic. The deliverable shifts from code to curated data + a trained model.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Where should an enterprise apply AI first?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>High-volume, pattern-rich, rule-resistant tasks with clean data and tolerable error cost — e.g. demand forecasting or support triage — not rare high-stakes judgement calls.</p></div>
+          </div>
+        </section>
+
+        <!-- 16 ARCHITECT -->
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">The manual enterprise trades <em>scalability</em> for <em>accountability and nuance</em>. The architect's task across this handbook is not to eliminate humans, but to move them <em>up the value chain</em> — from doing repetitive cognition to supervising systems that do it.</p>
+          </div>
+          <div class="callout is-ok">
+            <div class="callout-title"><i class="fa-solid fa-lightbulb"></i> Enterprise perspective</div>
+            <p style="margin:0">Data is the true prerequisite. Exponential AI could only start its AI journey because a decade of digitisation had captured its transactions, tickets, and images. No data, no learning — a theme that returns in RAG (Ch 7) and context engineering (Ch 14).</p>
+          </div>
+        </section>
+
+        <!-- 17 MISTAKES -->
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Skipping the baseline.</strong> Without measuring the manual process, you can't prove AI improved anything.</li>
+            <li><strong>Confusing automation with intelligence.</strong> A macro is not a model; rules aren't learning.</li>
+            <li><strong>Treating AI as a product to buy</strong> rather than a capability to build on your data.</li>
+            <li><strong>Ignoring change management</strong> — the hardest part is people, not models.</li>
+          </ul>
+        </section>
+
+        <!-- 18 DECISION TREE -->
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Manual, rules, or machine learning?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["New task to automate"]) --> V{"High volume?"}
+    V -->|No| M["Keep manual<br/>(judgement matters more than scale)"]
+    V -->|Yes| R{"Can you write<br/>exact rules?"}
+    R -->|Yes| RULES["Use rule-based automation"]
+    R -->|No| D{"Do you have<br/>labelled data?"}
+    D -->|No| COLLECT["Digitise &amp; collect data first"]
+    D -->|Yes| ML["Use machine learning (Ch 2)"]
+            </div>
+            <p class="diagram-caption">Figure 1.2 — The fork that sends Exponential AI toward Chapter 2.</p>
+          </div>
+        </section>
+
+        <!-- 19 CHECKLIST -->
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Readiness checklist before starting an AI journey</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Core processes are digitised and generate captured data.</li>
+            <li><i class="fa-solid fa-square-check"></i> A high-volume, pattern-rich candidate task is identified.</li>
+            <li><i class="fa-solid fa-square-check"></i> The current manual baseline is measured (cost, time, accuracy).</li>
+            <li><i class="fa-solid fa-square-check"></i> Error tolerance and human-in-the-loop plan are defined.</li>
+            <li><i class="fa-solid fa-square-check"></i> Data quality and access are good enough to learn from.</li>
+            <li><i class="fa-solid fa-square-check"></i> Stakeholders are bought in on augmentation before automation.</li>
+          </ul>
+        </section>
+
+        <!-- 20 QUIZ -->
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="Rules must be hand-written; edge cases explode, making them brittle.">
+              <p class="q-text">1. Why did rule-based expert systems hit a wall?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">They were too slow to run.</button>
+                <button class="quiz-option" data-correct="true">Humans had to write every rule, and edge cases exploded combinatorially.</button>
+                <button class="quiz-option">They required GPUs that didn't exist.</button>
+                <button class="quiz-option">They used too much labelled data.</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="ML infers logic from examples; traditional software has logic written by humans.">
+              <p class="q-text">2. What is the defining difference between ML and traditional software?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">ML runs in the cloud; software runs locally.</button>
+                <button class="quiz-option" data-correct="true">ML infers logic from data; traditional software has logic written by a human.</button>
+                <button class="quiz-option">ML never makes mistakes.</button>
+                <button class="quiz-option">Software cannot scale.</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Manual work scales with headcount — the core limitation.">
+              <p class="q-text">3. The throughput of Exponential AI's manual support was capped by…</p>
+              <div class="quiz-options">
+                <button class="quiz-option" data-correct="true">Headcount.</button>
+                <button class="quiz-option">GPU memory.</button>
+                <button class="quiz-option">Context window size.</button>
+                <button class="quiz-option">Token cost.</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Clean, captured data is the prerequisite for any learning system.">
+              <p class="q-text">4. What is the true prerequisite for an enterprise AI journey?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">A large marketing budget.</button>
+                <button class="quiz-option">The newest GPUs.</button>
+                <button class="quiz-option" data-correct="true">Digitised, captured, reasonably clean data.</button>
+                <button class="quiz-option">A chatbot vendor.</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 21 SUMMARY -->
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            Exponential AI begins as a successful but entirely manual enterprise, where software stores
+            information and humans supply all the judgement. That model is accountable and nuanced but
+            capped by headcount, inconsistent, and leaky of knowledge. The history of computing —
+            computers, programming, automation, expert systems — is a sequence of bottlenecks removed,
+            each wave pushing the frontier of "what machines can do" outward.
+          </p>
+          <p>
+            The final wall of the pre-AI era is the one only learning can breach: tasks with real
+            patterns but no writable rules. Recognising that wall is the whole point of this chapter,
+            because everything that follows is a way over it.
+          </p>
+        </section>
+
+        <!-- 22 TRANSITION -->
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 2</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              Exponential AI's leadership has just accepted an uncomfortable truth: their most valuable
+              decisions — how much to stock, which customers will churn — depend on patterns no human
+              can write into a rule. <strong>What if the company could learn those patterns directly
+              from its own history?</strong> That is the promise of machine learning. In
+              <a href="02_machine_learning.html">Chapter 2 — Machine Learning</a>, Exponential AI trains
+              its first model to predict demand and customer churn, and the age of learned decisions
+              begins.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 1 of 24 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

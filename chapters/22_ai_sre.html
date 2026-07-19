@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="22" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 22 — AI-SRE: Running AI in Production · Exponential AI Handbook</title>
+  <meta name="description" content="Operating AI reliably: observability across quality and cost, SLIs/SLOs/error budgets, alerting, incident response, on-call, drift detection, and disaster recovery." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 22 — AI-SRE: Running AI in Production · Exponential AI Handbook" />
+  <meta property="og:description" content="Operating AI reliably: observability across quality and cost, SLIs/SLOs/error budgets, alerting, incident response, on-call, drift detection, and disaster recovery." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 22 — AI-SRE: Running AI in Production · Exponential AI Handbook" />
+  <meta name="twitter:description" content="Operating AI reliably: observability across quality and cost, SLIs/SLOs/error budgets, alerting, incident response, on-call, drift detection, and disaster recovery." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 24 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-gauge-high"></i> Chapter 22 · Operate &amp; Keep Reliable</span>
+          <h1 class="chapter-title">AI-SRE: running AI in production</h1>
+          <p class="chapter-lede">
+            AIOps (Ch 21) got the new version safely to go-live and left a rollback switch in reach.
+            Keeping it healthy afterwards is a different discipline: observability across quality and cost,
+            SLOs and error budgets, alerting, incident response, on-call, and detecting the silent drift
+            that degrades AI systems without ever throwing an error.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            <a href="21_aiops.html">Chapter 21</a> shipped the refund-triage system to production: versioned
+            in a registry, gated on evaluation, rolled out through a canary, and left with a warm rollback.
+            AIOps ends the moment traffic is flowing steadily. But go-live is a beginning, not an end. A
+            model that passed every offline gate can still degrade in the wild as the world shifts, as
+            traffic mixes change, as an upstream dependency wobbles, or as a rare failure mode finally
+            surfaces at scale. Someone has to <em>run</em> the system — watch it, define what "healthy"
+            means, get paged when it isn't, and fix it under pressure.
+          </p>
+          <p>
+            <strong>AI-SRE</strong> is that discipline: site reliability engineering adapted for
+            non-deterministic, learned systems. It extends classic SRE — SLIs, SLOs, error budgets,
+            alerting, on-call, incident response, disaster recovery — with the signals AI uniquely needs:
+            <em>quality</em> and <em>cost</em> as first-class reliability dimensions, not just latency and
+            uptime. A refund agent that is fast, cheap, and up but quietly approving the wrong refunds is
+            <em>unreliable</em>, and only AI-aware operations will notice.
+          </p>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-road-barrier"></i> What this chapter owns — and what it hands off</div>
+            <p style="margin:0">
+              This chapter owns <strong>operating</strong> live AI: observability (traces/logs/metrics plus
+              quality and cost signals), debugging non-deterministic failures, SLIs/SLOs/error budgets,
+              alerting, incident response and runbooks, on-call, drift and silent-degradation detection,
+              and disaster recovery/failover. It does <strong>not</strong> cover <em>building or shipping</em>
+              — that is <a href="21_aiops.html">Chapter 21 · AIOps</a> — nor the <em>overall methodology</em>
+              — that is <a href="20_sdlc.html">Chapter 20 · AI SDLC</a>. When operations reveal a systemic
+              quality problem, the fix re-enters the lifecycle; AI-SRE detects and contains, it doesn't
+              re-run the methodology or re-ship.
+            </p>
+          </div>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart LR
+    A["Ch 20 · AI SDLC<br/>frame · data · experiment · evaluate"] --> B["Ch 21 · AIOps<br/>build &amp; ship"]
+    B --> C["Ch 22 · AI-SRE<br/>operate &amp; keep reliable"]
+    C -. "evals + incidents feed back" .-> A
+    style C fill:#6366f1,stroke:#4338ca,color:#ffffff
+            </div>
+            <p class="diagram-caption">Figure 22.1 — The final act of the lifecycle. AI-SRE runs what AIOps shipped, and its signals feed the next SDLC iteration.</p>
+          </div>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Instrument an AI system with traces, logs, metrics, and quality/cost signals; define SLIs, SLOs, and error budgets that include quality; run an incident with a runbook; and detect drift and silent degradation before customers do.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why running AI needs its own reliability discipline</h2>
+          <p>
+            Classic SRE was built for deterministic systems whose failures are loud: a service crashes,
+            returns 500s, or gets slow, and metrics like uptime and latency capture health well. AI
+            systems fail differently. The most dangerous failure is <strong>silent</strong>: the service
+            is up, fast, and cheap, but its <em>answers</em> get worse. A forecasting model slowly
+            mis-predicts as buying patterns shift; a product-image classifier degrades when a new product
+            line photographs differently; a refund agent starts approving edge cases it should escalate.
+            No exception is thrown, so uptime dashboards stay green while quality quietly collapses. AI-SRE
+            exists because you cannot operate such systems with reliability signals that only measure
+            whether the lights are on.
+          </p>
+          <p>
+            It also exists because AI failures are <strong>non-deterministic and hard to reproduce</strong>.
+            The same input can yield different outputs across runs, and a failure may depend on a
+            particular context, retrieval result, or model sampling. Debugging by "run it again and watch"
+            often doesn't work, so AI-SRE leans on <em>tracing</em> — capturing the full context, prompts,
+            retrieved documents, tool calls, and outputs of each request — so a failure can be examined
+            after the fact even if it can't be re-triggered on demand.
+          </p>
+          <p>
+            A third driver is <strong>cost as a reliability concern</strong>. Because inference is billed
+            per token (Ch 16), a subtle regression — a prompt that grows, a retrieval that returns more
+            context, a retry loop that fires too often — can multiply spend without any functional error.
+            An AI system that is correct but suddenly costs 5× is an operational incident. AI-SRE therefore
+            treats cost, alongside quality and latency, as a signal with its own SLOs and alerts.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given a live AI system whose failures may be silent, non-deterministic, and expensive rather
+            than loud and reproducible, design operations that (a) make its true health observable across
+            latency, quality, and cost; (b) define what "reliable enough" means and alert when it isn't;
+            (c) enable debugging of failures that can't be reproduced on demand; and (d) detect gradual
+            drift before it harms customers — all while keeping humans sustainably on-call.
+          </p>
+          <p>
+            The organising principle is <strong>reliability includes quality and cost, not just uptime</strong>.
+            Every practice — the signals you collect, the SLOs you set, the alerts you fire, the runbooks
+            you write — must treat "the answers are still good and still affordable" as core to reliability.
+            An AI-SRE practice that inherits classic SRE unchanged will proudly report four-nines
+            availability on a system that is steadily making worse and more expensive decisions.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>A smoke detector for bad answers</h4>
+              <p>It's not enough to know the kitchen's lights are on. You need an alarm for when the food starts tasting wrong — even though nothing is obviously broken.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Signals + SLOs + on-call</h4>
+              <p>Trace every request, track quality and cost SLIs alongside latency, set SLOs and error budgets, alert on breaches, and run incidents from runbooks when they fire.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>Operate the non-deterministic</h4>
+              <p>Design observability so unreproducible failures are debuggable from traces, drift is caught early, cost is bounded, and recovery (rollback/failover) is fast — a system that stays trustworthy in the wild.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From uptime SRE to quality-aware AI-SRE</h2>
+          <p>
+            Reliability practice grew from keeping servers up toward keeping learned systems trustworthy.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>Ops &amp; monitoring</h4><p>Watch CPU, memory, uptime; page when a box falls over.</p></div>
+              <div class="timeline-item"><h4>SRE</h4><p>SLIs/SLOs/error budgets, blameless incidents, and toil reduction formalise reliability.</p></div>
+              <div class="timeline-item"><h4>Observability</h4><p>Traces, logs, and metrics let teams debug complex distributed systems after the fact.</p></div>
+              <div class="timeline-item"><h4>AI-SRE / LLM observability</h4><p>Quality and cost become first-class signals; tracing captures prompts/retrievals/tools; drift detection joins the toolkit.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>Inside an AI-SRE practice</h2>
+          <p>
+            The foundation is <strong>observability</strong> with three classic pillars plus two AI ones.
+            <em>Traces</em> capture the full path of a request — the prompt, retrieved context, tool calls,
+            model version, and output — so an unreproducible failure can still be inspected. <em>Logs</em>
+            record events; <em>metrics</em> aggregate them. On top, <strong>quality signals</strong>
+            (automated evals on sampled live traffic, LLM-as-judge scores, user feedback, escalation rates)
+            and <strong>cost signals</strong> (tokens per request, spend per outcome) turn "are the answers
+            good and affordable?" into measurable telemetry.
+          </p>
+          <p>
+            On these signals sit <strong>SLIs/SLOs/error budgets</strong> that explicitly include quality
+            and cost, not just latency and availability. <strong>Alerting</strong> fires when an SLO is at
+            risk; <strong>on-call</strong> and <strong>incident response</strong> with
+            <strong>runbooks</strong> turn a page into a bounded, repeatable response.
+            <strong>Drift detection</strong> watches input distributions and output quality over time to
+            catch silent degradation early. <strong>Disaster recovery and failover</strong> keep the system
+            serving when a model provider, retrieval store, or region fails — degrading gracefully (e.g.,
+            to a cheaper model or a cached/rule-based fallback) rather than going dark. Crucially, the
+            architecture consumes the health signals that AIOps emitted and can <em>trigger</em> a rollback
+            (AIOps' mechanism) or route a systemic problem back into the SDLC — but it does not build,
+            package, or re-ship; those remain the previous acts' jobs.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>Exponential AI handles a silent quality regression</h2>
+          <ol>
+            <li><strong>Signal.</strong> The quality SLI (sampled-eval precision on refund decisions) drifts from 96% toward 92% over two days; cost per decision also creeps up.</li>
+            <li><strong>Alert.</strong> The error budget burn-rate alert fires before the SLO is fully breached; on-call is paged.</li>
+            <li><strong>Triage from traces.</strong> The responder pulls traces for recent low-quality decisions and finds a new product category with photos the retrieval step mis-grounds.</li>
+            <li><strong>Mitigate.</strong> Per the runbook, they trigger a rollback to the previous known-good version (AIOps' switch) to stop the bleeding.</li>
+            <li><strong>Contain.</strong> Quality returns to baseline; the incident is stabilised without a full outage.</li>
+            <li><strong>Feed back.</strong> The root cause — an unseen data slice — becomes a new hypothesis in the SDLC (Ch 20): expand the eval set and retrain/re-prompt. AI-SRE detected and contained; the lifecycle fixes.</li>
+            <li><strong>Learn.</strong> A blameless postmortem updates the runbook and adds a drift check for new product categories.</li>
+          </ol>
+          <p class="code-label">A quality + cost SLO with a burn-rate alert</p>
+          <pre><code class="language-python">SLO = {"quality_precision": 0.95, "p95_latency_ms": 1500, "cost_per_call": 0.02}
+
+def evaluate_health(window):
+    sli = {
+        "quality_precision": sampled_eval(window),     # AI-specific
+        "p95_latency_ms": p95(window.latencies),
+        "cost_per_call": window.spend / window.calls,  # AI-specific
+    }
+    for k, target in SLO.items():
+        worse = sli[k] &lt; target if k == "quality_precision" else sli[k] &gt; target
+        if worse and burning_error_budget(k, window):
+            page_oncall(k, sli[k], target)             # alert before full breach
+    return sli</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture AI-SRE</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-heart-pulse"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>An ICU monitor. It doesn't just check whether the patient is alive (uptime) — it tracks the vital signs that reveal deterioration early, and it alarms before a crisis, not after.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-clipboard-check"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Quality control on a production line: continuous sampling of finished goods, control charts that flag drift, and a documented response when a batch goes out of spec.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-magnifying-glass-chart"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Distributed tracing and SLOs — but the "error rate" includes a statistical quality score and a cost metric, and many failures can't be reproduced on demand.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-tower-observation"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A control tower: it observes everything in the air, sets the rules for safe operation, coordinates the response to trouble, and reroutes around failures — without building or loading the planes.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>The observe → decide → respond loop</h2>
+          <pre class="ascii">   live AI system (shipped by Ch 21 AIOps)
+        |
+        v
+   [ OBSERVE ]  traces + logs + metrics
+        |        + quality signal + cost signal
+        v
+   [ SLIs vs SLOs / error budget ]
+        |
+   healthy? --yes--> keep serving (watch for drift)
+        | no
+        v
+   [ ALERT -> on-call -> runbook ]
+        |
+        +--> mitigate: rollback (Ch 21 switch) / failover
+        |
+        +--> systemic quality issue? --> feed back to Ch 20 SDLC
+        |
+        v
+   [ blameless postmortem -> update runbook ]</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>Incident response for a quality regression</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    O["Observe: quality + cost<br/>+ latency signals"] --> S{"SLO at risk?<br/>(error budget burning)"}
+    S -->|No| O
+    S -->|Yes| P["Page on-call"]
+    P --> T["Triage from traces<br/>(prompts, retrieval, tools)"]
+    T --> M{"Fast mitigation<br/>available?"}
+    M -->|Rollback / failover| Fix["Stabilise (AIOps switch)"]
+    M -->|Systemic quality issue| FB["Feed back to SDLC (Ch 20)"]
+    Fix --> PM["Blameless postmortem"]
+    FB --> PM
+    PM --> O
+            </div>
+            <p class="diagram-caption">Figure 22.2 — Detect and contain here; re-ship (Ch 21) and re-method (Ch 20) happen in the other acts.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>Reliability compared</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Aspect</th><th>Traditional SRE</th><th>AI-SRE</th></tr></thead>
+              <tbody>
+                <tr><td>Core SLIs</td><td>Latency, uptime, error rate</td><td>+ <strong>quality</strong> and <strong>cost</strong> as first-class</td></tr>
+                <tr><td>Typical failure</td><td>Crash / 500 / slow</td><td>Silent quality degradation</td></tr>
+                <tr><td>Reproducibility</td><td>Usually reproducible</td><td>Often non-deterministic</td></tr>
+                <tr><td>Key debug tool</td><td>Logs + metrics</td><td>Full-context traces (prompt/retrieval/tool)</td></tr>
+                <tr><td>Slow killer</td><td>Resource leaks</td><td>Data/behaviour drift</td></tr>
+                <tr><td>Recovery</td><td>Restart / failover</td><td>Rollback version / degrade to fallback</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">The signals AI-SRE watches</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Signal</th><th>What it tells you</th><th>Example alert</th></tr></thead>
+              <tbody>
+                <tr><td>Traces</td><td>What happened in one request, end to end</td><td>(used for triage, not alerting)</td></tr>
+                <tr><td>Latency</td><td>Is it fast enough?</td><td>p95 &gt; 1.5s</td></tr>
+                <tr><td>Quality</td><td>Are the answers still good?</td><td>sampled precision &lt; 95%</td></tr>
+                <tr><td>Cost</td><td>Is it still affordable?</td><td>cost/decision up 30%</td></tr>
+                <tr><td>Drift</td><td>Has the input/output distribution shifted?</td><td>new-category share &gt; 10%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Investing in AI-SRE: benefits and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Catches silent regressions</strong> before customers do.</li>
+                <li><strong>Bounds cost</strong> with spend SLOs and alerts.</li>
+                <li><strong>Faster recovery</strong> via runbooks and failover.</li>
+                <li><strong>Continuous improvement</strong> through feedback to the SDLC.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages / realities</h3>
+              <ul>
+                <li><strong>Observability cost</strong> — tracing and sampled evals add spend.</li>
+                <li><strong>Quality SLIs are hard</strong> — defining "good" is itself work.</li>
+                <li><strong>Alert tuning</strong> — noisy alerts cause fatigue.</li>
+                <li><strong>On-call burden</strong> on humans must be managed.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>AI-SRE done well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Make quality and cost first-class SLIs,</strong> with SLOs and error budgets.</li>
+                <li><strong>Trace full request context</strong> so unreproducible failures are debuggable.</li>
+                <li><strong>Sample live traffic for evals</strong> to detect drift early.</li>
+                <li><strong>Write runbooks;</strong> practise rollback and failover.</li>
+                <li><strong>Blameless postmortems;</strong> feed root causes back to the SDLC.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Uptime-only dashboards</strong> that miss quality collapse.</li>
+                <li><strong>No tracing</strong> — failures can't be reproduced <em>or</em> inspected.</li>
+                <li><strong>Ignoring cost</strong> until the monthly bill explodes.</li>
+                <li><strong>Blurring the boundary</strong> — re-building/re-shipping here instead of detecting and handing back.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why can't classic SRE signals fully cover AI?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Because the most dangerous AI failure is silent — the service is up and fast but the answers get worse. You need quality and cost as first-class SLIs alongside latency and uptime, or a degrading system looks perfectly healthy.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>How do you debug a failure you can't reproduce?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>With full-context tracing: capture the prompt, retrieved documents, tool calls, model version, and output for each request so the failure can be inspected after the fact even if it can't be re-triggered on demand.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What is drift and how do you detect it?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Drift is gradual change in input or output distributions that degrades quality without any error. Detect it by monitoring input distributions and running sampled evaluations on live traffic over time.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Where does AI-SRE stop?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>It detects and contains — mitigating with rollback or failover — but it doesn't build or re-ship (AIOps, Ch 21) or re-run the methodology (SDLC, Ch 20). Systemic quality issues are handed back to the lifecycle.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">Decide your quality SLI before you need it, and accept that it will be imperfect. A rough, cheap quality signal you actually watch (sampled LLM-as-judge, escalation rate) beats a perfect one you never built. The point of the SLO is to convert "the answers feel worse" into a paging condition — so bias toward a signal that is good enough to alert on today.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">A retrieval store degrades and starts returning stale documents. Uptime stays at 100%, latency is fine, so classic monitoring is silent — but refund quality slowly falls and customers escalate. Without a quality SLI and drift detection, the first "alert" is a wave of complaints days later.</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Measuring only uptime and latency</strong> on a probabilistic system.</li>
+            <li><strong>No traces,</strong> so post-hoc debugging of odd failures is impossible.</li>
+            <li><strong>Alert fatigue</strong> from noisy, poorly tuned thresholds.</li>
+            <li><strong>No graceful degradation</strong> — the system goes dark when a provider fails.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Production quality just dropped — what do you do?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["Quality SLI breaching"]) --> A{"Correlates with a<br/>recent release?"}
+    A -->|Yes| RB["Roll back to known-good (Ch 21)"]
+    A -->|No| B{"Upstream dependency<br/>degraded?"}
+    B -->|Yes| FO["Fail over / degrade to fallback"]
+    B -->|No| C{"Input distribution<br/>shifted (drift)?"}
+    C -->|Yes| FB["Contain, then feed back to SDLC (Ch 20)"]
+    C -->|No| T["Deep-dive traces; open incident"]
+            </div>
+            <p class="diagram-caption">Figure 22.3 — Mitigate first (rollback/failover), then route the root cause to the right act.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before you consider an AI system "operable"</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Full-context tracing on every request.</li>
+            <li><i class="fa-solid fa-square-check"></i> Quality and cost SLIs defined, with SLOs and error budgets.</li>
+            <li><i class="fa-solid fa-square-check"></i> Alerts tuned to burn-rate, not single blips.</li>
+            <li><i class="fa-solid fa-square-check"></i> Runbooks for rollback, failover, and common incidents.</li>
+            <li><i class="fa-solid fa-square-check"></i> Drift detection on inputs and sampled output quality.</li>
+            <li><i class="fa-solid fa-square-check"></i> Graceful degradation path and a sustainable on-call rota.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="AI's most dangerous failure is silent quality degradation, so quality and cost must be first-class SLIs.">
+              <p class="q-text">1. Beyond latency and uptime, AI-SRE treats which as first-class SLIs?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Disk color and fan speed</button>
+                <button class="quiz-option" data-correct="true">Quality and cost</button>
+                <button class="quiz-option">Only request count</button>
+                <button class="quiz-option">Font size</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Full-context traces let you inspect a failure after the fact even when it can't be reproduced.">
+              <p class="q-text">2. To debug non-reproducible AI failures you rely most on…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Rerunning until it fails</button>
+                <button class="quiz-option" data-correct="true">Full-context traces</button>
+                <button class="quiz-option">Bigger models</button>
+                <button class="quiz-option">More RAM</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Drift is gradual distribution change that degrades quality with no error; sampled evals over time catch it.">
+              <p class="q-text">3. Silent, gradual quality loss with no errors is called…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">A crash</button>
+                <button class="quiz-option" data-correct="true">Drift / silent degradation</button>
+                <button class="quiz-option">A syntax error</button>
+                <button class="quiz-option">A cache miss</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="AI-SRE detects and contains; building/shipping is AIOps and methodology is SDLC.">
+              <p class="q-text">4. When AI-SRE finds a systemic quality problem, it…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Re-trains and re-ships itself</button>
+                <button class="quiz-option" data-correct="true">Contains it and feeds the root cause back to the SDLC</button>
+                <button class="quiz-option">Ignores it</button>
+                <button class="quiz-option">Deletes the logs</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            AI-SRE is the operate act of the lifecycle: keeping shipped AI healthy in production. It extends
+            classic SRE with the signals AI demands — quality and cost as first-class SLIs beside latency
+            and uptime — because the most dangerous AI failure is silent, not loud. It relies on
+            full-context tracing to debug non-deterministic failures, on SLOs and error budgets to define
+            "reliable enough," on alerting and runbook-driven incident response with sustainable on-call,
+            and on drift detection, failover, and graceful degradation to stay trustworthy as the world
+            shifts. It detects and contains — rolling back or failing over — and routes systemic problems
+            back to the SDLC rather than rebuilding or re-shipping itself.
+          </p>
+          <p>
+            With methodology (Ch 20), build-and-ship (Ch 21), and operations (Ch 22) in place, Exponential
+            AI can run AI reliably at scale. That mastery of the present raises the natural next question:
+            what is coming that will reshape all of it? Time to look outward, and far.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 23</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              The operational trilogy is complete: Exponential AI now runs AI as a disciplined lifecycle —
+              framed, shipped, and operated. But the ground keeps moving. New silicon, world models,
+              embodied AI, and the AGI debate will reshape what is buildable and operable in the years
+              ahead. <a href="23_frontier.html">Chapter 23 — The Frontier: Advanced &amp; Emerging AI</a>
+              looks honestly at that deep horizon — labelling what is deployable today versus experimental
+              versus speculative — before the finale pulls the whole story together.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 22 of 24 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

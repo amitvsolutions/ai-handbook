@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="3" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 03 — Deep Learning · Exponential AI Handbook</title>
+  <meta name="description" content="Exponential AI teaches computers to see: neural networks, neurons and activations, backpropagation, CNNs vs RNNs vs MLPs, and why deep learning reshaped enterprise AI economics." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 03 — Deep Learning · Exponential AI Handbook" />
+  <meta property="og:description" content="Exponential AI teaches computers to see: neural networks, neurons and activations, backpropagation, CNNs vs RNNs vs MLPs, and why deep learning reshaped enterprise AI economics." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 03 — Deep Learning · Exponential AI Handbook" />
+  <meta name="twitter:description" content="Exponential AI teaches computers to see: neural networks, neurons and activations, backpropagation, CNNs vs RNNs vs MLPs, and why deep learning reshaped enterprise AI economics." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 24 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-layer-group"></i> Chapter 03 · Machines That See</span>
+          <h1 class="chapter-title">Deep Learning: Exponential AI teaches computers to see</h1>
+          <p class="chapter-lede">
+            Classical ML needed humans to hand-craft features. Deep learning removed that ceiling by
+            learning the features itself, straight from raw pixels and signals. This chapter follows
+            Exponential AI as neural networks take over product-image tagging, damaged-package detection,
+            and shelf monitoring — and sets up the architecture that will later conquer language.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            <a href="02_machine_learning.html">Chapter 2</a> ended on a wall. Exponential AI's supervised
+            models were excellent on <em>tabular</em> data — churn, demand — because humans could
+            define the features. But when the vision team tried to auto-tag two million product photos,
+            classical ML stalled: someone would have had to hand-engineer features like "edges,"
+            "textures," and "colour histograms," and even then the results were mediocre. Raw pixels
+            are simply too rich and too variable for hand-crafted features.
+          </p>
+          <p>
+            Deep learning breaks the wall with one idea: <strong>let the model learn the features
+            too</strong>. Stack many layers of simple units, and early layers discover edges, middle
+            layers discover shapes, and late layers discover "this is a running shoe" — all learned
+            automatically from labelled examples. This chapter is where Exponential AI's machines gain
+            perception, and where we meet the neural network that Chapter 4 will reshape for language.
+          </p>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Explain what a neuron, layer, and activation function do; describe forward pass and backpropagation; distinguish CNNs, RNNs, and MLPs; and articulate why deep learning's hunger for data and compute reshaped enterprise AI economics.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why the world invented deep learning</h2>
+          <p>
+            Deep learning exists to kill <strong>feature engineering</strong>. In classical ML, the
+            single biggest determinant of success was how cleverly a human converted raw data into
+            numeric features. That worked for structured records but failed catastrophically for
+            perception: nobody can enumerate the features that distinguish a cat from a dog across
+            lighting, angle, and breed. The information is in the pixels, but the <em>representation</em>
+            has to be discovered, not declared.
+          </p>
+          <p>
+            A deep neural network is a <strong>representation learner</strong>. By composing many
+            nonlinear transformations, it builds its own hierarchy of features, from primitive to
+            abstract, optimised end-to-end for the task. When cheap GPUs and large labelled datasets
+            (like ImageNet) arrived around 2012, this idea suddenly worked spectacularly — and every
+            perception problem Exponential AI had been unable to automate became tractable overnight.
+          </p>
+          <p>
+            It helps to be precise about what "deep" buys you. A shallow model with hand-crafted
+            features asks a human to answer the hardest question — <em>what should the machine look
+            at?</em> — in advance. Depth lets the network answer that question itself, and to answer it
+            differently at each level of abstraction. That is why the same architectural idea, scaled
+            up, later generalised far beyond vision: once you can learn representations from raw data,
+            you are no longer limited by human imagination about features. Exponential AI's leadership grasped
+            the strategic implication immediately — the company's competitive edge would increasingly
+            come from the <em>data</em> it owned rather than the rules its staff could articulate.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given raw, high-dimensional inputs (a 224×224×3 image is ~150,000 numbers) and labels,
+            learn a function that classifies or detects <em>without</em> a human specifying features.
+            The challenge is threefold: the input space is enormous, the useful patterns are
+            hierarchical and spatially local, and the model must generalise across enormous natural
+            variation.
+          </p>
+          <p>
+            The breakthrough that makes this learnable is <strong>backpropagation</strong> plus
+            <strong>gradient descent</strong> at scale: compute how wrong the network is, then push the
+            error backwards through every layer to adjust millions of weights a little in the direction
+            that reduces the error. Repeat over millions of examples and the network self-organises
+            into a feature hierarchy. The cost is data and compute — the recurring theme of this
+            chapter.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>Layers that build understanding</h4>
+              <p>Like an assembly line: the first station sees dots, the next joins them into lines, the next into shapes, the last into "a shoe." Each layer builds on the one before to recognise something more complex.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Weights, activations, backprop</h4>
+              <p>Each neuron computes a weighted sum of its inputs, applies a nonlinearity (ReLU), and passes it on. Training uses backpropagation to compute gradients of a loss with respect to every weight, and gradient descent to update them.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>Compute, data, and inductive bias</h4>
+              <p>Architecture <em>is</em> inductive bias: CNNs assume locality, RNNs assume sequence. Choosing the right bias — and budgeting the data and GPU-hours to train it — is the architect's core deep-learning decision.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From perceptrons to the deep learning revolution</h2>
+          <p>
+            Neural networks were dismissed for decades before three ingredients — data, GPUs, and a few
+            algorithmic tricks — converged to ignite the modern era.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>1958 — The perceptron</h4><p>A single artificial neuron. Powerful idea, but a single layer can't learn nonlinear patterns.</p></div>
+              <div class="timeline-item"><h4>1986 — Backpropagation popularised</h4><p>Efficiently trains multi-layer networks, in principle. Compute and data were still too scarce.</p></div>
+              <div class="timeline-item"><h4>1998 — Convolutional nets (LeNet)</h4><p>CNNs read handwritten digits for banks — the template for all modern vision.</p></div>
+              <div class="timeline-item"><h4>2012 — AlexNet &amp; ImageNet</h4><p>A deep CNN on GPUs crushes the ImageNet benchmark. The deep learning revolution begins in earnest.</p></div>
+              <div class="timeline-item"><h4>2014–16 — Deeper &amp; residual</h4><p>ResNet's skip connections let networks go hundreds of layers deep — an idea Transformers will borrow (Ch 4).</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>Inside a neural network</h2>
+          <p>
+            A neural network is layers of <strong>neurons</strong>. Each neuron takes inputs, multiplies
+            them by learned <strong>weights</strong>, adds a <strong>bias</strong>, and passes the sum
+            through a nonlinear <strong>activation</strong> (commonly ReLU). Stack neurons into layers,
+            stack layers into depth, and the network can approximate astonishingly complex functions —
+            the universal approximation property.
+          </p>
+          <p>
+            The architecture encodes assumptions. A <strong>CNN</strong> (convolutional net) slides
+            small filters across an image, exploiting the fact that a feature like an edge looks the
+            same anywhere — perfect for Exponential AI's product photos. An <strong>RNN/LSTM</strong>
+            processes sequences one step at a time, carrying a hidden state — used for time series and,
+            historically, language. A plain <strong>MLP</strong> (fully-connected net) makes no spatial
+            assumption. Crucially, RNNs' step-by-step nature becomes their fatal flaw for long text —
+            the exact bottleneck Chapter 4's Transformer removes.
+          </p>
+          <p>
+            Two training-time realities shape every deep-learning project. First, networks are trained
+            in <strong>mini-batches</strong>: rather than one example at a time, hundreds flow through
+            together, which is what makes GPUs so effective and RNNs so frustrating (their sequential
+            dependency resists this parallelism). Second, deep nets are prone to <strong>overfitting</strong>
+            because they have so many parameters, so practitioners lean on regularisation, dropout, and
+            data augmentation — synthetically rotating, cropping, and recolouring images so the model
+            sees more variety than it was given. Exponential AI's defect detector, for instance, was trained
+            on a few thousand real photos multiplied into tens of thousands of augmented variants,
+            teaching it that a scratch is a scratch regardless of angle or lighting.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>How a CNN tags a Exponential AI product photo</h2>
+          <ol>
+            <li><strong>Input.</strong> A 224×224 RGB photo of a sneaker becomes a grid of pixel values.</li>
+            <li><strong>Convolution.</strong> Early filters detect edges and colour blobs across the whole image.</li>
+            <li><strong>Pooling.</strong> Downsample to keep the strongest signals and gain translation tolerance.</li>
+            <li><strong>Deeper convolutions.</strong> Later layers combine edges into laces, soles, logos.</li>
+            <li><strong>Flatten &amp; classify.</strong> A dense head maps the final features to category probabilities.</li>
+            <li><strong>Output.</strong> "Footwear → Running shoe, 0.97" — auto-tagged, no human labeller.</li>
+          </ol>
+          <p class="code-label">Forward pass + training, as pseudocode</p>
+          <pre><code class="language-python">def forward(image):
+    x = conv_relu_pool(image)     # low-level features (edges)
+    x = conv_relu_pool(x)         # mid-level features (shapes)
+    x = conv_relu_pool(x)         # high-level features (parts)
+    return softmax(dense(flatten(x)))   # class probabilities
+
+# training loop (backpropagation)
+for images, labels in batches:
+    preds = forward(images)
+    loss  = cross_entropy(preds, labels)
+    grads = backprop(loss)        # error flows backward through layers
+    weights -= lr * grads         # gradient descent update</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture deep learning</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-people-roof"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A relay of specialists inspecting a car on an assembly line: one checks bolts, the next panels, the next the finished shape. Each only understands its own level, but together they judge the whole — layers of a neural net.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-building"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Exponential AI replaces a room of interns tagging photos with a model that learned tagging from the interns' past work — then scales it to millions of images overnight.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-code"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Instead of writing an image parser by hand, you let the network compile one from examples. Backprop is the optimiser; the trained weights are the "binary."</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-sitemap"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Convolution is a shared library reused across every position in the image — parameter sharing — rather than duplicating logic for each pixel region.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>A single neuron, and a stack of them</h2>
+          <pre class="ascii">   inputs      weights
+    x1 ---- w1 --\
+    x2 ---- w2 ---\        sum = w1*x1 + w2*x2 + w3*x3 + b
+    x3 ---- w3 ---/---> ( Σ ) --> [ ReLU ] --> output
+                         bias b        (nonlinearity)
+
+   Stacked into layers:
+    INPUT  ->  [layer 1] -> [layer 2] -> [layer 3] ->  OUTPUT
+    pixels     edges        shapes       objects       class
+              (learned features, no human engineering)</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>The CNN pipeline, as a flow</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart LR
+    IMG["Raw image<br/>224x224x3"] --> C1["Conv + ReLU<br/>edges"]
+    C1 --> P1["Pool"]
+    P1 --> C2["Conv + ReLU<br/>shapes"]
+    C2 --> P2["Pool"]
+    P2 --> C3["Conv + ReLU<br/>parts"]
+    C3 --> FL["Flatten"]
+    FL --> DN["Dense + Softmax"]
+    DN --> OUT["Class probabilities"]
+            </div>
+            <p class="diagram-caption">Figure 3.1 — Features grow more abstract left to right; none are hand-designed.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>Classical ML vs deep learning</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Dimension</th><th>Classical ML</th><th>Deep learning</th></tr></thead>
+              <tbody>
+                <tr><td>Features</td><td>Hand-engineered by humans</td><td><strong>Learned automatically</strong></td></tr>
+                <tr><td>Best data type</td><td>Tabular / structured</td><td>Images, audio, text (raw)</td></tr>
+                <tr><td>Data needed</td><td>Modest (thousands)</td><td>Large (often millions)</td></tr>
+                <tr><td>Compute</td><td>CPU is fine</td><td>GPUs/TPUs typically required</td></tr>
+                <tr><td>Interpretability</td><td>Higher</td><td>Lower (opaque)</td></tr>
+                <tr><td>Exponential AI fit</td><td>Churn, demand</td><td>Photo tagging, defect detection</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">CNN vs RNN vs MLP</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Property</th><th>CNN</th><th>RNN / LSTM</th><th>MLP</th></tr></thead>
+              <tbody>
+                <tr><td>Built-in assumption</td><td>Spatial locality</td><td>Sequential order</td><td>None</td></tr>
+                <tr><td>Great for</td><td>Images, video</td><td>Time series, older NLP</td><td>Tabular, small tasks</td></tr>
+                <tr><td>Parallelism in training</td><td>High</td><td><strong>Low (step-by-step)</strong></td><td>High</td></tr>
+                <tr><td>Long-range memory</td><td>Local</td><td>Struggles (vanishing gradients)</td><td>n/a</td></tr>
+                <tr><td>Weakness</td><td>Not for sequences</td><td>Slow; forgets long context</td><td>No structure prior</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout is-warn" style="margin-top:1.5rem">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> The seed of Chapter 4</div>
+            <p style="margin:0">Note the two red cells in the RNN column: <em>low parallelism</em> and <em>poor long-range memory</em>. Those are exactly the flaws the Transformer eliminates — the reason it, not the RNN, powers modern language AI.</p>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Strengths and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>No feature engineering</strong> — learns representations end-to-end.</li>
+                <li><strong>State-of-the-art</strong> on images, audio, and language.</li>
+                <li><strong>Transferable</strong> — pretrained backbones adapt to new tasks.</li>
+                <li><strong>Scales</strong> with more data and compute (unlike many classical models).</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages</h3>
+              <ul>
+                <li><strong>Data-hungry</strong> — needs large labelled datasets.</li>
+                <li><strong>Compute-intensive</strong> — GPUs, energy, and cost.</li>
+                <li><strong>Opaque</strong> — hard to explain individual decisions.</li>
+                <li><strong>Overkill</strong> for tabular problems trees already solve.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Doing deep learning well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Start from a pretrained model</strong> and fine-tune — rarely train from scratch.</li>
+                <li><strong>Use data augmentation</strong> to stretch limited labelled data.</li>
+                <li><strong>Watch the validation curve</strong> and stop early to avoid overfitting.</li>
+                <li><strong>Match architecture to data</strong> — CNN for images, not an MLP.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Deep nets on tiny tabular data</strong> where boosting wins cheaper.</li>
+                <li><strong>Training from scratch</strong> when transfer learning would do.</li>
+                <li><strong>Ignoring compute cost</strong> until the GPU bill arrives.</li>
+                <li><strong>Trusting an opaque model</strong> for high-stakes calls with no review.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What is an activation function and why is it needed?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A nonlinearity (e.g. ReLU) applied to each neuron's output. Without it, stacked layers collapse into a single linear function, so the network couldn't model complex patterns.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>How does backpropagation work at a high level?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>It applies the chain rule to compute the gradient of the loss with respect to every weight, propagating error from output back to input, so gradient descent can update all weights.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why do CNNs suit images so well?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Convolution exploits spatial locality and parameter sharing — a feature detector is reused across the whole image — making them efficient and translation-tolerant.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What limits RNNs on long sequences?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Sequential processing prevents parallelism, and vanishing/exploding gradients make it hard to retain information across long distances — motivating attention and Transformers.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">Deep learning trades <em>interpretability and cheap compute</em> for <em>raw capability on unstructured data</em>. The architect's move is to reserve it for perception and language, where nothing else works, and keep boosting/trees for tabular decisions — matching tool to data, not chasing hype.</p>
+          </div>
+          <div class="callout is-ok">
+            <div class="callout-title"><i class="fa-solid fa-lightbulb"></i> Enterprise perspective</div>
+            <p style="margin:0">Transfer learning changed the economics: Exponential AI didn't need millions of its own photos, only a pretrained backbone fine-tuned on a few thousand. This "pretrain once, adapt cheaply" pattern is the direct ancestor of foundation models and LLMs (Ch 5).</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Reaching for deep learning by default</strong>, even where a tree wins.</li>
+            <li><strong>Underestimating data needs</strong> and getting an under-trained, unreliable model.</li>
+            <li><strong>Skipping augmentation/regularisation</strong> and overfitting small datasets.</li>
+            <li><strong>Deploying an opaque model</strong> for regulated decisions without explainability.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Deep learning or classical ML?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["What is the data?"]) --> T{"Structured / tabular?"}
+    T -->|Yes| ML["Use trees/boosting<br/>(cheaper, interpretable)"]
+    T -->|No| U{"Images, audio, or text?"}
+    U -->|Yes| D2{"Enough labelled data<br/>or a pretrained model?"}
+    D2 -->|Pretrained available| TL["Fine-tune a pretrained net"]
+    D2 -->|Lots of own data| SC["Train a deep net"]
+    D2 -->|Neither| COL["Collect data / use transfer learning"]
+            </div>
+            <p class="diagram-caption">Figure 3.2 — The "text" branch soon leads to Transformers (Ch 4).</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before shipping a deep learning model</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Data type genuinely warrants deep learning (unstructured).</li>
+            <li><i class="fa-solid fa-square-check"></i> A pretrained backbone considered before training from scratch.</li>
+            <li><i class="fa-solid fa-square-check"></i> Data augmentation and regularisation applied.</li>
+            <li><i class="fa-solid fa-square-check"></i> Compute budget and inference cost estimated.</li>
+            <li><i class="fa-solid fa-square-check"></i> Validation curve monitored; early stopping configured.</li>
+            <li><i class="fa-solid fa-square-check"></i> Explainability plan for any high-stakes use.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="Deep learning's headline advantage is learning features automatically.">
+              <p class="q-text">1. The key advantage of deep learning over classical ML is…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">It always needs less data.</button>
+                <button class="quiz-option" data-correct="true">It learns features automatically instead of relying on hand-engineering.</button>
+                <button class="quiz-option">It is always more interpretable.</button>
+                <button class="quiz-option">It runs faster on CPUs.</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Without nonlinearity, stacked layers collapse to one linear layer.">
+              <p class="q-text">2. Remove all activation functions from a deep net and it becomes…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">More accurate</button>
+                <button class="quiz-option" data-correct="true">Equivalent to a single linear model</button>
+                <button class="quiz-option">A convolutional net</button>
+                <button class="quiz-option">Unable to run at all</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="CNNs exploit spatial locality and parameter sharing.">
+              <p class="q-text">3. Which architecture is the natural fit for product images?</p>
+              <div class="quiz-options">
+                <button class="quiz-option" data-correct="true">CNN</button>
+                <button class="quiz-option">RNN</button>
+                <button class="quiz-option">Plain MLP</button>
+                <button class="quiz-option">Decision tree</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="RNNs process sequentially and forget long-range context — the flaws Transformers fix.">
+              <p class="q-text">4. Which RNN weaknesses motivated the Transformer?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Too interpretable and too fast</button>
+                <button class="quiz-option" data-correct="true">Low parallelism and poor long-range memory</button>
+                <button class="quiz-option">Too little data required</button>
+                <button class="quiz-option">Only works on images</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            Deep learning removed classical ML's dependence on hand-crafted features by learning
+            representations directly from raw data. Stacked layers of neurons, trained by
+            backpropagation and gradient descent, build a hierarchy from edges to objects, and CNNs
+            gave Exponential AI reliable perception — photo tagging, defect detection, shelf monitoring —
+            at a scale humans could never match. The price is data, compute, and opacity, so deep
+            learning earns its place on unstructured problems, not tabular ones.
+          </p>
+          <p>
+            One architecture in this chapter carried a fatal flaw for language: the RNN's sequential,
+            forgetful nature. Solving that flaw produced the single most important architecture in
+            modern AI — and it is the subject of the chapter you have been building toward.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 4</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              Exponential AI can now <em>see</em>. But it still can't <em>read</em>: support emails,
+              contracts, and reviews defeat the sequential RNNs the NLP team tried. Reading one word at
+              a time is too slow and too forgetful. <strong>What if a model could look at every word at
+              once and learn which words matter to which?</strong> That idea — attention — is
+              <a href="04_transformers.html">Chapter 4 — Transformers</a>, the architecture that taught
+              Exponential AI to read and the hinge of this entire handbook.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 3 of 24 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

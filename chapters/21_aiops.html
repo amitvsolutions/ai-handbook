@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="21" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 21 — AIOps: Building &amp; Deploying AI Software · Exponential AI Handbook</title>
+  <meta name="description" content="Build-and-ship mechanics for AI: CI/CD for models and prompts, versioning and registries, packaging and serving, and deployment patterns like canary, blue-green, shadow, and rollback." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 21 — AIOps: Building &amp; Deploying AI Software · Exponential AI Handbook" />
+  <meta property="og:description" content="Build-and-ship mechanics for AI: CI/CD for models and prompts, versioning and registries, packaging and serving, and deployment patterns like canary, blue-green, shadow, and rollback." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 21 — AIOps: Building &amp; Deploying AI Software · Exponential AI Handbook" />
+  <meta name="twitter:description" content="Build-and-ship mechanics for AI: CI/CD for models and prompts, versioning and registries, packaging and serving, and deployment patterns like canary, blue-green, shadow, and rollback." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 24 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-boxes-packing"></i> Chapter 21 · Build &amp; Ship</span>
+          <h1 class="chapter-title">AIOps: building and deploying AI software</h1>
+          <p class="chapter-lede">
+            The lifecycle (Ch 20) produced a ship-ready candidate and a definition of "good enough." AIOps
+            is the engineering discipline that turns that candidate into a live service — repeatably and
+            reversibly — through CI/CD for models and prompts, versioning and registries, and deployment
+            patterns like canary, blue-green, shadow, and rollback.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            <a href="20_sdlc.html">Chapter 20</a> gave Exponential AI a methodology: frame the problem,
+            build a frozen evaluation set, experiment, and promote a candidate only when it clears the bar
+            on the slices that matter. The lifecycle's exit gate produced a concrete artefact — a chosen
+            model or prompt-plus-model system — and a threshold that defines success. What it deliberately
+            did <em>not</em> do was ship it. A candidate that scores well in a notebook is not a product;
+            between "the eval passed" and "customers are using it" lies a whole engineering discipline.
+          </p>
+          <p>
+            <strong>AIOps</strong> is that discipline: the build-and-ship mechanics for AI systems. It
+            answers how you package a model and its prompts, version everything that affects behaviour,
+            gate releases on evaluation, and roll changes out to production in a way that limits risk and
+            can be undone instantly. If the SDLC is the recipe and the taste test, AIOps is the commercial
+            kitchen that produces the dish the same way every service and can pull a bad batch before it
+            reaches the table.
+          </p>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-road-barrier"></i> What this chapter owns — and what it hands off</div>
+            <p style="margin:0">
+              This chapter owns <strong>build &amp; ship</strong>: CI/CD for models and prompts,
+              environments, versioning and registries, packaging and serving, deployment patterns
+              (canary/blue-green/shadow/rollback), and release governance. It does <strong>not</strong>
+              cover the overall methodology — that is <a href="20_sdlc.html">Chapter 20 · AI SDLC</a>. And
+              it stops at go-live: once traffic is flowing, <em>observability, SLOs, incidents, drift, and
+              on-call</em> belong to <a href="22_ai_sre.html">Chapter 22 · AI-SRE</a>. Deploying is getting
+              it out safely; keeping it healthy is the next chapter.
+            </p>
+          </div>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart LR
+    A["Ch 20 · AI SDLC<br/>frame · data · experiment · evaluate"] --> B["Ch 21 · AIOps<br/>build &amp; ship"]
+    B --> C["Ch 22 · AI-SRE<br/>operate &amp; keep reliable"]
+    C -. "evals + incidents feed back" .-> A
+    style B fill:#6366f1,stroke:#4338ca,color:#ffffff
+            </div>
+            <p class="diagram-caption">Figure 21.1 — The middle act. AIOps takes the SDLC's chosen candidate and gets it safely to go-live; operations start next chapter.</p>
+          </div>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Design a CI/CD pipeline for models and prompts with an evaluation gate; version data, models, and prompts in a registry; choose between canary, blue-green, and shadow deployments; and build a release that can roll back instantly.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why deploying AI needs its own mechanics</h2>
+          <p>
+            Ordinary CI/CD versions and ships <em>code</em>. AI systems have three more things that change
+            behaviour and must be shipped together: the <strong>model</strong> (weights or a pinned API
+            version), the <strong>prompts</strong> (which are effectively source code for an LLM), and the
+            <strong>data</strong> the behaviour was derived from. Change any one and the output
+            distribution changes, so "what version is in production?" is a four-part answer, not one git
+            SHA. Traditional pipelines that track only code silently lose the provenance that makes AI
+            releases reproducible and auditable.
+          </p>
+          <p>
+            AIOps also exists because the release gate is different. In classic software, the gate is a
+            deterministic test suite: green means correct. In AI, correctness is statistical, so the gate
+            is an <strong>evaluation</strong> against the SDLC's frozen set — a candidate is promoted only
+            if it clears the metric threshold on the slices that matter. A build can compile perfectly and
+            still be worse than what's live, so the pipeline must block on quality regressions, not just
+            on compilation and unit tests.
+          </p>
+          <p>
+            Finally, the mechanics exist because the blast radius of a bad AI release is large and often
+            invisible at first. A regressed model doesn't crash; it quietly makes worse decisions — more
+            wrong refunds, more mis-tagged product images — which may not show up until customers notice.
+            That is why AIOps leans so heavily on <em>progressive delivery</em> (expose new versions to a
+            sliver of traffic first) and <em>instant rollback</em> (return to the last known-good version
+            in seconds). You cannot rely on catching every regression before release, so you design the
+            release so a missed regression is cheap to reverse.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given a ship-ready candidate (model + prompts + the data lineage behind it) and an evaluation
+            threshold from the lifecycle, build a repeatable pipeline that packages it, records exactly
+            which versions are in play, verifies it still clears the bar, and rolls it out to production
+            such that any regression is contained to a small fraction of traffic and can be reversed
+            instantly — with a clear governance trail of who released what and why.
+          </p>
+          <p>
+            The organising principle is <strong>reversible, progressive delivery gated on evaluation</strong>.
+            Never flip 100% of traffic to a new version on the strength of an offline score alone. Ship
+            behind a gate, expose it gradually while watching the signals, and keep the previous version
+            one switch away. The goal is not to guarantee every release is perfect — it is to guarantee no
+            release can do lasting damage before it is caught and rolled back.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>A test kitchen with an undo button</h4>
+              <p>Serve the new dish to a few tables first. If they love it, serve everyone; if not, switch back to the old recipe instantly. Nobody gets a bad meal at scale.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Versioned artefacts + eval gate + canary</h4>
+              <p>Register the model, prompt, and data version; run the eval in CI; deploy to a canary slice; promote on healthy signals; roll back automatically on regression.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>Reproducible, reversible release system</h4>
+              <p>Design a registry and pipeline so any production behaviour is traceable to exact versions, every release is progressive and instantly reversible, and governance is automatic, not manual.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From code deploys to model deploys</h2>
+          <p>
+            Deployment practice matured from manual releases toward the reversible, progressive delivery AI needs.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>Manual releases</h4><p>Hand-copied builds; slow, risky, hard to reverse.</p></div>
+              <div class="timeline-item"><h4>CI/CD for code</h4><p>Automated build/test/deploy pipelines make code releases fast and repeatable.</p></div>
+              <div class="timeline-item"><h4>MLOps &amp; model registries</h4><p>Models and data become versioned artefacts with lineage; pipelines retrain and package them.</p></div>
+              <div class="timeline-item"><h4>LLMOps &amp; prompt CI</h4><p>Prompts, tools, and API model versions are treated as shippable artefacts, gated by evaluation and rolled out progressively.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>Inside an AIOps pipeline</h2>
+          <p>
+            A production AIOps setup has a few cooperating parts. A <strong>registry</strong> stores
+            versioned artefacts — model weights or a pinned model ID, the prompt set, the data snapshot,
+            and the evaluation results that justified promotion — so any deployed behaviour is fully
+            traceable. A <strong>CI pipeline</strong> triggers on a change to any artefact: it builds the
+            package, runs unit and integration tests, and — critically — runs the <em>evaluation</em>
+            against the frozen set, blocking promotion on a regression. <strong>Environments</strong>
+            (dev → staging → prod) let changes be validated on progressively more realistic traffic.
+          </p>
+          <p>
+            <strong>Packaging &amp; serving</strong> wraps the artefact behind a stable inference interface
+            (a container or a serving endpoint) so callers don't change when the version does.
+            <strong>Deployment control</strong> implements progressive delivery: route a small
+            <em>canary</em> slice or run a <em>shadow</em> copy in parallel, compare against the incumbent,
+            and promote or abort. A <strong>rollback</strong> mechanism keeps the previous version warm and
+            switchable in seconds. Wrapping all of it is <strong>release governance</strong>: approvals,
+            an audit trail, and policy checks (e.g., no model ships without a passing eval and a named
+            owner). Note the deliberate seam — this architecture emits <em>metrics and health signals</em>
+            for the canary decision, but it does not <em>operate</em> those signals long-term; consuming
+            them for SLOs, alerting, and incident response is AI-SRE's architecture (Ch 22).
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>Exponential AI ships a new refund-triage prompt</h2>
+          <ol>
+            <li><strong>Change.</strong> An engineer improves the refund-triage prompt and opens a pull request.</li>
+            <li><strong>CI + eval gate.</strong> The pipeline builds the package and runs the frozen eval; the new prompt beats the incumbent on precision and on the "rare category" slice, so the gate passes.</li>
+            <li><strong>Register.</strong> The prompt version, the pinned model ID, and the eval report are written to the registry with an owner and timestamp.</li>
+            <li><strong>Canary.</strong> Deployment control routes 5% of live traffic to the new version, previous version kept warm.</li>
+            <li><strong>Compare.</strong> The canary's decision quality and cost signals are compared against the incumbent on the same traffic.</li>
+            <li><strong>Promote or roll back.</strong> Healthy → ramp to 100%. Regressed → flip back to the previous version in seconds; no customer sees sustained harm.</li>
+            <li><strong>Hand off.</strong> Once at 100%, ongoing health is watched by AI-SRE (Ch 22), whose signals may later trigger the next iteration back in the SDLC.</li>
+          </ol>
+          <p class="code-label">A release gate: promote only if the eval clears the bar</p>
+          <pre><code class="language-python">def release(candidate, registry, traffic):
+    report = run_eval(candidate, FROZEN_EVAL)         # gate on quality
+    if report.precision &lt; BAR or report.worst_slice &lt; BAR - 0.05:
+        return "blocked: eval regression"
+    version = registry.publish(candidate, report)     # versioned + audited
+    traffic.canary(version, pct=5, keep_warm=registry.current)
+    if traffic.canary_healthy(version):               # signals compared live
+        traffic.promote(version, pct=100)
+        return f"shipped {version}"
+    traffic.rollback()                                # instant, known-good
+    return "rolled back"</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture AIOps</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-industry"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A factory production line with QA gates and a "stop the line" cord. Every unit is built the same way, checked before it leaves, and the line can be reverted instantly if a batch is bad.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-plane-departure"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A phased product rollout to a few stores before national launch: limited exposure, measured results, and a plan to pull the product if early stores report problems.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-code-compare"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Feature flags and canary deploys — but the "feature" is a model or prompt, and the pass/fail gate is a statistical evaluation rather than a boolean test suite.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-box-archive"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>An artefact registry with immutable versions and lineage — like a container registry, but each entry binds model + prompt + data + eval report so any release is reproducible.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>The build-and-ship pipeline</h2>
+          <pre class="ascii">  change (model / prompt / data)
+        |
+        v
+   [ CI: build + tests ] --> [ EVAL GATE vs frozen set ]
+        |                            |
+        |                       fail | (block)
+        |                            v
+        |                     back to iterate (Ch 20)
+        v pass
+   [ REGISTRY: version model+prompt+data+eval, owner ]
+        |
+        v
+   [ CANARY 5% ] --healthy--> [ ramp 100% ] --> GO-LIVE
+        |                                          |
+   regressed                                 (handoff)
+        |                                          v
+        +--> [ ROLLBACK to known-good ]     operate: Ch 22 AI-SRE</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>CI/CD with an evaluation gate</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    C["Change: model /<br/>prompt / data"] --> B["CI: build + tests"]
+    B --> E{"Eval gate:<br/>clears bar on slices?"}
+    E -->|No| I["Block → iterate (Ch 20)"]
+    E -->|Yes| R["Register version<br/>(model+prompt+data+report)"]
+    R --> Can["Canary 5% traffic"]
+    Can --> H{"Canary healthy?"}
+    H -->|No| RB["Rollback to known-good"]
+    H -->|Yes| P["Promote to 100% → go-live"]
+    P --> O["Operate &amp; monitor (Ch 22)"]
+            </div>
+            <p class="diagram-caption">Figure 21.2 — Reversible, progressive delivery gated on evaluation. The pipeline ends at go-live; operations are Chapter 22.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>Mechanics compared</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Aspect</th><th>Traditional CI/CD</th><th>AI CI/CD (AIOps)</th></tr></thead>
+              <tbody>
+                <tr><td>What is versioned</td><td>Code</td><td><strong>Code + model + prompt + data</strong></td></tr>
+                <tr><td>Release gate</td><td>Deterministic tests</td><td>Evaluation vs frozen set (statistical)</td></tr>
+                <tr><td>Artefact store</td><td>Package repo</td><td>Model/prompt registry with lineage</td></tr>
+                <tr><td>Rollout</td><td>Often all-at-once / canary</td><td>Progressive by default (canary/shadow)</td></tr>
+                <tr><td>Failure signature</td><td>Crash / error</td><td>Silent quality regression</td></tr>
+                <tr><td>Rollback target</td><td>Previous code</td><td>Previous model + prompt + config</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Deployment patterns</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Pattern</th><th>How it works</th><th>Rollback</th><th>Best for</th></tr></thead>
+              <tbody>
+                <tr><td>Canary</td><td>Small % of live traffic to new version</td><td>Fast (shift traffic back)</td><td>Most model/prompt changes</td></tr>
+                <tr><td>Blue-green</td><td>Two full environments; switch over</td><td>Instant (flip)</td><td>Big-bang cutovers needing quick reverse</td></tr>
+                <tr><td>Shadow</td><td>New version runs in parallel, no user impact</td><td>N/A (not serving)</td><td>Validating on real traffic pre-launch</td></tr>
+                <tr><td>Rolling</td><td>Replace instances gradually</td><td>Slower</td><td>Stateless services, minor updates</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Investing in AIOps: benefits and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Reproducible releases</strong> with full lineage.</li>
+                <li><strong>Regressions caught</strong> at a gate, not by customers.</li>
+                <li><strong>Contained blast radius</strong> via canary/shadow.</li>
+                <li><strong>Instant rollback</strong> to known-good versions.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages / realities</h3>
+              <ul>
+                <li><strong>Pipeline complexity</strong> — more moving parts to maintain.</li>
+                <li><strong>Eval infra dependency</strong> — the gate is only as good as the eval.</li>
+                <li><strong>Registry discipline</strong> required to avoid version sprawl.</li>
+                <li><strong>Serving cost</strong> of running canaries/shadows in parallel.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>AIOps done well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Version model, prompt, data, and eval together;</strong> pin API model IDs.</li>
+                <li><strong>Gate every release on evaluation,</strong> not just unit tests.</li>
+                <li><strong>Deploy progressively;</strong> keep the previous version warm.</li>
+                <li><strong>Make rollback a single, tested action.</strong></li>
+                <li><strong>Automate governance</strong> — owner, approval, audit on every release.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Shipping on an offline score</strong> straight to 100% traffic.</li>
+                <li><strong>Unpinned model versions</strong> — behaviour changes under you.</li>
+                <li><strong>Prompts edited in production</strong> with no version or review.</li>
+                <li><strong>No rollback plan</strong> — "we'll fix forward" during an incident.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why isn't ordinary CI/CD enough for AI?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Because behaviour depends on model, prompt, and data — not just code — so all four must be versioned and shipped together, and the release gate must be a statistical evaluation rather than a deterministic test suite.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Canary vs blue-green vs shadow?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Canary routes a small % of live traffic to the new version; blue-green keeps two full environments and flips between them; shadow runs the new version in parallel with no user impact to validate on real traffic. Canary and shadow are the AI workhorses.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why is rollback so central to AIOps?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Because AI regressions are silent — worse decisions, not crashes — and you can't catch every one offline. Designing releases to be instantly reversible means a missed regression is cheap rather than catastrophic.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Where does AIOps stop and AI-SRE start?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>AIOps owns getting a version safely to go-live and being able to reverse it. Once traffic is flowing steadily, observability, SLOs, alerting, incidents, and drift detection are AI-SRE's job (Ch 22).</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">Optimise for reversibility over release speed. A slightly slower pipeline that guarantees instant, tested rollback beats a fast one that ships irreversible changes. For AI, where regressions are silent, the cost of a bad release is measured in customer trust — so spend on canary infrastructure and known-good warm standbys, not on shaving minutes off deploys.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">A team upgrades to a newer API model version without pinning or re-evaluating. Overnight the provider changes defaults, refund-triage precision drops, and there's no registered previous version to fall back to. Pinned versions plus an eval gate plus a warm rollback would have made this a non-event.</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Treating prompts as config</strong> instead of versioned, reviewed artefacts.</li>
+            <li><strong>Skipping the canary</strong> because the offline eval "looked fine."</li>
+            <li><strong>No lineage</strong> — can't say which data/model produced a decision.</li>
+            <li><strong>Blurring the boundary</strong> — building monitoring/alerting here instead of shipping mechanics (that's Ch 22).</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Which deployment strategy should you use?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["Ready to release a new version"]) --> A{"Can it run without<br/>affecting users first?"}
+    A -->|Yes, validate silently| Sh["Shadow deploy"]
+    A -->|No, must serve| B{"Need instant full<br/>cutover + reverse?"}
+    B -->|Yes| BG["Blue-green"]
+    B -->|No| C{"Want gradual exposure<br/>with live comparison?"}
+    C -->|Yes| Can["Canary (ramp + auto-rollback)"]
+    C -->|No| Roll["Rolling update"]
+            </div>
+            <p class="diagram-caption">Figure 21.3 — Match the rollout pattern to how much risk and reversibility the change needs.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before a release reaches production traffic</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Model, prompt, data, and eval report versioned in the registry.</li>
+            <li><i class="fa-solid fa-square-check"></i> API model IDs pinned; no floating "latest".</li>
+            <li><i class="fa-solid fa-square-check"></i> Evaluation gate passed on aggregate and key slices.</li>
+            <li><i class="fa-solid fa-square-check"></i> Progressive rollout (canary/shadow) configured.</li>
+            <li><i class="fa-solid fa-square-check"></i> Previous version warm; rollback is one tested action.</li>
+            <li><i class="fa-solid fa-square-check"></i> Release has a named owner and an audit trail.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="AI behaviour depends on model, prompt, and data as well as code, so all must be versioned and shipped together.">
+              <p class="q-text">1. Compared to code CI/CD, AI CI/CD must additionally version…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Nothing extra</button>
+                <button class="quiz-option" data-correct="true">Model, prompt, and data</button>
+                <button class="quiz-option">Only the README</button>
+                <button class="quiz-option">The user's browser</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="The AI release gate is a statistical evaluation against a frozen set, not a boolean test suite.">
+              <p class="q-text">2. The release gate in AIOps is…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">A deterministic unit-test pass</button>
+                <button class="quiz-option" data-correct="true">An evaluation against the frozen set</button>
+                <button class="quiz-option">A manager's approval only</button>
+                <button class="quiz-option">Compilation success</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Shadow deployment runs the new version in parallel with no user impact, ideal for validating on real traffic.">
+              <p class="q-text">3. To validate a new version on real traffic without affecting users, use…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Blue-green</button>
+                <button class="quiz-option" data-correct="true">Shadow deployment</button>
+                <button class="quiz-option">All-at-once</button>
+                <button class="quiz-option">Manual copy</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Post-go-live observability, SLOs, incidents and drift belong to AI-SRE (Ch 22).">
+              <p class="q-text">4. Once the release is live, ongoing monitoring and incidents are owned by…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">This chapter (AIOps)</button>
+                <button class="quiz-option" data-correct="true">Chapter 22 (AI-SRE)</button>
+                <button class="quiz-option">Chapter 20 (SDLC)</button>
+                <button class="quiz-option">No one</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            AIOps is the build-and-ship act of the AI lifecycle. It takes the SDLC's chosen candidate and
+            turns it into a live service through mechanics ordinary CI/CD doesn't cover: versioning the
+            model, prompt, and data together in a registry with lineage; gating releases on evaluation
+            rather than deterministic tests; and rolling out progressively — canary, blue-green, shadow —
+            with instant, tested rollback. Because AI regressions are silent, the discipline optimises for
+            reversibility and contained blast radius, not just release speed, all under automatic release
+            governance.
+          </p>
+          <p>
+            But shipping safely is only half of production. Once traffic flows, the system must be
+            <em>kept</em> healthy: watched, measured against reliability targets, debugged when it fails in
+            non-deterministic ways, and protected against silent drift. That operational discipline is the
+            final act.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 22</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              AIOps got the new version safely to go-live and left a rollback switch within reach. Keeping
+              it healthy day after day — with observability across quality and cost, SLOs and error budgets,
+              alerting, incident response, on-call, and drift detection — is a different discipline.
+              <a href="22_ai_sre.html">Chapter 22 — AI-SRE: Running AI in Production</a> owns everything that
+              happens <em>after</em> the deploy, and its signals are exactly what feed the next iteration
+              back in the lifecycle.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 21 of 24 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

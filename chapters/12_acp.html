@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="12" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 12 — Agent Communication Protocol · Exponential AI Handbook</title>
+  <meta name="description" content="ACP as an emerging category for agent-to-agent communication: discovery, capability profiles, async tasks and identity — with IBM&#x27;s ACP as a notable example and wire formats still converging." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 12 — Agent Communication Protocol · Exponential AI Handbook" />
+  <meta property="og:description" content="ACP as an emerging category for agent-to-agent communication: discovery, capability profiles, async tasks and identity — with IBM&#x27;s ACP as a notable example and wire formats still converging." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 12 — Agent Communication Protocol · Exponential AI Handbook" />
+  <meta name="twitter:description" content="ACP as an emerging category for agent-to-agent communication: discovery, capability profiles, async tasks and identity — with IBM&#x27;s ACP as a notable example and wire formats still converging." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 24 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-comments"></i> Chapter 12 · Agents Talking to Agents</span>
+          <h1 class="chapter-title">Agent Communication Protocols: the emerging peer layer</h1>
+          <p class="chapter-lede">
+            MCP let each of Exponential AI's agents reach tools and data. But an agent is not a tool —
+            it plans, holds state, and can say "no." As agents multiply, they need to talk to
+            <em>each other</em> as peers. Agent Communication Protocols (ACP) are the emerging category
+            aiming to standardise that. This chapter covers the intent honestly: what problem ACP
+            targets, IBM's ACP as a notable example, and why the wire formats are still converging.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~17 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            <a href="11_mcp.html">Chapter 11</a> solved integration sprawl: every tool and data source
+            now exposes one MCP server, and every agent reaches it through one client. But re-read that
+            sentence — MCP connects a <em>model</em> to <em>tools</em>. The relationship is asymmetric:
+            a caller invokes a passive capability that always answers. Exponential AI's returns agent
+            calling the fraud agent is a different shape entirely. Both are autonomous. Either can be
+            busy, can ask a clarifying question, can decline, can take minutes to finish. Treating another
+            agent as if it were a stateless tool loses everything that makes it an agent.
+          </p>
+          <p>
+            So a new question emerges: how do independent agents — possibly built by different teams,
+            frameworks, or companies — <strong>discover each other, describe their capabilities, and
+            exchange messages as peers</strong>? That is the domain of <strong>Agent Communication
+            Protocols (ACP)</strong>. Be clear up front: ACP is best understood today as an
+            <em>emerging category and intent</em>, not a single settled wire format. Several efforts are
+            converging on it, and this chapter describes the shape of the problem and the leading
+            examples rather than declaring a winner.
+          </p>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Emerging-terminology note</div>
+            <p style="margin:0">"ACP" is used by more than one initiative and the specifics are still moving. We describe the category accurately, name <strong>IBM's Agent Communication Protocol</strong> as a notable reference, and flag in NOTES.md that wire formats are still converging. Don't treat any single detail here as a ratified standard.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why the world is reaching for ACP</h2>
+          <p>
+            ACP exists because the "agent as tool" abstraction breaks down at scale. When Exponential AI
+            had one agent, it just called functions. When it had a handful inside one process, LangGraph
+            wired them together (<a href="10_langgraph.html">Chapter 10</a>). But agents are increasingly
+            built by <em>different owners</em>: the fraud agent belongs to the risk team, the logistics
+            agent to operations, and tomorrow a supplier's agent belongs to another company entirely.
+            You cannot put all of them in one graph. They need a shared way to talk across process,
+            team, and organisational boundaries.
+          </p>
+          <p>
+            The requirements that fall out of that are distinctly <em>agent-shaped</em>: discovery (find
+            an agent and learn what it can do), capability description (a machine-readable profile),
+            asynchronous tasks (requests that take time and stream progress), stateful conversations
+            (multi-turn, with identity and context), and negotiation (an agent may accept, decline, or
+            ask for more). A tool-calling protocol like MCP was never meant to carry those semantics.
+            ACP is the category of standards trying to.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given many autonomous agents owned by different parties, define a common protocol for
+            discovering agents, advertising their capabilities, and exchanging messages/tasks as
+            peers — with support for asynchronous, long-running, multi-turn interactions and clear
+            identity — so agents built independently can collaborate without bespoke, pairwise glue.
+          </p>
+          <p>
+            The honest difficulty is that this is being solved <em>right now</em>, in public, by several
+            groups at once. IBM's ACP frames it one way; Google's A2A (next chapter) frames it another;
+            other proposals exist. They agree strongly on the <em>goals</em> and differ on the
+            <em>wire details</em>. The mature architectural stance is to design to the <em>category</em>
+            — discovery, capability profiles, async tasks, identity — while keeping the specific
+            protocol behind an adapter so you can adopt whichever format wins.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>A shared language for coworkers</h4>
+              <p>MCP is like a worker using tools. ACP is like two workers <em>talking to each other</em> — introducing themselves, asking for help, and replying — using an agreed language.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Peer messaging + discovery</h4>
+              <p>ACP-style protocols add agent discovery, a capability profile, and asynchronous, multi-turn message/task exchange between independent agents — semantics tool-calling lacks.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>An interop category, not one spec</h4>
+              <p>Design to the category (discovery, capabilities, async tasks, identity) behind an adapter. Adopt a concrete spec (IBM ACP, Google A2A) without hard-coupling your system to it.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From RPC to agent peers</h2>
+          <p>
+            The idea of machines talking to machines is old; what's new is talking to <em>reasoning,
+            stateful</em> peers.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>Classic RPC / SOA</h4><p>Services call each other — but callees are stateless functions, not autonomous decision-makers.</p></div>
+              <div class="timeline-item"><h4>Agent frameworks (2023–24)</h4><p>Multi-agent systems appear, but agents talk only <em>within</em> one framework/process.</p></div>
+              <div class="timeline-item"><h4>MCP (late 2024)</h4><p>Standardises agent→tool access — deliberately not agent↔agent.</p></div>
+              <div class="timeline-item"><h4>ACP efforts (2025)</h4><p>IBM's ACP, Google's A2A and others push to standardise peer agent communication; wire formats still converging.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>What an ACP-style protocol contains</h2>
+          <p>
+            Across the leading efforts, the <em>building blocks</em> rhyme even where the encodings
+            differ. First, <strong>identity &amp; discovery</strong>: an agent has an addressable
+            endpoint and a way to be found. Second, a <strong>capability profile</strong> — a
+            machine-readable description of what the agent does, its inputs/outputs, and how to reach it
+            (Google's A2A calls this an "Agent Card"; IBM's ACP has its own descriptor). Third, a
+            <strong>message/task model</strong>: a request creates a task that may run asynchronously,
+            stream intermediate updates, and end in a result — because agents don't answer instantly.
+          </p>
+          <p>
+            Fourth, <strong>conversation state</strong>: interactions are multi-turn, so the protocol
+            carries a task/session identity that lets both sides keep context across messages. Fifth,
+            <strong>trust &amp; auth</strong>: since a peer may belong to another team or company,
+            authentication, authorization, and (increasingly) verifiable identity matter more than in
+            the tool case. Note what's shared with MCP — schemas, transports like JSON/HTTP — and what's
+            genuinely new: <em>symmetry</em>. In ACP either side can initiate, decline, or negotiate.
+            IBM positions its ACP around RESTful, standards-friendly agent messaging; the details are
+            still settling, which is exactly why we design to these blocks rather than to one byte layout.
+          </p>
+          <p>
+            It's worth dwelling on why <em>symmetry</em> changes the engineering so much. In the tool
+            model, failure is simple: the tool errors and the caller retries or gives up. Between peers,
+            failure is a conversation — the callee might be temporarily overloaded and ask you to retry
+            later, might partially complete and hand back what it has, or might refuse on policy grounds
+            it will not disclose. That means an ACP-style protocol has to carry <em>status</em> as a
+            first-class concept (accepted, working, input-needed, failed, completed) and let both sides
+            reason about it. It also means idempotency and correlation IDs move from "nice to have" to
+            "mandatory": if Exponential AI's returns agent re-sends a request after a timeout, the fraud
+            agent must recognise it as the same task rather than scoring the order twice. These are the
+            unglamorous details that separate a real peer protocol from a pretty diagram, and they are
+            precisely the details the competing efforts are still refining.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>Returns agent consults the fraud agent</h2>
+          <ol>
+            <li><strong>Discover.</strong> The returns agent looks up the fraud agent and fetches its capability profile.</li>
+            <li><strong>Address.</strong> It sees a "risk_assessment" capability with an input/output contract.</li>
+            <li><strong>Open a task.</strong> It sends a message creating an async task with the order details.</li>
+            <li><strong>Stream.</strong> The fraud agent acknowledges, works, and streams progress ("checking device history…").</li>
+            <li><strong>Negotiate.</strong> It asks a clarifying question ("include chargeback history?"); the returns agent replies.</li>
+            <li><strong>Result.</strong> The fraud agent returns a risk score; the task closes with an auditable trail.</li>
+          </ol>
+          <p class="code-label">A peer task exchange, sketched (illustrative, not a ratified format)</p>
+          <pre><code class="language-json">// returns-agent → fraud-agent : create task
+{"type":"task.create","capability":"risk_assessment",
+ "input":{"order_id":90214,"amount":260.00},
+ "reply_to":"agent://returns","task_id":"t-77a1"}
+
+// fraud-agent → returns-agent : streamed update, then result
+{"type":"task.update","task_id":"t-77a1","status":"working"}
+{"type":"task.result","task_id":"t-77a1",
+ "output":{"risk":"low","score":0.12}}</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture ACP</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-handshake"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Two professionals emailing across companies: they introduce themselves, state what they need, and go back and forth — versus one person pressing a vending-machine button (that's MCP).</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-building"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A B2B contract interface: Exponential AI's agent and a supplier's agent agree on a common way to request and fulfil work across the org boundary.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-code"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Like the early days of web services before REST settled: everyone agreed on the need (services calling services) while SOAP/REST/other formats competed.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-tower-cell"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Telephone standards before one prevailed: the <em>goal</em> (any phone calls any phone) was clear long before a single signalling standard won.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>Tool call vs peer conversation</h2>
+          <pre class="ascii">  MCP (asymmetric)            ACP (symmetric, emerging)
+  agent --call--> [tool]      agentA <==== discover ====> agentB
+        <-result--            agentA --task.create-->  agentB
+     tool always answers      agentA <--update/ask---   agentB
+     no identity of its own   agentA <--result-------   agentB
+                              either side may decline / negotiate</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>A peer task lifecycle</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+sequenceDiagram
+    participant R as Returns agent
+    participant F as Fraud agent
+    R->>F: discover + fetch capability profile
+    R->>F: task.create(risk_assessment)
+    F-->>R: task.update(working)
+    F-->>R: clarify? (chargeback history?)
+    R->>F: yes
+    F-->>R: task.result(score=0.12)
+            </div>
+            <p class="diagram-caption">Figure 12.1 — Async, multi-turn, either side can pause or ask. That's what tool-calling can't express.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>MCP vs ACP vs A2A</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Aspect</th><th>MCP (Ch 11)</th><th>ACP (this chapter)</th><th>A2A (Ch 13)</th></tr></thead>
+              <tbody>
+                <tr><td>Connects</td><td>Model ↔ tools/data</td><td>Agent ↔ agent</td><td>Agent ↔ agent</td></tr>
+                <tr><td>Symmetry</td><td>Asymmetric (caller/callee)</td><td>Symmetric peers</td><td>Symmetric peers</td></tr>
+                <tr><td>Status</td><td>Open standard, adopted</td><td><strong>Emerging category</strong></td><td>Reference spec (Google)</td></tr>
+                <tr><td>Notable example</td><td>Anthropic MCP</td><td>IBM's ACP</td><td>Google A2A</td></tr>
+                <tr><td>Wire format</td><td>Settling</td><td><strong>Still converging</strong></td><td>Defined (Agent Cards, tasks)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Design goals an ACP-style protocol must meet</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Goal</th><th>Why it matters</th><th>Tool-calling has it?</th></tr></thead>
+              <tbody>
+                <tr><td>Discovery</td><td>Find agents you didn't hard-wire</td><td>No</td></tr>
+                <tr><td>Capability profile</td><td>Know what a peer can do</td><td>Partial</td></tr>
+                <tr><td>Async long tasks</td><td>Agents take time</td><td>No</td></tr>
+                <tr><td>Multi-turn state</td><td>Clarify &amp; negotiate</td><td>No</td></tr>
+                <tr><td>Cross-org identity</td><td>Trust across boundaries</td><td>No</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Treat another agent as a tool vs as a peer</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>If you…</th><th>Consequence</th></tr></thead>
+              <tbody>
+                <tr><td>Wrap an agent as a plain tool</td><td>Lose async, negotiation, and identity; brittle</td></tr>
+                <tr><td>Use a peer protocol</td><td>Keep autonomy, streaming, and cross-org trust</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Strengths and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Cross-boundary collaboration</strong> between independently built agents.</li>
+                <li><strong>Agent-shaped semantics</strong>: async, multi-turn, negotiable.</li>
+                <li><strong>Discovery</strong> of agents you didn't pre-wire.</li>
+                <li><strong>Ecosystem potential</strong> — an internet of agents.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages</h3>
+              <ul>
+                <li><strong>Still converging</strong> — no single ratified wire format yet.</li>
+                <li><strong>Fragmentation risk</strong> — multiple competing efforts.</li>
+                <li><strong>Trust &amp; security</strong> are hard across orgs.</li>
+                <li><strong>Overhead</strong> vs a simple in-process call when peers are co-located.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Adopting ACP wisely</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Design to the category</strong>; keep the concrete spec behind an adapter.</li>
+                <li><strong>Model long work as async tasks</strong>, not blocking calls.</li>
+                <li><strong>Authenticate peers</strong> and log every cross-agent exchange.</li>
+                <li><strong>Version capability profiles</strong> explicitly.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Hard-coupling</strong> your whole system to one draft spec.</li>
+                <li><strong>Treating peers as stateless tools.</strong></li>
+                <li><strong>Trusting unauthenticated agents</strong> across boundaries.</li>
+                <li><strong>Synchronous blocking</strong> on long agent tasks.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why isn't MCP enough for agent-to-agent work?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>MCP is asymmetric tool-calling: a caller invokes a passive capability. Agents are symmetric, stateful peers that run async, negotiate, and can decline — semantics MCP doesn't model.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Is ACP a single standard?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>No. It's best described as an emerging category/intent. IBM's ACP is a notable example, Google's A2A is another effort, and wire formats are still converging — don't declare a winner.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What building blocks do ACP efforts share?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Identity/discovery, a machine-readable capability profile, an async message/task model, multi-turn conversation state, and cross-boundary trust/auth.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>How should an architect adopt ACP today?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Build to the category behind an adapter so you can swap the concrete protocol; model long work as async tasks; authenticate and audit every peer exchange.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">The bet is timing. Adopt the <em>category</em> now to be ready for peer collaboration, but don't hard-wire to a draft. An adapter around discovery + capability profile + async tasks lets Exponential AI ride whichever spec (IBM ACP, Google A2A) prevails without rewrites.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">Exponential AI hard-codes one early draft everywhere. Six months later the ecosystem consolidates on a different format, and every agent integration must be rewritten. The lesson: interoperability layers should be swappable while a standard is still converging.</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Assuming ACP is one finished standard.</strong></li>
+            <li><strong>Wrapping peer agents as dumb tools</strong>, losing autonomy.</li>
+            <li><strong>Ignoring cross-org identity and trust.</strong></li>
+            <li><strong>Blocking synchronously</strong> on long-running agent tasks.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Tool, in-process agent, or ACP peer?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["Agent needs another capability"]) --> T{"Is it a passive<br/>tool/data source?"}
+    T -->|Yes| MCP["Use MCP (Ch 11)"]
+    T -->|No, it's an agent| C{"Same process/framework<br/>&amp; owner?"}
+    C -->|Yes| LG["Wire it in LangGraph (Ch 10)"]
+    C -->|No| X{"Cross team/company,<br/>async, negotiable?"}
+    X -->|Yes| ACP["Use an ACP-style peer protocol (behind an adapter)"]
+    X -->|No| LG
+            </div>
+            <p class="diagram-caption">Figure 12.2 — Reach for a peer protocol only when the callee is a truly independent agent.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before wiring agents as peers</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> The callee really is an autonomous agent, not a tool.</li>
+            <li><i class="fa-solid fa-square-check"></i> Concrete protocol sits behind a swappable adapter.</li>
+            <li><i class="fa-solid fa-square-check"></i> Long work modelled as async tasks with streaming.</li>
+            <li><i class="fa-solid fa-square-check"></i> Peers are authenticated; exchanges are audited.</li>
+            <li><i class="fa-solid fa-square-check"></i> Capability profiles are versioned.</li>
+            <li><i class="fa-solid fa-square-check"></i> NOTES.md flag reviewed — no single standard assumed.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="ACP targets symmetric agent↔agent communication; MCP is agent→tool.">
+              <p class="q-text">1. ACP primarily standardises…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Model ↔ tools</button>
+                <button class="quiz-option" data-correct="true">Agent ↔ agent (peers)</button>
+                <button class="quiz-option">Model ↔ GPU</button>
+                <button class="quiz-option">UI ↔ database</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="ACP is an emerging category; wire formats are still converging.">
+              <p class="q-text">2. The correct framing of ACP today is…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">A single ratified standard</button>
+                <button class="quiz-option" data-correct="true">An emerging category, formats still converging</button>
+                <button class="quiz-option">A deprecated idea</button>
+                <button class="quiz-option">Identical to REST</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="IBM's ACP is a notable reference implementation of the category.">
+              <p class="q-text">3. A notable example named for ACP is…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Anthropic's MCP</button>
+                <button class="quiz-option" data-correct="true">IBM's ACP</button>
+                <button class="quiz-option">OpenAI Gym</button>
+                <button class="quiz-option">Apache Kafka</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Design to the category behind an adapter so you can swap specs.">
+              <p class="q-text">4. The safest way to adopt ACP now is…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Hard-code one draft everywhere</button>
+                <button class="quiz-option" data-correct="true">Design to the category behind an adapter</button>
+                <button class="quiz-option">Avoid all agent-to-agent work</button>
+                <button class="quiz-option">Treat peers as stateless tools</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            Once agents outnumber the graphs that can hold them and start crossing team and company
+            lines, they need to talk as peers — not as tools. Agent Communication Protocols are the
+            emerging category aiming to standardise that: discovery, capability profiles, asynchronous
+            multi-turn tasks, and cross-boundary identity. We named IBM's ACP as a notable reference and
+            were deliberately honest that the wire formats are still converging; the architect's move is
+            to design to the category behind a swappable adapter rather than betting the enterprise on
+            one draft.
+          </p>
+          <p>
+            That honesty raises a fair question: if the category is still settling, is there a concrete,
+            documented specification an architect can actually read and build against today? There is —
+            and it's the most fully realised of the peer protocols.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 13</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              We've described the <em>category</em>. Now we anchor it to a concrete reference:
+              <strong>Google's A2A (Agent-to-Agent) protocol</strong>, with its Agent Cards, task
+              lifecycle, and peer messaging. <a href="13_a2a.html">Chapter 13 — A2A</a> makes the
+              abstractions of this chapter tangible and shows exactly how it complements MCP (tools) and
+              fits within the ACP category.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 12 of 24 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

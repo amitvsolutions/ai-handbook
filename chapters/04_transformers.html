@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="4" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 4 — Transformers · Exponential AI Handbook</title>
+  <meta name="description" content="Why the world invented Transformers: the attention mechanism that let Exponential AI's AI finally understand language in parallel, and the architecture behind every modern LLM." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 4 — Transformers · Exponential AI Handbook" />
+  <meta property="og:description" content="Why the world invented Transformers: the attention mechanism that let Exponential AI's AI finally understand language in parallel, and the architecture behind every modern LLM." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 4 — Transformers · Exponential AI Handbook" />
+  <meta name="twitter:description" content="Why the world invented Transformers: the attention mechanism that let Exponential AI's AI finally understand language in parallel, and the architecture behind every modern LLM." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 24 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <!-- ===== CHAPTER HERO ===== -->
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-bolt"></i> Chapter 04 · Language &amp; Knowledge</span>
+          <h1 class="chapter-title">Transformers: the architecture that taught Exponential AI to read</h1>
+          <p class="chapter-lede">
+            Why did the world invent the Transformer? Because reading one word at a time was too
+            slow, too forgetful, and too shallow. This is the story of the mechanism —
+            <strong>attention</strong> — that let machines finally understand language in parallel,
+            and the blueprint behind every model in the rest of this handbook.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <!-- ===== 1. STORY RECAP + INTRODUCTION ===== -->
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            When we left Exponential AI in <a href="03_deep_learning.html">Chapter 3</a>, the company had
+            just taught computers to <em>see</em>. Convolutional neural networks were quietly sorting
+            millions of product photos, flagging mislabelled SKUs, and spotting damaged packaging on
+            the warehouse conveyor. Deep learning had proven that, given enough data and enough layers,
+            a model could learn representations no human had hand-coded. Vision was solved well enough
+            to ship.
+          </p>
+          <p>
+            But Exponential AI does not run on images alone. It runs on <strong>language</strong>: support
+            tickets, product descriptions, supplier contracts, policy documents, chat transcripts, and
+            the endless river of customer emails that Chapter 1 described employees answering by hand.
+            The vision team's success created an obvious, painful question from the Head of Customer
+            Experience: <em>"If a model can understand a photo of a shoe, why can't it understand a
+            paragraph about one?"</em>
+          </p>
+          <p>
+            The answer, in 2016, was uncomfortable: the best language models of the day still read text
+            the way a tired human skims a contract at midnight — one word at a time, forgetting the
+            beginning by the time they reached the end. This chapter is about the invention that broke
+            that ceiling. It is the hinge of the entire handbook: everything after it — LLMs, RAG,
+            agents, and the protocols that coordinate them — stands on the Transformer.
+          </p>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Explain <em>why</em> attention replaced recurrence, describe how a Transformer block turns tokens into meaning, reason about the quadratic cost that shapes every deployment decision, and recognise when a Transformer is — and is not — the right tool.</p>
+          </div>
+        </section>
+
+        <!-- ===== 2. WHY THIS EXISTS ===== -->
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why the world invented the Transformer</h2>
+          <p>
+            The Transformer exists because of a single, stubborn bottleneck: <strong>sequential
+            processing</strong>. Before 2017, the dominant way to handle a sentence was the recurrent
+            neural network (RNN) and its more capable cousin, the LSTM. These models read a sentence
+            like a conveyor belt — token one, then token two, each step updating a small "memory" vector
+            that had to summarise everything seen so far.
+          </p>
+          <p>
+            Two problems flowed from that design. First, <strong>you cannot parallelise a conveyor
+            belt</strong>. Step ten depends on step nine, which depends on step eight, so a GPU with
+            thousands of cores sat mostly idle, forced to wait. Training on internet-scale text would
+            have taken years. Second, that single memory vector was a <strong>bottleneck</strong>: by
+            the time an LSTM reached the end of a long contract clause, the subject of the sentence had
+            faded into statistical noise. Long-range dependencies — "the <em>refund</em>, which the
+            customer requested three paragraphs ago, <em>is</em> approved" — were routinely lost.
+          </p>
+          <p>
+            In 2017, a group of Google researchers published a paper with a deliberately provocative
+            title: <em>"Attention Is All You Need."</em> Their claim was radical. Throw away recurrence
+            entirely. Do not read word by word. Instead, let <strong>every word look at every other word
+            at once</strong>, and learn — directly, in parallel — which words matter to which. That
+            mechanism is <em>self-attention</em>, and the architecture built around it is the
+            Transformer. It didn't just improve translation scores; it removed the ceiling on scale,
+            and scale is what produced everything that followed.
+          </p>
+        </section>
+
+        <!-- ===== 3. PROBLEM STATEMENT ===== -->
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Strip away the narrative and the engineering problem is crisp. Given a sequence of tokens
+            <code>x₁, x₂, …, xₙ</code>, we want to produce a representation of each token that is
+            <em>context-aware</em> — the vector for the word "bank" should differ depending on whether
+            the sentence is about a river or a loan. We want three properties simultaneously, and prior
+            architectures could only ever give us two:
+          </p>
+          <ol>
+            <li><strong>Parallelism</strong> — compute all token representations at the same time, so
+              training scales with hardware rather than sentence length.</li>
+            <li><strong>Constant path length between any two tokens</strong> — token 1 and token 500
+              should be able to influence each other directly, not through 499 lossy hops.</li>
+            <li><strong>Content-based mixing</strong> — how much token A attends to token B should depend
+              on what A and B <em>mean</em>, not merely on how far apart they sit.</li>
+          </ol>
+          <p>
+            RNNs gave content-based mixing and (weakly) long memory but no parallelism. Convolutions
+            gave parallelism but only a <em>local</em> receptive field — path length grew with distance.
+            The Transformer's self-attention is the first mechanism to deliver all three at once, and
+            that is precisely why it won.
+          </p>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> The catch, foreshadowed</div>
+            <p style="margin:0">"Every word looks at every other word" means <strong>n × n</strong> comparisons. That quadratic cost is the price of the Transformer's power and the source of nearly every hard trade-off in later chapters — context windows, token economics, and retrieval all exist partly to manage it.</p>
+          </div>
+        </section>
+
+        <!-- ===== THREE LEVELS ===== -->
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <p>Per the handbook's method, here is the same core idea — self-attention — explained at three levels. Read whichever matches where you are today; re-read the others once the chapter clicks.</p>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>The dinner-party analogy</h4>
+              <p>Imagine each word at a dinner party. Before speaking, every guest quickly glances around the table to see who else is relevant to what they're about to say. "It" glances at "the refund" and realises <em>that's</em> what it refers to. Attention is just every word deciding who to listen to.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Query, Key, Value</h4>
+              <p>Each token emits a <em>Query</em> ("what am I looking for?"), a <em>Key</em> ("what do I offer?"), and a <em>Value</em> ("what I'll contribute if chosen"). Attention scores every Query against every Key, softmaxes them into weights, and returns a weighted blend of Values. Do it in parallel for all tokens and you have one attention layer.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>Learned, differentiable routing</h4>
+              <p>Self-attention is a <em>content-addressable, fully differentiable router</em> over a set. It replaces fixed topology (recurrence, convolution) with topology learned per-input. The architectural consequence: capability scales with data and parameters far more predictably than with prior designs — which is why "just make it bigger" became a viable strategy.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 4. HISTORICAL EVOLUTION ===== -->
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>How we got here</h2>
+          <p>
+            The Transformer did not appear from nothing. It was the resolution of a decade of pressure.
+            The timeline below traces the lineage Exponential AI's own ML team lived through.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>2013 — Word2Vec &amp; embeddings</h4><p>Words became vectors; "king − man + woman ≈ queen" showed geometry could hold meaning. But embeddings were <em>static</em> — one vector per word, blind to context.</p></div>
+              <div class="timeline-item"><h4>2014 — Seq2Seq with RNN/LSTM</h4><p>Encoder–decoder models translated and summarised, but squeezed the entire input into one fixed vector — the infamous information bottleneck.</p></div>
+              <div class="timeline-item"><h4>2015 — Attention as an add-on</h4><p>Bahdanau attention let the decoder "peek" back at all encoder states. It fixed the bottleneck — but was still bolted onto a recurrent core.</p></div>
+              <div class="timeline-item"><h4>2017 — "Attention Is All You Need"</h4><p>Vaswani et al. remove recurrence entirely. Self-attention + feed-forward + positional encodings. Fully parallel, state-of-the-art translation, dramatically faster to train.</p></div>
+              <div class="timeline-item"><h4>2018 → — BERT, GPT and the scaling era</h4><p>Encoder-only (BERT) and decoder-only (GPT) Transformers pretrained on huge corpora. The recipe generalised. Everything in Chapters 5–20 descends from here.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 5. INTERNAL ARCHITECTURE ===== -->
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>Inside a Transformer block</h2>
+          <p>
+            A Transformer is a stack of near-identical <strong>blocks</strong>. Data flows upward through
+            the stack, and each block refines the representation of every token using two sub-layers:
+            <strong>multi-head self-attention</strong> (how tokens exchange information) and a
+            <strong>position-wise feed-forward network</strong> (how each token is individually
+            transformed). Two supporting techniques — <strong>residual connections</strong> and
+            <strong>layer normalisation</strong> — keep the deep stack trainable, and
+            <strong>positional encodings</strong> re-inject the word order that attention, being
+            order-agnostic, would otherwise ignore.
+          </p>
+          <h3>The five components you must know</h3>
+          <ul>
+            <li><strong>Embeddings + positional encoding</strong> — tokens become vectors; a positional signal is added so the model knows sequence order.</li>
+            <li><strong>Multi-head self-attention</strong> — several attention "heads" run in parallel, each learning a different relationship (syntax, coreference, topic).</li>
+            <li><strong>Feed-forward network (FFN)</strong> — a small MLP applied to each position independently; this is where much of the model's stored "knowledge" lives.</li>
+            <li><strong>Residual connections</strong> — each sub-layer adds its output to its input, giving gradients a clean highway through dozens of layers.</li>
+            <li><strong>Layer normalisation</strong> — stabilises activations so very deep stacks converge.</li>
+          </ul>
+
+          <p class="code-label">The block, as pseudocode</p>
+          <pre><code class="language-python">def transformer_block(x, mask=None):
+    # x: (seq_len, d_model)  — one vector per token
+    # 1) tokens exchange information via attention
+    attn = multi_head_attention(query=x, key=x, value=x, mask=mask)
+    x = layer_norm(x + attn)          # residual + norm
+
+    # 2) each token is transformed independently
+    hidden = relu(x @ W1 + b1)        # expand  (d_model -> 4*d_model)
+    ffn    = hidden @ W2 + b2         # project (4*d_model -> d_model)
+    x = layer_norm(x + ffn)           # residual + norm
+    return x
+
+# A full model is just this block, stacked N times.
+def transformer(tokens):
+    x = embed(tokens) + positional_encoding(len(tokens))
+    for _ in range(N_LAYERS):
+        x = transformer_block(x)
+    return x</code></pre>
+
+          <h3>How self-attention actually computes</h3>
+          <p>
+            Each token's vector is projected into three learned vectors: a Query <code>Q</code>, a Key
+            <code>K</code>, and a Value <code>V</code>. The attention output is the famous scaled
+            dot-product formula, where <code>d_k</code> is the key dimension used to keep the scores
+            numerically stable:
+          </p>
+          <pre><code class="language-python">import numpy as np
+
+def softmax(z, axis=-1):
+    z = z - z.max(axis=axis, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=axis, keepdims=True)
+
+def self_attention(X, Wq, Wk, Wv):
+    Q, K, V = X @ Wq, X @ Wk, X @ Wv       # project tokens
+    d_k = Q.shape[-1]
+    scores = (Q @ K.T) / np.sqrt(d_k)      # (n x n) similarity of every pair
+    weights = softmax(scores, axis=-1)     # each row sums to 1
+    return weights @ V                     # blend Values by relevance</code></pre>
+          <p>
+            "Multi-head" simply runs this several times with different learned projections and
+            concatenates the results — letting one head track grammatical subject while another tracks,
+            say, sentiment. The whole thing is differentiable, so back-propagation teaches the model
+            <em>which</em> relationships to attend to.
+          </p>
+        </section>
+
+        <!-- ===== 6. HOW IT WORKS STEP BY STEP ===== -->
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>Following one sentence through the model</h2>
+          <p>Let's trace Exponential AI's actual sentence — <em>"The refund the customer requested is approved"</em> — through a decoder-style Transformer answering a support query.</p>
+          <ol>
+            <li><strong>Tokenise.</strong> The sentence is split into subword tokens (e.g. <code>["The", "refund", "the", "customer", "request", "ed", "is", "approved"]</code>) and mapped to integer IDs.</li>
+            <li><strong>Embed &amp; position.</strong> Each ID becomes a vector; a positional encoding is added so "refund" at position 2 is distinguishable from "refund" elsewhere.</li>
+            <li><strong>Attend.</strong> In the first block, the token "is" computes attention over all tokens and places heavy weight on "refund" — learning that <em>refund</em> is its grammatical subject, even across four intervening words.</li>
+            <li><strong>Transform.</strong> The FFN refines each token's vector using knowledge baked into its weights during pretraining (e.g. that "approved" implies a positive resolution).</li>
+            <li><strong>Repeat.</strong> Steps 3–4 recur through every layer; representations get progressively more abstract and context-rich.</li>
+            <li><strong>Predict.</strong> The final vector for the last position is projected over the vocabulary; a softmax yields probabilities for the next token, and the model emits the most appropriate continuation for the support reply.</li>
+          </ol>
+          <div class="callout is-ok">
+            <div class="callout-title"><i class="fa-solid fa-lightbulb"></i> The key insight</div>
+            <p style="margin:0">Nothing in steps 3–6 is sequential across tokens — every token is processed at once. That single fact is why Exponential AI could train on its entire ten-year support archive in days rather than months.</p>
+          </div>
+        </section>
+
+        <!-- ===== 7. ANALOGIES ===== -->
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture attention</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-people-roof"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel">
+              <p>A newsroom on deadline. Every reporter (token) shouts what they know; each editor (query) instantly scans the room and pulls quotes only from the reporters relevant to <em>their</em> story. No single relay of gossip desk-to-desk (that's the RNN); everyone hears everyone at once and filters by relevance.</p>
+            </div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-building"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel">
+              <p>Exponential AI's cross-functional standup. Instead of information passing hierarchically up and down the org chart (slow, lossy), every team can query a shared channel and directly reference any other team's update. Attention weights are the relevance filters that stop it becoming noise.</p>
+            </div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-code"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel">
+              <p>A content-addressable cache or a hash lookup — but soft. A Query doesn't fetch <em>one</em> Key's Value; it fetches a weighted blend of <em>all</em> Values, weighted by key-similarity. Think <code>dict.get()</code> replaced by a similarity-weighted average over the whole dictionary.</p>
+            </div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-sitemap"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel">
+              <p>A message bus with dynamic, learned routing. Recurrence is a point-to-point pipeline; convolution is a fixed local mesh; attention is a fully-connected bus where routing weights are recomputed per message based on content. Familiar to anyone who has swapped rigid RPC chains for an event-driven backbone.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 8. ASCII DIAGRAM ===== -->
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>The data path, in plain text</h2>
+          <p>A single Transformer block, drawn so it reads even with diagrams disabled:</p>
+          <pre class="ascii">        tokens ("The refund ... is approved")
+           |
+    [ Embedding + Positional Encoding ]
+           |
+           v
+   +-------------------------------+
+   |  MULTI-HEAD SELF-ATTENTION    |   <- every token looks at every token
+   |  Q=xWq  K=xWk  V=xWv          |
+   |  softmax(QKᵀ / sqrt(d_k)) · V |
+   +-------------------------------+
+           |  (+) residual
+           v
+      [ Layer Norm ]
+           |
+           v
+   +-------------------------------+
+   |  FEED-FORWARD NETWORK (MLP)   |   <- per-token transform / "knowledge"
+   |  relu(xW1+b1) W2 + b2         |
+   +-------------------------------+
+           |  (+) residual
+           v
+      [ Layer Norm ]
+           |
+           v   ( x N layers )
+      context-aware vectors  ->  next-token probabilities</pre>
+        </section>
+
+        <!-- ===== 9. MERMAID DIAGRAM ===== -->
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>The stack as a flow</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    A["Input tokens"] --> B["Embedding + Positional Encoding"]
+    B --> C{{"Transformer Block x N"}}
+    C --> D["Multi-Head Self-Attention"]
+    D --> E["Add &amp; LayerNorm"]
+    E --> F["Feed-Forward Network"]
+    F --> G["Add &amp; LayerNorm"]
+    G -->|"repeat N times"| C
+    C --> H["Final token vectors"]
+    H --> I["Linear + Softmax"]
+    I --> J["Next-token probabilities"]
+            </div>
+            <p class="diagram-caption">Figure 4.1 — Information flows up a stack of identical blocks; each block mixes tokens (attention) then transforms them (FFN).</p>
+          </div>
+        </section>
+
+        <!-- ===== 10. COMPARISON TABLE ===== -->
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>Transformer vs. what came before</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Property</th><th>RNN / LSTM</th><th>CNN (for text)</th><th>Transformer</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Parallel over sequence</td><td>No (sequential)</td><td>Yes</td><td><strong>Yes</strong></td></tr>
+                <tr><td>Path length between distant tokens</td><td>O(n)</td><td>O(n / kernel)</td><td><strong>O(1)</strong></td></tr>
+                <tr><td>Long-range dependencies</td><td>Weak (vanishing)</td><td>Local only</td><td><strong>Strong</strong></td></tr>
+                <tr><td>Compute per layer</td><td>O(n · d²)</td><td>O(n · k · d²)</td><td>O(n² · d)</td></tr>
+                <tr><td>Memory in sequence length</td><td>O(n)</td><td>O(n)</td><td>O(n²) ⚠️</td></tr>
+                <tr><td>Scales with more data/params</td><td>Plateaus early</td><td>Moderate</td><td><strong>Predictably (scaling laws)</strong></td></tr>
+                <tr><td>Best fit today</td><td>Tiny/streaming sequences</td><td>Local pattern tasks</td><td><strong>Language, and most sequence modelling</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>The single red flag — <code>O(n²)</code> memory — is deliberate. Hold onto it: Chapters 7 (RAG), 14 (Context Engineering) and 16 (Token Economics) are, in large part, engineering responses to that one cell in the table.</p>
+
+          <h3 style="margin-top:2rem">The three Transformer families — same block, different wiring</h3>
+          <p>One more matrix worth internalising: the same attention block gets wired three ways, and the choice determines what a model is <em>good at</em>. Exponential AI uses all three — encoders to search its catalogue, decoders to talk to customers, and encoder-decoders to translate and summarise.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Dimension</th><th>Encoder-only (e.g. BERT)</th><th>Decoder-only (e.g. GPT)</th><th>Encoder-decoder (e.g. T5)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Attention pattern</td><td>Bidirectional (sees whole input)</td><td>Causal / masked (left-to-right)</td><td>Bidirectional encode + causal decode</td></tr>
+                <tr><td>Primary job</td><td>Understand / represent text</td><td><strong>Generate</strong> text</td><td>Transform input → output</td></tr>
+                <tr><td>Natural tasks</td><td>Classification, search, embeddings</td><td>Chat, completion, reasoning</td><td>Translation, summarisation</td></tr>
+                <tr><td>Output shape</td><td>Vectors / labels (no free-form text)</td><td>A token stream</td><td>A token stream conditioned on input</td></tr>
+                <tr><td>Exponential AI use</td><td>Product &amp; ticket search (feeds Ch 7 RAG)</td><td><strong>Customer assistant (Ch 5 onward)</strong></td><td>Multilingual replies &amp; digests</td></tr>
+                <tr><td>Powers modern LLMs?</td><td>Rarely alone</td><td><strong>Yes — the dominant design</strong></td><td>Sometimes (seq2seq)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Notice the last row: the <strong>decoder-only</strong> design won the LLM era because next-token prediction scales cleanly with data and parameters. That is the thread Chapter 5 picks up.</p>
+        </section>
+
+        <!-- ===== 11 & 12 ADVANTAGES / DISADVANTAGES ===== -->
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Strengths and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Massively parallel</strong> training — the reason internet-scale models became feasible.</li>
+                <li><strong>Direct long-range modelling</strong> — any token can influence any other in one hop.</li>
+                <li><strong>Transfer learning</strong> — pretrain once, fine-tune or prompt for many tasks.</li>
+                <li><strong>Predictable scaling</strong> — more data + parameters reliably improve quality (scaling laws).</li>
+                <li><strong>Modality-agnostic</strong> — the same block now powers vision, audio, and code.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages</h3>
+              <ul>
+                <li><strong>Quadratic cost</strong> in sequence length — long documents are expensive.</li>
+                <li><strong>Data-hungry</strong> — needs large corpora to shine; weak in tiny-data regimes.</li>
+                <li><strong>Compute &amp; energy intensive</strong> — real infrastructure and cost implications.</li>
+                <li><strong>Limited context window</strong> — cannot natively see beyond its trained length.</li>
+                <li><strong>Opaque</strong> — attention weights are suggestive, not a full explanation.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 13 & 14 BEST PRACTICES / ANTI-PATTERNS ===== -->
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Doing it well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Reuse, don't reinvent.</strong> Start from a pretrained Transformer; fine-tune or prompt rather than training from scratch.</li>
+                <li><strong>Right-size the context.</strong> Feed only the tokens that matter — shorter inputs are cheaper <em>and</em> often more accurate.</li>
+                <li><strong>Match architecture to task.</strong> Encoder-only for classification/embeddings; decoder-only for generation; encoder–decoder for translation-style mapping.</li>
+                <li><strong>Measure tokens, not characters.</strong> Cost and limits are in tokens — instrument them early (see Chapter 16).</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Stuffing everything into the prompt</strong> "just in case" — pay quadratic cost, dilute attention, degrade answers.</li>
+                <li><strong>Training a Transformer on 500 examples</strong> — the wrong tool; a smaller model or classical ML will beat it.</li>
+                <li><strong>Treating attention weights as ground-truth explanations</strong> for compliance or audit.</li>
+                <li><strong>Ignoring the context limit</strong> until a long document silently gets truncated in production.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 15. INTERVIEW QUESTIONS ===== -->
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why did Transformers replace RNNs?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Parallelism and constant path length. RNNs process sequentially (no GPU parallelism) and lose long-range signal through a single evolving state; self-attention removes both limits, unlocking scale.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What are Q, K, and V — and why three?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Query = what a token seeks; Key = what a token offers for matching; Value = what it contributes if matched. Separating "how we match" (Q·K) from "what we return" (V) lets the model learn routing independently of content.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why divide the attention scores by √d_k?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Dot products grow with dimension; large values push softmax into saturated regions with vanishing gradients. Scaling by √d_k keeps variance stable so training remains well-behaved.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why does the Transformer need positional encodings?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Self-attention is permutation-invariant — it sees a <em>set</em>, not a sequence. Positional encodings inject order so "dog bites man" ≠ "man bites dog".</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What is the complexity of self-attention, and why does it matter?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>O(n²) in sequence length for both compute and memory. It matters because it caps practical context length and drives cost — the motivation for retrieval, sparse/linear attention, and context engineering.</p></div>
+          </div>
+        </section>
+
+        <!-- ===== 16. ARCHITECT NOTES ===== -->
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0 0 .6rem">The Transformer buys you capability with three currencies: <strong>compute</strong>, <strong>data</strong>, and <strong>context length</strong>. Every downstream design decision at Exponential AI is a negotiation over these. Want a bigger context window? Pay n² memory. Want lower latency? Shrink the model or the input. Want better answers on internal data? Don't fine-tune blindly — retrieve (Chapter 7) so you spend context tokens only on what's relevant.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">Exponential AI pastes entire 40-page supplier contracts into a prompt to "let the model figure it out." Latency triples, cost balloons, and accuracy <em>drops</em> because the relevant clause is drowned in thousands of irrelevant tokens. The architect's move is not a bigger model — it's retrieval + context engineering.</p>
+          </div>
+          <div class="callout is-ok">
+            <div class="callout-title"><i class="fa-solid fa-lightbulb"></i> Enterprise perspective</div>
+            <p style="margin:0">Treat the Transformer as a <em>reasoning engine</em>, not a database. It is superb at transforming and relating text it can currently see, and unreliable at recalling specific facts it merely glimpsed in training. This one mental model prevents most costly architecture mistakes in the chapters ahead.</p>
+          </div>
+        </section>
+
+        <!-- ===== 17. COMMON MISTAKES ===== -->
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Confusing parameters with knowledge.</strong> A bigger model isn't a bigger, fresher database — it still can't know last night's inventory.</li>
+            <li><strong>Assuming attention = interpretability.</strong> High attention weight is a hint, not a causal explanation; don't build compliance on it.</li>
+            <li><strong>Forgetting tokenisation.</strong> Costs, limits, and even model behaviour hinge on subword tokens, not words or characters.</li>
+            <li><strong>Over-fine-tuning.</strong> Reaching for fine-tuning when a good prompt + retrieval would be cheaper, faster, and easier to maintain.</li>
+            <li><strong>Ignoring the context ceiling</strong> until production quietly truncates a long input and answers go subtly wrong.</li>
+          </ul>
+        </section>
+
+        <!-- ===== 18. DECISION TREE ===== -->
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Should you reach for a Transformer?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["Task involves sequences / language?"]) -->|No| CLASSIC["Use classical ML or a CNN"]
+    S -->|Yes| DATA{"Do you have lots of data<br/>or a pretrained model?"}
+    DATA -->|No, tiny data, no pretrained| SMALL["Use smaller model /<br/>classical NLP"]
+    DATA -->|Yes| LONG{"Very long inputs<br/>(&gt; context window)?"}
+    LONG -->|No| TX["Use a pretrained Transformer<br/>(prompt or fine-tune)"]
+    LONG -->|Yes| RETR["Transformer + Retrieval (RAG)<br/>and/or long-context variant"]
+    TX --> DONE(["Ship &amp; measure tokens/latency"])
+    RETR --> DONE
+            </div>
+            <p class="diagram-caption">Figure 4.2 — A first-pass decision tree. Note how "long inputs" routes you straight toward Chapter 7's retrieval.</p>
+          </div>
+        </section>
+
+        <!-- ===== 19. CHECKLIST ===== -->
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before you ship anything on a Transformer</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> Chosen the right architecture (encoder / decoder / encoder–decoder) for the task.</li>
+            <li><i class="fa-solid fa-square-check"></i> Started from a pretrained model rather than training from scratch.</li>
+            <li><i class="fa-solid fa-square-check"></i> Measured input length in <em>tokens</em> and confirmed it fits the context window.</li>
+            <li><i class="fa-solid fa-square-check"></i> Estimated cost &amp; latency at expected sequence lengths (remember n²).</li>
+            <li><i class="fa-solid fa-square-check"></i> Decided retrieval vs. fine-tuning vs. prompting deliberately, not by habit.</li>
+            <li><i class="fa-solid fa-square-check"></i> Added a plan for facts the model can't know (freshness, private data).</li>
+            <li><i class="fa-solid fa-square-check"></i> Set up evaluation before scaling usage (foreshadowing Chapter 17).</li>
+          </ul>
+        </section>
+
+        <!-- ===== 20. QUIZ ===== -->
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="Parallelism + O(1) path length are the two decisive wins over recurrence.">
+              <p class="q-text">1. What is the primary reason Transformers scaled where RNNs could not?</p>
+              <div class="quiz-options">
+                <button class="quiz-option" data-correct="true">They process all tokens in parallel with constant path length between them.</button>
+                <button class="quiz-option">They use fewer parameters than RNNs.</button>
+                <button class="quiz-option">They don't require any training data.</button>
+                <button class="quiz-option">They read text strictly one token at a time, but faster.</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Q·K decides routing/weights; V is what gets blended and returned.">
+              <p class="q-text">2. In self-attention, which pair determines the attention weights?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Value and Value</button>
+                <button class="quiz-option" data-correct="true">Query and Key</button>
+                <button class="quiz-option">Key and Value</button>
+                <button class="quiz-option">Embedding and Position</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Self-attention is permutation-invariant, so order must be added explicitly.">
+              <p class="q-text">3. Why are positional encodings necessary?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">To reduce the model's parameter count.</button>
+                <button class="quiz-option">To make attention run in O(1) memory.</button>
+                <button class="quiz-option" data-correct="true">Because attention alone treats the input as an unordered set.</button>
+                <button class="quiz-option">To encrypt the input tokens.</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="O(n²) memory/compute is the defining cost that later chapters engineer around.">
+              <p class="q-text">4. Which cost most directly motivates RAG, context engineering, and token economics?</p>
+              <div class="quiz-options">
+                <button class="quiz-option" data-correct="true">Self-attention's O(n²) cost in sequence length.</button>
+                <button class="quiz-option">The cost of positional encodings.</button>
+                <button class="quiz-option">The cost of layer normalisation.</button>
+                <button class="quiz-option">The cost of tokenisation.</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== 21. SUMMARY ===== -->
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            The Transformer replaced the sequential conveyor belt of recurrence with
+            <strong>self-attention</strong> — a parallel, content-addressable mechanism in which every
+            token can directly attend to every other. By separating <em>Query</em>, <em>Key</em> and
+            <em>Value</em>, stacking attention with position-wise feed-forward layers, and stabilising
+            the stack with residuals and layer norm, it delivered parallelism, constant-length paths,
+            and content-based mixing all at once. That combination removed the ceiling on scale and made
+            everything downstream — LLMs, RAG, agents, protocols — possible.
+          </p>
+          <p>
+            The price is the quadratic cost of attention, which quietly authors most of the hard
+            engineering decisions in the rest of this handbook. Hold two mental models as you continue:
+            a Transformer is a <em>reasoning engine, not a database</em>, and its power is metered in
+            <em>tokens</em>. Keep both in mind and the coming chapters will feel less like new inventions
+            and more like inevitable answers to problems this architecture created.
+          </p>
+        </section>
+
+        <!-- ===== 22. TRANSITION ===== -->
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 5</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              Exponential AI now has an architecture that can genuinely understand language — but an
+              untrained Transformer knows nothing. <strong>What happens when you feed one nearly the
+              entire public internet and scale it to billions of parameters?</strong> It stops being a
+              translation tool and starts to <em>converse</em>, summarise, and reason. That emergent
+              leap is the subject of <a href="05_llms.html">Chapter 5 — Large Language Models</a>, where
+              Exponential AI's AI finally begins answering employee and customer questions in its own words.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 4 of 24 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

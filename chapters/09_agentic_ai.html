@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="9" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 09 — Agentic AI · Exponential AI Handbook</title>
+  <meta name="description" content="From one loop to goal-directed systems: planning, decomposition, specialised multi-agent roles, reflection, shared state, supervisor vs network topologies — Exponential AI runs whole operations." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 09 — Agentic AI · Exponential AI Handbook" />
+  <meta property="og:description" content="From one loop to goal-directed systems: planning, decomposition, specialised multi-agent roles, reflection, shared state, supervisor vs network topologies — Exponential AI runs whole operations." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 09 — Agentic AI · Exponential AI Handbook" />
+  <meta name="twitter:description" content="From one loop to goal-directed systems: planning, decomposition, specialised multi-agent roles, reflection, shared state, supervisor vs network topologies — Exponential AI runs whole operations." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 24 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-diagram-project"></i> Chapter 09 · Planning &amp; Autonomy</span>
+          <h1 class="chapter-title">Agentic AI: from one loop to systems that pursue goals</h1>
+          <p class="chapter-lede">
+            A single agent resolves one ticket. Agentic AI tackles the whole operation — decomposing a
+            goal into sub-tasks, planning, remembering across long horizons, coordinating specialised
+            agents, and recovering from failure. This chapter is where Exponential AI moves from an
+            automated task to an autonomous capability.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            <a href="08_agents.html">Chapter 8</a> gave Exponential AI an agent: an LLM with tools and a
+            reason–act loop that resolves a single support ticket end-to-end. But the moment the goal
+            grew — "run the entire returns-and-restocking process for the week" — the simple loop
+            strained. That task has phases (triage, refund, restock, reorder, report), each with its own
+            sub-steps, dependencies, and failure modes. One flat loop trying to hold all of it in a
+            single transcript quickly loses the plot.
+          </p>
+          <p>
+            <strong>Agentic AI</strong> is the step up: systems that exhibit <em>goal-directed
+            autonomy</em> through explicit planning, persistent memory, and often multiple cooperating
+            agents. Where Chapter 8's agent reacts step by step, agentic systems <em>plan</em> ahead,
+            <em>decompose</em> work, <em>delegate</em> to specialists, and <em>reflect</em> on results to
+            self-correct. The distinction is one of degree and structure — but at enterprise scale that
+            structure is the difference between a demo and a dependable operation.
+          </p>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Distinguish an agent from an agentic system; explain planner–executor and multi-agent patterns; reason about single vs multi-agent trade-offs; recognise reflection and memory as reliability tools; and see why orchestrating all this reliably demands the framework of Chapter 10.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why agentic AI exists</h2>
+          <p>
+            It exists because a flat reason–act loop degrades as tasks get longer and broader. Two
+            forces push against it. First, the <strong>context window</strong> fills with the growing
+            transcript, so a long task literally runs out of working memory. Second, the
+            <strong>compounding-error problem</strong> from Chapter 8 worsens: the more steps, the lower
+            the odds every one is correct. A single undifferentiated loop has no way to contain either
+            problem.
+          </p>
+          <p>
+            Structure is the answer. <strong>Planning</strong> turns a vague goal into an explicit list
+            of sub-tasks, so the system knows where it is and what remains. <strong>Decomposition and
+            delegation</strong> let each sub-task run in its own focused context — a "refund agent" needn't
+            hold the "reorder agent's" details. <strong>Reflection</strong> lets the system check its own
+            work and retry. <strong>Persistent memory</strong> carries state across steps and even
+            sessions. Together these keep a long-horizon task tractable where a flat loop would collapse.
+          </p>
+          <p>
+            It helps to see this as the same move software engineering has always made when a program
+            grows too big to hold in one function: you factor it into modules with clear interfaces. A
+            flat agent loop is one giant function whose "variables" all live in a single, ever-growing
+            prompt; an agentic system is that logic refactored into cohesive units with explicit inputs,
+            outputs, and a coordinator. The payoff is the same too — each part becomes independently
+            testable, replaceable, and reasoned-about. Exponential AI can improve its refund agent without
+            touching its reorder agent, and can point to exactly which unit failed when something goes
+            wrong, instead of scrolling through one enormous transcript hunting for the moment it drifted.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given a complex, open-ended goal, produce and execute a plan that decomposes it into
+            manageable sub-tasks, allocates each to an appropriate capability, tracks progress and
+            shared state, handles partial failures, and knows when the overall goal is achieved — all
+            while keeping any single reasoning step within a manageable context and error budget.
+          </p>
+          <p>
+            The central tension is <strong>autonomy vs control</strong>. More autonomy means the system
+            handles more variety without human help, but also more ways to go wrong and less
+            predictability. Agentic design is largely about buying autonomy <em>safely</em>: explicit
+            plans you can inspect, bounded sub-tasks, reflection checkpoints, and clear hand-offs — so the
+            system is powerful without being a black box that occasionally torches production.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>A team, not a solo worker</h4>
+              <p>Instead of one assistant doing everything, a manager breaks the job into pieces and hands each to a specialist, then checks the results — like a small project team.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Plan, delegate, reflect, remember</h4>
+              <p>A planner produces sub-tasks; executor agents (often specialised, with their own tools) carry them out; a reflection step reviews output; shared memory tracks state across the whole run.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>An orchestrated multi-agent system</h4>
+              <p>Design the topology (who talks to whom), the state model, failure/retry semantics, and termination. Autonomy is bounded by explicit plans, budgets, and checkpoints you can audit.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>From single agents to agentic systems</h2>
+          <p>
+            Agentic AI emerged rapidly once single-agent tool use worked and people pushed it at bigger
+            goals — and hit the limits described above.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>2022–23 — Single ReAct agents</h4><p>One LLM, tools, one loop. Great for bounded tasks, brittle on long ones.</p></div>
+              <div class="timeline-item"><h4>2023 — Autonomous-agent experiments</h4><p>Projects like AutoGPT/BabyAGI add planning and task queues — ambitious, but unreliable without structure.</p></div>
+              <div class="timeline-item"><h4>2023 — Reflection &amp; roles</h4><p>Self-critique and role specialisation (planner, worker, critic) markedly improve reliability.</p></div>
+              <div class="timeline-item"><h4>2024+ — Orchestration frameworks</h4><p>Graph-based orchestration (Ch 10) makes multi-agent workflows stateful, resumable, and debuggable.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>The anatomy of an agentic system</h2>
+          <p>
+            The dominant structure is <strong>planner–executor</strong>. A planner decomposes the goal
+            into an ordered (or dependency-aware) list of sub-tasks. Executors — often specialised agents,
+            each with a focused prompt and its own tools — carry out sub-tasks. A <strong>reflection or
+            critic</strong> step evaluates outputs and can trigger a retry or re-plan. A shared
+            <strong>state store / memory</strong> holds the plan, progress, and intermediate results so
+            everything stays coordinated.
+          </p>
+          <p>
+            Multi-agent topologies vary. A <strong>supervisor</strong> pattern has one orchestrator that
+            routes work to workers and aggregates results — predictable and easy to audit. A
+            <strong>network</strong> pattern lets agents talk peer-to-peer — flexible but harder to
+            control. The right choice depends on how much structure the task tolerates. Whatever the
+            topology, the recurring lesson is that <em>explicit state and explicit hand-offs</em> beat an
+            ever-growing free-form transcript — which is precisely what motivates a real orchestration
+            framework in Chapter 10.
+          </p>
+          <p>
+            Memory in an agentic system is layered rather than monolithic. There is <strong>short-term
+            working memory</strong> — what the currently active agent needs right now; <strong>shared task
+            state</strong> — the plan, its progress, and the intermediate results every agent can read; and
+            optionally <strong>long-term memory</strong> — durable knowledge that outlives a single run, such
+            as "this supplier is chronically late." Keeping these separate matters: dumping everything
+            into one bucket recreates the very context-window and confusion problems agentic design set
+            out to solve. A well-designed system passes each agent the minimum it needs and no more —
+            again foreshadowing the deliberate discipline of context engineering in Chapter 14.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>Exponential AI runs weekly returns-and-restocking</h2>
+          <ol>
+            <li><strong>Plan.</strong> Planner decomposes: triage returns → issue refunds → restock → reorder low stock → report.</li>
+            <li><strong>Delegate.</strong> Each sub-task goes to a specialised executor with the right tools.</li>
+            <li><strong>Execute.</strong> The refund agent processes eligible returns; the inventory agent updates stock.</li>
+            <li><strong>Reflect.</strong> A critic checks totals and flags anomalies (e.g., a refund spike).</li>
+            <li><strong>Recover.</strong> Failed sub-tasks are retried or escalated; the plan updates.</li>
+            <li><strong>Aggregate.</strong> The supervisor compiles a report and marks the goal complete.</li>
+          </ol>
+          <p class="code-label">Planner–executor, as pseudocode</p>
+          <pre><code class="language-python">def agentic(goal):
+    plan = planner(goal)                     # list of sub-tasks
+    state = {}
+    for task in plan:
+        agent = route(task)                  # pick a specialist
+        result = agent.run(task, state)      # each has its own tools
+        if not critic(task, result):         # reflection / self-check
+            result = agent.retry(task, state)
+        state[task.id] = result              # shared memory
+    return supervisor.summarise(state)</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture agentic AI</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-people-roof"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A project manager leading a small team of specialists. They plan the work, assign pieces, review deliverables, and re-assign when something fails — nobody holds the whole job in their head at once.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-building"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Exponential AI's operations department: a manager (supervisor) coordinates returns, inventory, and procurement clerks (executor agents), each expert in one system, reporting up to a shared dashboard (state).</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-code"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A distributed system of microservices with an orchestrator: each service (agent) owns a bounded concern; a coordinator manages workflow, shared state, retries, and aggregation.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-sitemap"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A workflow engine where nodes are reasoning agents. The plan is the DAG; reflection is validation; memory is the shared context passed along edges.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>Planner–supervisor–executors, in plain text</h2>
+          <pre class="ascii">                       goal
+                        |
+                        v
+                   [ PLANNER ] --> sub-task list
+                        |
+                        v
+                  [ SUPERVISOR ] <-------- shared STATE/MEMORY
+                   /    |     \                  ^
+                  v     v      v                 |
+            [refund] [restock] [reorder]  --results--+
+              agent    agent     agent
+                  \     |      /
+                   v    v     v
+                   [ CRITIC / reflection ] --ok?--> report
+                        |
+                        +--retry / re-plan on failure</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>Agentic control flow</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    G["Goal"] --> P["Planner: decompose"]
+    P --> S["Supervisor: route sub-tasks"]
+    S --> A1["Refund agent"]
+    S --> A2["Inventory agent"]
+    S --> A3["Procurement agent"]
+    A1 --> C["Critic / reflection"]
+    A2 --> C
+    A3 --> C
+    C -->|pass| R["Aggregate report"]
+    C -->|fail| S
+    S <-.-> M[("Shared state / memory")]
+            </div>
+            <p class="diagram-caption">Figure 9.1 — Explicit plan, routing, reflection, and shared state contain long-horizon risk.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>Agent vs agentic AI</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Dimension</th><th>Single agent (Ch 8)</th><th>Agentic system (Ch 9)</th></tr></thead>
+              <tbody>
+                <tr><td>Scope</td><td>One bounded task</td><td>Open-ended, multi-phase goal</td></tr>
+                <tr><td>Structure</td><td>One reason–act loop</td><td>Plan + delegate + reflect</td></tr>
+                <tr><td>Memory</td><td>Single transcript</td><td>Shared, persistent state</td></tr>
+                <tr><td>Failure handling</td><td>Retry within loop</td><td>Re-plan, re-route, escalate</td></tr>
+                <tr><td>Reliability lever</td><td>Step limits</td><td>Decomposition + reflection</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Single-agent vs multi-agent</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Property</th><th>Single agent</th><th>Multi-agent</th></tr></thead>
+              <tbody>
+                <tr><td>Context focus</td><td>One big context</td><td>Each agent stays focused</td></tr>
+                <tr><td>Specialisation</td><td>Generalist</td><td>Role experts</td></tr>
+                <tr><td>Complexity</td><td>Lower</td><td>Higher (coordination)</td></tr>
+                <tr><td>Cost</td><td>Lower</td><td>Higher (more calls)</td></tr>
+                <tr><td>Best for</td><td>Focused tasks</td><td>Broad, decomposable goals</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Multi-agent topologies</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Topology</th><th>How it coordinates</th><th>Trade-off</th></tr></thead>
+              <tbody>
+                <tr><td>Supervisor</td><td>One orchestrator routes work</td><td>Predictable, easy to audit</td></tr>
+                <tr><td>Network (peer)</td><td>Agents talk directly</td><td>Flexible, harder to control</td></tr>
+                <tr><td>Pipeline</td><td>Fixed hand-off sequence</td><td>Simple, but rigid</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Strengths and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Handles big, open-ended goals</strong> a single loop can't.</li>
+                <li><strong>Focused contexts</strong> via decomposition and specialists.</li>
+                <li><strong>Self-correction</strong> through reflection and re-planning.</li>
+                <li><strong>Resilience</strong> — failures are contained and retried.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages</h3>
+              <ul>
+                <li><strong>Much more complex</strong> to build and reason about.</li>
+                <li><strong>Expensive &amp; slow</strong> — many agents, many calls.</li>
+                <li><strong>Coordination failures</strong> and error propagation.</li>
+                <li><strong>Hard to debug</strong> without strong observability.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Building agentic systems well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Make the plan explicit</strong> and inspectable.</li>
+                <li><strong>Keep each agent focused</strong> with a narrow role and toolset.</li>
+                <li><strong>Add reflection/critics</strong> on important outputs.</li>
+                <li><strong>Budget everything</strong> — steps, cost, and time per run.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Multi-agent for a simple task</strong> — needless complexity.</li>
+                <li><strong>No shared state model</strong> — agents drift out of sync.</li>
+                <li><strong>Unbounded autonomy</strong> without budgets or checkpoints.</li>
+                <li><strong>Agents that all do everything</strong> instead of specialising.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>How does agentic AI differ from a single agent?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A single agent runs one reason–act loop on a bounded task. Agentic systems add planning, decomposition, specialised/multiple agents, reflection, and persistent shared state to pursue open-ended goals.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Why decompose into multiple agents at all?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>To keep each context focused (fighting window limits), to specialise behaviour and tools, and to contain errors — a failure in one sub-task doesn't corrupt the whole transcript.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What is reflection and why does it help?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A step where the system critiques its own output and can retry or re-plan. It catches errors before they propagate, meaningfully improving reliability on multi-step work.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>When is multi-agent overkill?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>When a task is focused enough for one agent. Multiple agents add coordination cost and latency; use them only when decomposition and specialisation genuinely pay off.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">Agentic AI trades <em>simplicity</em> for <em>reach</em>. The architect's discipline: add structure only to buy back reliability you actually need. Explicit plans, focused agents, reflection, and budgets are how you get autonomy without an unaccountable black box.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">Peer agents pass a subtly wrong stock figure back and forth with no shared source of truth; the error amplifies until reorders are wildly off. A supervisor topology with a single authoritative state store would have caught it — a direct argument for real orchestration (Ch 10).</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Reaching for multi-agent</strong> when one focused agent suffices.</li>
+            <li><strong>No explicit plan or state</strong>, so runs are impossible to follow.</li>
+            <li><strong>Skipping reflection</strong>, letting early errors propagate.</li>
+            <li><strong>No budgets</strong>, so autonomous runs balloon in cost and time.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Single agent, multi-agent, or workflow?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["Goal to automate"]) --> C{"Decomposes into<br/>distinct sub-tasks?"}
+    C -->|No| SA["Single agent (Ch 8)"]
+    C -->|Yes| V{"Sub-tasks need<br/>different skills/tools?"}
+    V -->|No| SA
+    V -->|Yes| P{"Path stable &amp; known?"}
+    P -->|Yes| WF["Structured workflow (Ch 10)"]
+    P -->|No| MA["Multi-agent + planning &amp; reflection"]
+            </div>
+            <p class="diagram-caption">Figure 9.2 — Even the multi-agent branch points straight at orchestration.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Before shipping an agentic system</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> The plan is explicit and inspectable.</li>
+            <li><i class="fa-solid fa-square-check"></i> Each agent has a focused role and toolset.</li>
+            <li><i class="fa-solid fa-square-check"></i> A shared state model tracks progress and results.</li>
+            <li><i class="fa-solid fa-square-check"></i> Reflection/critics guard important outputs.</li>
+            <li><i class="fa-solid fa-square-check"></i> Step, cost, and time budgets are enforced.</li>
+            <li><i class="fa-solid fa-square-check"></i> Failures re-plan, re-route, or escalate cleanly.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="Agentic AI adds planning, decomposition, reflection, and shared state.">
+              <p class="q-text">1. What best distinguishes agentic AI from a single agent?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">A larger model</button>
+                <button class="quiz-option" data-correct="true">Planning, decomposition, and coordination toward a goal</button>
+                <button class="quiz-option">A bigger temperature</button>
+                <button class="quiz-option">No tools</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Decomposition keeps each context focused and contains errors.">
+              <p class="q-text">2. A key reason to split work across specialised agents is to…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Use more tokens</button>
+                <button class="quiz-option" data-correct="true">Keep each context focused and contain errors</button>
+                <button class="quiz-option">Avoid using tools</button>
+                <button class="quiz-option">Remove the need for memory</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Reflection catches errors before they propagate.">
+              <p class="q-text">3. A reflection/critic step primarily improves…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Model size</button>
+                <button class="quiz-option" data-correct="true">Reliability, by catching errors before they spread</button>
+                <button class="quiz-option">Token cost</button>
+                <button class="quiz-option">Embedding quality</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="A supervisor with authoritative shared state is predictable and auditable.">
+              <p class="q-text">4. Which topology is most predictable and easiest to audit?</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Peer network</button>
+                <button class="quiz-option" data-correct="true">Supervisor with shared state</button>
+                <button class="quiz-option">Everyone talks to everyone</button>
+                <button class="quiz-option">No coordination</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            Agentic AI scales the single agent into a goal-directed system: a planner decomposes the
+            goal, specialised executors carry out sub-tasks, a critic reflects and triggers retries, and
+            shared persistent state keeps everything coordinated. This structure is how Exponential AI runs
+            an entire multi-phase operation rather than a single ticket, containing the context-window
+            and compounding-error limits that break a flat loop. The price is complexity, cost, and
+            coordination risk — so autonomy should always be bounded by explicit plans, focused roles,
+            reflection, and budgets.
+          </p>
+          <p>
+            But notice what every reliable example above quietly assumed: an authoritative shared state,
+            clean hand-offs, retries, and the ability to pause, resume, and inspect a run. Hand-rolling
+            all of that with ad-hoc code is exactly where teams drown. Agentic AI needs a real
+            orchestration substrate.
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 10</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              Exponential AI's agentic operation works in the happy path, but the glue holding it together —
+              state, routing, retries, resumability — is fragile hand-written plumbing. <strong>What if
+              the workflow itself were a first-class, stateful graph you could define, inspect, pause,
+              and resume?</strong> That is <a href="10_langgraph.html">Chapter 10 — LangGraph</a>, where
+              Exponential AI turns ad-hoc agent coordination into a durable, debuggable orchestration.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 9 of 24 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>

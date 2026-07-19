@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en" data-root="../" data-chapter="23" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(){try{var t=localStorage.getItem('exponential-ai-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+  <title>Chapter 23 — The Frontier: Advanced &amp; Emerging AI · Exponential AI Handbook</title>
+  <meta name="description" content="The deep, emerging AI horizon as of early 2026 — silicon and accelerators, world models, embodied AI, multimodal, edge AI, energy, and the AGI/ASI debate — rated by maturity with a prepare-don&#x27;t-predict stance." />
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Exponential AI Handbook" />
+  <meta property="og:title" content="Chapter 23 — The Frontier: Advanced &amp; Emerging AI · Exponential AI Handbook" />
+  <meta property="og:description" content="The deep, emerging AI horizon as of early 2026 — silicon and accelerators, world models, embodied AI, multimodal, edge AI, energy, and the AGI/ASI debate — rated by maturity with a prepare-don&#x27;t-predict stance." />
+  <meta property="og:image" content="../assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Exponential AI Handbook — the AI evolution, told as one story" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Chapter 23 — The Frontier: Advanced &amp; Emerging AI · Exponential AI Handbook" />
+  <meta name="twitter:description" content="The deep, emerging AI horizon as of early 2026 — silicon and accelerators, world models, embodied AI, multimodal, edge AI, energy, and the AGI/ASI debate — rated by maturity with a prepare-don&#x27;t-predict stance." />
+  <meta name="twitter:image" content="../assets/og-banner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/animations.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="reading-bar-track"><div class="reading-bar" data-reading-bar></div></div>
+
+  <div class="layout">
+    <aside class="sidebar" data-sidebar aria-label="Chapter navigation">
+      <a class="brand" href="../index.html">
+        <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+        <span>
+          <span class="brand-name">Exponential AI</span><br />
+          <span class="brand-sub">Enterprise AI Handbook</span>
+        </span>
+      </a>
+      <div class="sidebar-tools">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="search-input" type="search" id="chapter-search" name="chapter-search" placeholder="Search chapters…" aria-label="Search chapters" data-nav-search-input />
+        </label>
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme"><i class="fa-solid fa-sun" aria-hidden="true"></i></button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Your progress</span><span data-progress-label>0 / 24 chapters</span></div>
+        <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+      </div>
+      <nav aria-label="Chapters">
+        <p class="nav-heading">Chapters</p>
+        <ul class="nav-list" data-nav-list></ul>
+      </nav>
+    </aside>
+
+    <div class="scrim" data-scrim></div>
+
+    <div class="content">
+      <div class="topbar">
+        <button class="icon-btn" data-nav-toggle aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+        <a class="brand" href="../index.html">
+          <span class="brand-badge"><i class="fa-solid fa-brain" aria-hidden="true"></i></span>
+          <span class="brand-name">Exponential AI Handbook</span>
+        </a>
+      </div>
+
+      <main id="main" class="container">
+        <header class="chapter-hero">
+          <span class="chapter-eyebrow"><i class="fa-solid fa-satellite-dish"></i> Chapter 23 · The Deep Horizon</span>
+          <h1 class="chapter-title">The Frontier: advanced &amp; emerging AI</h1>
+          <p class="chapter-lede">
+            With the lifecycle mastered (Ch 20–22), Exponential AI can run AI reliably today. This chapter
+            looks far ahead — the silicon race, world models, embodied AI and robotics, multimodal
+            frontiers, edge AI, energy, and the AGI/ASI debate — with deliberate epistemic humility. This
+            field moves monthly; everything here is framed as <em>deploy-now</em>, <em>experimental</em>, or
+            <em>speculative</em>, as of early 2026.
+          </p>
+          <div class="chapter-meta">
+            <span><i class="fa-regular fa-clock"></i> ~18 min read</span>
+            <span><i class="fa-solid fa-signal"></i> Level 1 → Level 3</span>
+            <span><i class="fa-solid fa-diagram-project"></i> Mermaid + ASCII diagrams</span>
+            <span><i class="fa-solid fa-circle-question"></i> Quiz included</span>
+          </div>
+        </header>
+
+        <section class="section" id="recap">
+          <span class="section-tag">01 · Recap &amp; Introduction</span>
+          <h2>Where Exponential AI left off</h2>
+          <p>
+            <a href="22_ai_sre.html">Chapter 22</a> completed the operational trilogy: Exponential AI now
+            frames AI work as a discipline (Ch 20), ships it safely (Ch 21), and operates it reliably
+            (Ch 22). That is mastery of the <em>present</em>. But the ground under all of it keeps shifting.
+            The models, the chips they run on, and the very kinds of problems AI can attack are advancing so
+            quickly that an architect who plans only for today's capabilities will be surprised — expensively
+            — by tomorrow's.
+          </p>
+          <p>
+            This chapter is the <strong>deep horizon</strong>: a survey of the advanced and still-emerging
+            frontier. It is the deliberately speculative companion to the finale. Where
+            <a href="24_future.html">Chapter 24</a> is the grounded, near-term picture of what an autonomous
+            enterprise looks like as capabilities compound, this chapter goes <em>further out and less
+            certain</em> — into hardware, world models, embodied AI, and the AGI debate. The two do not
+            duplicate: Chapter 24 is "where this story lands soon"; Chapter 23 is "what is being invented
+            that could change the game."
+          </p>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Epistemic-humility notice (read this first)</div>
+            <p style="margin:0">
+              This is the highest-uncertainty chapter in the handbook, and your author's knowledge has a
+              training cutoff. Specifics here move fast and some may already have shifted. Everything is
+              framed as <strong>emerging / debated / as of early 2026</strong>, with an honest maturity
+              rating — <em>deploy-now</em>, <em>experimental</em>, or <em>speculative</em> — rather than
+              stated as settled fact. The stance throughout is <strong>prepare, don't predict</strong>:
+              favour <em>no-regret</em> moves that pay off across many futures. Every uncertain claim is
+              flagged for review in <code>NOTES.md</code>.
+            </p>
+          </div>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-map-signs"></i> What you'll be able to do after this chapter</div>
+            <p style="margin:0">Reason about the frontier — accelerators, world models, embodied AI, multimodal, edge, energy, AGI/ASI — using maturity ratings; separate deployable technology from experimental and speculative ideas; and identify no-regret architecture moves that prepare Exponential AI without betting on a specific prediction.</p>
+          </div>
+        </section>
+
+        <section class="section" id="why">
+          <span class="section-tag">02 · Why this technology exists</span>
+          <h2>Why an architect must watch the frontier</h2>
+          <p>
+            The frontier matters not because you should chase every headline, but because the
+            <em>assumptions</em> baked into today's architecture have expiry dates. The cost of a token, the
+            latency of inference, whether a model can watch video or act in the physical world, whether it
+            runs in a datacentre or on a device in a store — all of these are frontier variables that will
+            move, and each one, when it moves, changes what is worth building. An architect who tracks the
+            frontier can make decisions today that stay good as it advances; one who ignores it hard-codes
+            assumptions that quietly become liabilities.
+          </p>
+          <p>
+            It also exists because the frontier is where <strong>capability discontinuities</strong> come
+            from. Most progress is incremental, but occasionally a new hardware generation, a new model
+            paradigm (world models, say), or a new modality unlocks a class of applications that was simply
+            impossible before — as transformers once did for language. You cannot schedule those jumps, but
+            you can stay literate enough to recognise one early and to have built systems flexible enough to
+            absorb it. That literacy — knowing what is real, what is emerging, and what is hype — is itself
+            the deliverable of this chapter.
+          </p>
+          <p>
+            Finally, it exists to inoculate against two equal and opposite failures: <em>breathless
+            over-adoption</em> of speculative tech that isn't ready, and <em>complacent under-preparation</em>
+            that leaves you flat-footed. The antidote to both is the same discipline: rate maturity
+            honestly, and act in proportion to it.
+          </p>
+        </section>
+
+        <section class="section" id="problem">
+          <span class="section-tag">03 · Problem statement</span>
+          <h2>The problem, stated precisely</h2>
+          <p>
+            Given a fast-moving frontier where claims are frequently premature and your own information has
+            a cutoff, provide an architect with a durable way to reason about advanced and emerging AI: to
+            place each development on a maturity scale, to decide what (if anything) to do about it now, and
+            to prepare the organisation without betting the business on any single prediction that may not
+            come true.
+          </p>
+          <p>
+            The organising principle is <strong>prepare, don't predict</strong>. Instead of forecasting
+            which frontier bet will win, identify moves that are valuable across many plausible futures —
+            keeping systems model-agnostic, instrumenting for cost and quality, building good data assets,
+            and staying literate. These <em>no-regret</em> moves convert frontier uncertainty from a threat
+            into an option you can exercise when — and if — a development matures.
+          </p>
+        </section>
+
+        <section class="section" id="levels">
+          <span class="section-tag">Three levels of understanding</span>
+          <h2>One idea, three depths</h2>
+          <div class="levels">
+            <div class="level glass reveal">
+              <span class="level-tag">Level 1 · Simple</span>
+              <h4>Watch the weather, pack layers</h4>
+              <p>You can't predict the exact forecast weeks out, but you can prepare sensibly for a range of conditions. Prepare, don't predict.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 2 · Engineering</span>
+              <h4>Rate maturity, act proportionally</h4>
+              <p>Tag each frontier area deploy-now, experimental, or speculative. Adopt the first, pilot the second, and merely track the third — revisiting as the ratings change.</p>
+            </div>
+            <div class="level glass reveal">
+              <span class="level-tag">Level 3 · Architect</span>
+              <h4>Build for optionality</h4>
+              <p>Design so a capability jump (cheaper compute, a new modality, on-device models) can be absorbed without a rewrite. Favour no-regret moves that pay off across many futures.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="history">
+          <span class="section-tag">04 · Historical evolution</span>
+          <h2>How frontiers became mainstream (a cautionary pattern)</h2>
+          <p>
+            History rhymes: today's boring infrastructure was yesterday's frontier — and much yesterday's
+            hype quietly vanished. The pattern, not the specifics, is the lesson.
+          </p>
+          <div class="card glass reveal">
+            <div class="timeline">
+              <div class="timeline-item"><h4>GPUs for AI</h4><p>Repurposing graphics chips for training was once niche; it became the backbone of modern AI.</p></div>
+              <div class="timeline-item"><h4>Deep learning</h4><p>Dismissed for years, then a step change once data and compute aligned.</p></div>
+              <div class="timeline-item"><h4>Transformers &amp; scale</h4><p>An architecture plus scale turned language into a solvable frontier (Ch 4–5).</p></div>
+              <div class="timeline-item"><h4>Today's frontier</h4><p>New silicon, world models, embodied AI, multimodal, edge — some will mainstream, some won't. Maturity ratings, not certainty, are how we tell.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="architecture">
+          <span class="section-tag">05 · Internal architecture</span>
+          <h2>A map of the frontier</h2>
+          <p>
+            Think of the frontier as layers, each with its own maturity. <strong>Silicon</strong> is the
+            base: GPUs are the deploy-now workhorse; TPUs and other datacentre accelerators are widely used;
+            NPUs bring acceleration to phones and laptops (increasingly deploy-now for on-device inference);
+            and <strong>neuromorphic</strong> and other novel designs remain largely research/experimental
+            as of early 2026. Above silicon sits the <strong>compute race</strong> — the economics of who
+            can train and serve the largest models, and the energy and cost pressures that push toward
+            efficiency.
+          </p>
+          <p>
+            On top of compute sit new <strong>model paradigms</strong>. <em>World models</em> — systems that
+            learn a predictive internal model of an environment — are an active research direction (broadly
+            experimental) with promise for planning and robotics. <em>Multimodal</em> models that jointly
+            handle text, images, audio, and video are rapidly maturing (parts are deploy-now, frontiers
+            remain experimental). <em>Physical/embodied AI and robotics</em> — putting learned policies into
+            machines that act in the world — is advancing quickly but is largely experimental for general
+            tasks. <em>On-device/edge AI</em> pushes smaller models onto local hardware for privacy,
+            latency, and cost (increasingly deploy-now for modest models). At the top sits the
+            <strong>AGI/ASI debate</strong>: whether and when AI reaches or exceeds broad human capability —
+            genuinely <em>debated</em>, with no consensus on definition or timeline. The architecture of
+            this chapter is simply to hold all of these at once, each with an honest label, and to act in
+            proportion to maturity rather than to excitement.
+          </p>
+        </section>
+
+        <section class="section" id="stepbystep">
+          <span class="section-tag">06 · Step-by-step execution</span>
+          <h2>Exponential AI evaluates a frontier claim the disciplined way</h2>
+          <ol>
+            <li><strong>Hear the claim.</strong> A vendor pitches an on-device model to run product-image recognition in stores without the cloud.</li>
+            <li><strong>Rate maturity.</strong> On-device inference for modest vision models is broadly deploy-now as of early 2026; the specific vendor claim needs its own evaluation.</li>
+            <li><strong>Check no-regret fit.</strong> Edge inference reduces latency and cloud cost and improves privacy — valuable across many futures, so it is a candidate regardless of hype.</li>
+            <li><strong>Pilot, don't bet.</strong> Run it through the SDLC (Ch 20): a scoped eval on real store photos against the current cloud baseline.</li>
+            <li><strong>Decide proportionally.</strong> If it clears the bar, ship it via AIOps (Ch 21) with a cloud fallback (Ch 22 failover). If it's experimental, keep tracking; don't rip out what works.</li>
+            <li><strong>Flag uncertainty.</strong> Record any claim you couldn't verify in <code>NOTES.md</code> rather than repeating it as fact.</li>
+          </ol>
+          <p class="code-label">A maturity-gated adoption rule</p>
+          <pre><code class="language-python">def adopt(tech):
+    rating = maturity(tech)          # "deploy-now" | "experimental" | "speculative"
+    if rating == "deploy-now" and is_no_regret(tech):
+        return "pilot via SDLC, ship with fallback"
+    if rating == "experimental":
+        return "small scoped pilot; do not depend on it yet"
+    return "track only; revisit as rating changes"   # speculative</code></pre>
+        </section>
+
+        <section class="section" id="analogies">
+          <span class="section-tag">07 · Analogies</span>
+          <h2>Four ways to picture the frontier</h2>
+          <div class="accordion" data-accordion data-open="true">
+            <button class="accordion-header" aria-expanded="true"><span><i class="fa-solid fa-binoculars"></i> Real-world analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A ship's lookout. The job isn't to predict exactly what's on the horizon — it's to spot things early enough to steer, and to tell a real landmass from a mirage.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-chart-line"></i> Enterprise analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>A technology-radar / R&amp;D portfolio: rings of adopt / trial / assess / hold, revisited regularly, so bets are proportional to maturity rather than to fashion.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-plug-circle-bolt"></i> Software-engineering analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Depending on a library still in beta: fine to prototype behind an interface, dangerous to hard-wire into the core before it stabilises.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span><i class="fa-solid fa-layer-group"></i> Architecture analogy</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Designing for optionality: an abstraction layer over models and hardware so a frontier jump can be swapped in without a rewrite — the real hedge against uncertainty.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="ascii">
+          <span class="section-tag">08 · ASCII diagram</span>
+          <h2>The frontier stack, by maturity</h2>
+          <pre class="ascii">  DEBATE   | AGI / ASI ................ speculative / debated
+  ---------+------------------------------------------------
+  PARADIGM | world models ............. experimental
+           | embodied AI / robotics ... experimental (general)
+           | multimodal frontiers ..... mixed: some deploy-now
+  ---------+------------------------------------------------
+  DELIVERY | on-device / edge AI ...... increasingly deploy-now
+           | energy / efficiency ...... deploy-now pressure
+  ---------+------------------------------------------------
+  SILICON  | GPUs ..................... deploy-now
+           | TPUs / accelerators ...... deploy-now
+           | NPUs (device) ............ increasingly deploy-now
+           | neuromorphic ............. experimental / research
+
+           (ratings are "as of early 2026" and will change)</pre>
+        </section>
+
+        <section class="section" id="mermaid">
+          <span class="section-tag">09 · Mermaid diagram</span>
+          <h2>Prepare, don't predict</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    F["Frontier development"] --> R{"Maturity rating<br/>(as of early 2026)"}
+    R -->|deploy-now| A["Adopt if no-regret<br/>(pilot + fallback)"]
+    R -->|experimental| P["Small scoped pilot;<br/>don't depend on it"]
+    R -->|speculative / debated| T["Track only;<br/>keep optionality"]
+    A --> N["No-regret moves:<br/>model-agnostic, instrumented, good data"]
+    P --> N
+    T --> N
+            </div>
+            <p class="diagram-caption">Figure 23.1 — Whatever the rating, the durable response is no-regret preparation, not prediction.</p>
+          </div>
+        </section>
+
+        <section class="section" id="comparison">
+          <span class="section-tag">10 · Comparison tables</span>
+          <h2>The frontier, rated honestly</h2>
+          <p>Ratings below are <strong>as of early 2026</strong>, are debatable, and will move — see <code>NOTES.md</code>.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Frontier area</th><th>Maturity (early 2026)</th><th>No-regret move now</th></tr></thead>
+              <tbody>
+                <tr><td>GPUs / datacentre accelerators</td><td>Deploy-now</td><td>Stay portable across providers</td></tr>
+                <tr><td>On-device / edge AI (modest models)</td><td>Increasingly deploy-now</td><td>Pilot for latency/privacy/cost wins</td></tr>
+                <tr><td>Multimodal (text+image+audio+video)</td><td>Mixed; parts deploy-now</td><td>Design data/schemas to be multimodal-ready</td></tr>
+                <tr><td>World models</td><td>Experimental</td><td>Track; prototype behind interfaces</td></tr>
+                <tr><td>Embodied AI / robotics (general)</td><td>Experimental</td><td>Watch for narrow, high-value use cases</td></tr>
+                <tr><td>Neuromorphic computing</td><td>Research / experimental</td><td>Track only</td></tr>
+                <tr><td>AGI / ASI</td><td>Speculative / debated</td><td>Invest in safety, governance, adaptability</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:2rem">Accelerators at a glance</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Type</th><th>Typically used for</th><th>Where it runs</th></tr></thead>
+              <tbody>
+                <tr><td>GPU</td><td>Training &amp; large-scale inference</td><td>Datacentre / workstation</td></tr>
+                <tr><td>TPU / custom accelerator</td><td>Large training &amp; serving</td><td>Datacentre / cloud</td></tr>
+                <tr><td>NPU</td><td>Efficient on-device inference</td><td>Phones, laptops, edge devices</td></tr>
+                <tr><td>Neuromorphic</td><td>Event-driven, low-power (research)</td><td>Labs / early prototypes</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="tradeoffs">
+          <span class="section-tag">11 &amp; 12 · Advantages &amp; disadvantages</span>
+          <h2>Engaging with the frontier: benefits and costs</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid #34d399">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-up" style="color:#34d399"></i> Advantages</h3>
+              <ul>
+                <li><strong>Early awareness</strong> of capability jumps.</li>
+                <li><strong>Optionality</strong> — ready to adopt when tech matures.</li>
+                <li><strong>Avoids hype traps</strong> via honest maturity ratings.</li>
+                <li><strong>No-regret moves</strong> pay off across futures.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #ef4444">
+              <h3 style="margin-top:0"><i class="fa-solid fa-thumbs-down" style="color:#ef4444"></i> Disadvantages / realities</h3>
+              <ul>
+                <li><strong>High uncertainty</strong> — specifics date quickly.</li>
+                <li><strong>Distraction risk</strong> — chasing shiny experimental tech.</li>
+                <li><strong>Hard to evaluate</strong> immature claims responsibly.</li>
+                <li><strong>Opportunity cost</strong> of premature bets.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="practices">
+          <span class="section-tag">13 &amp; 14 · Best practices &amp; anti-patterns</span>
+          <h2>Frontier literacy done well — and badly</h2>
+          <div class="levels">
+            <div class="card glass reveal" style="border-top:3px solid var(--accent-2)">
+              <h3 style="margin-top:0"><i class="fa-solid fa-check-double"></i> Best practices</h3>
+              <ul>
+                <li><strong>Rate maturity honestly;</strong> revisit ratings on a schedule.</li>
+                <li><strong>Prefer no-regret moves;</strong> keep systems model- and hardware-agnostic.</li>
+                <li><strong>Pilot experimental tech behind interfaces,</strong> not in the core.</li>
+                <li><strong>Say "I don't know"</strong> and flag uncertainty explicitly.</li>
+                <li><strong>Invest in safety and governance</strong> ahead of capability.</li>
+              </ul>
+            </div>
+            <div class="card glass reveal" style="border-top:3px solid #f59e0b">
+              <h3 style="margin-top:0"><i class="fa-solid fa-ban"></i> Anti-patterns</h3>
+              <ul>
+                <li><strong>Stating speculation as fact</strong> or citing invented specifics.</li>
+                <li><strong>Hard-wiring beta tech</strong> into critical paths.</li>
+                <li><strong>Predicting timelines</strong> for AGI as if known.</li>
+                <li><strong>Ignoring the frontier entirely</strong> until blindsided.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="interview">
+          <span class="section-tag">15 · Interview questions</span>
+          <h2>Questions you should be able to answer</h2>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>What does "prepare, don't predict" mean?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Rather than forecasting which frontier bet wins, make no-regret moves that pay off across many futures — model-agnostic architecture, good instrumentation, strong data assets — so you can adopt a development when it matures instead of gambling on a timeline.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Give an honest maturity read on embodied AI.</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>As of early 2026 it's broadly experimental for general tasks — impressive demos and narrow wins, but not a reliable, general capability. Watch for narrow, high-value use cases; don't build a business on general embodied autonomy yet. (Flagged in NOTES.md.)</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>Is AGI close?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>It's genuinely debated — there's no consensus on definition or timeline, and confident predictions in either direction should be treated with suspicion. The responsible response is investing in adaptability, safety, and governance regardless of timeline.</p></div>
+          </div>
+          <div class="accordion" data-accordion>
+            <button class="accordion-header" aria-expanded="false"><span>How is this chapter different from the finale (Ch 24)?</span><i class="fa-solid fa-chevron-right chev"></i></button>
+            <div class="accordion-panel"><p>Chapter 24 is the grounded near-term picture of the autonomous enterprise as today's capabilities compound. This chapter is the deeper, more speculative horizon — hardware, world models, embodied AI, the AGI debate — rated by maturity. Complementary, not overlapping.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="architect">
+          <span class="section-tag">16 · Architect notes</span>
+          <h2><i class="fa-solid fa-drafting-compass"></i> Think like an architect</h2>
+          <div class="callout">
+            <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Trade-off analysis</div>
+            <p style="margin:0">The best hedge against frontier uncertainty is optionality, not prediction. Spend on abstraction layers that make models and hardware swappable, on instrumentation that tells you when a change helps, and on data assets that stay valuable no matter which model wins. These no-regret investments cost little relative to a big directional bet and keep every future open.</p>
+          </div>
+          <div class="callout is-warn">
+            <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Failure scenario</div>
+            <p style="margin:0">A team re-architects its core around a speculative paradigm on the strength of a demo and a confident timeline. The timeline slips, the paradigm stays experimental, and the rewrite becomes dead weight. Rating maturity honestly — and piloting behind an interface — would have preserved the option without the bet.</p>
+          </div>
+        </section>
+
+        <section class="section" id="mistakes">
+          <span class="section-tag">17 · Common mistakes</span>
+          <h2>Where teams go wrong</h2>
+          <ul>
+            <li><strong>Repeating hype</strong> as if it were verified fact.</li>
+            <li><strong>Confident timelines</strong> for inherently uncertain milestones (e.g. AGI).</li>
+            <li><strong>Betting the core</strong> on experimental or speculative tech.</li>
+            <li><strong>Frontier blindness</strong> — never scanning, then being blindsided.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="decision">
+          <span class="section-tag">18 · Decision tree</span>
+          <h2>Should you adopt a frontier technology now?</h2>
+          <div class="card glass diagram-frame reveal">
+            <div class="mermaid">
+flowchart TD
+    S(["A frontier tech is on your radar"]) --> A{"Maturity = deploy-now?"}
+    A -->|No| B{"Experimental?"}
+    B -->|Yes| Pilot["Small scoped pilot behind an interface"]
+    B -->|No, speculative| Track["Track only; invest in optionality"]
+    A -->|Yes| C{"Is it a no-regret move?"}
+    C -->|No| Wait["Wait for a clear use case"]
+    C -->|Yes| D{"Clears an SDLC eval vs baseline?"}
+    D -->|No| Iterate["Iterate or drop"]
+    D -->|Yes| Ship["Ship via AIOps with a fallback"]
+            </div>
+            <p class="diagram-caption">Figure 23.2 — Proportional response: adopt the mature and no-regret, pilot the experimental, track the speculative.</p>
+          </div>
+        </section>
+
+        <section class="section" id="checklist">
+          <span class="section-tag">19 · Checklist</span>
+          <h2>Staying frontier-ready without over-betting</h2>
+          <ul class="checklist">
+            <li><i class="fa-solid fa-square-check"></i> A living maturity rating for each frontier area, revisited on a schedule.</li>
+            <li><i class="fa-solid fa-square-check"></i> Architecture keeps models and hardware swappable (optionality).</li>
+            <li><i class="fa-solid fa-square-check"></i> Experimental tech is piloted behind interfaces, never in the core.</li>
+            <li><i class="fa-solid fa-square-check"></i> Uncertain claims are flagged, not repeated as fact.</li>
+            <li><i class="fa-solid fa-square-check"></i> Safety, governance, and adaptability investments precede capability bets.</li>
+            <li><i class="fa-solid fa-square-check"></i> No-regret moves prioritised over directional predictions.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="quiz">
+          <span class="section-tag">20 · Quiz</span>
+          <h2>Knowledge check</h2>
+          <div class="quiz glass" data-quiz>
+            <div class="quiz-q" data-question data-explain="The chapter's stance is to make no-regret moves that pay off across futures rather than forecasting a winner.">
+              <p class="q-text">1. "Prepare, don't predict" means…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Forecast the exact winner and bet on it</button>
+                <button class="quiz-option" data-correct="true">Make no-regret moves valuable across many futures</button>
+                <button class="quiz-option">Ignore the frontier</button>
+                <button class="quiz-option">Adopt every new tool immediately</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="AGI has no consensus definition or timeline; it is genuinely debated.">
+              <p class="q-text">2. The honest framing of AGI/ASI is…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">A settled fact arriving next year</button>
+                <button class="quiz-option" data-correct="true">Genuinely debated — no consensus on definition or timeline</button>
+                <button class="quiz-option">Proven impossible</button>
+                <button class="quiz-option">Already deployed everywhere</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="Experimental tech should be piloted behind interfaces, not hard-wired into critical paths.">
+              <p class="q-text">3. Experimental frontier tech should be…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Hard-wired into the core immediately</button>
+                <button class="quiz-option" data-correct="true">Piloted behind an interface, not depended on</button>
+                <button class="quiz-option">Ignored forever</button>
+                <button class="quiz-option">Shipped without evaluation</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+            <div class="quiz-q" data-question data-explain="NPUs bring efficient inference to devices like phones and laptops.">
+              <p class="q-text">4. NPUs are primarily associated with…</p>
+              <div class="quiz-options">
+                <button class="quiz-option">Only training the largest models</button>
+                <button class="quiz-option" data-correct="true">Efficient on-device / edge inference</button>
+                <button class="quiz-option">Graphics rendering only</button>
+                <button class="quiz-option">Storing data</button>
+              </div>
+              <p class="quiz-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="summary">
+          <span class="section-tag">21 · Summary</span>
+          <h2>Summary</h2>
+          <p>
+            The frontier — new silicon (GPUs, TPUs, NPUs, and experimental neuromorphic designs), world
+            models, embodied AI and robotics, multimodal advances, edge AI, energy and efficiency, and the
+            AGI/ASI debate — is where the assumptions behind today's architecture will eventually be
+            rewritten. Because this field moves monthly and any account of it (including this one) has a
+            cutoff, the responsible approach is to rate maturity honestly (deploy-now vs experimental vs
+            speculative), state uncertainty plainly, and flag unverified claims in <code>NOTES.md</code>.
+            The durable stance is <strong>prepare, don't predict</strong>: favour no-regret moves —
+            model- and hardware-agnostic design, strong instrumentation and data, and investment in safety
+            and governance — that keep every future open.
+          </p>
+          <p>
+            That is the deep horizon. Now the story returns home. What does it actually look like when the
+            capabilities we already have compound inside one enterprise — when Exponential AI becomes not
+            just a company that uses AI, but an autonomous enterprise?
+          </p>
+        </section>
+
+        <section class="section" id="transition">
+          <span class="section-tag">22 · What happens next</span>
+          <h2>Transition to Chapter 24</h2>
+          <div class="callout is-ok">
+            <p style="margin:0">
+              Having scanned the far, uncertain horizon, we come back to the grounded near term. The finale,
+              <a href="24_future.html">Chapter 24 — The Autonomous Enterprise</a>, pulls the entire journey
+              together — from manual retailer to AI-native to autonomous organisation — and looks honestly
+              at what happens as today's capabilities, disciplined by the lifecycle you've just learned,
+              compound into a self-driving enterprise. Where this chapter was the speculative companion, the
+              finale is where the story lands.
+            </p>
+          </div>
+          <nav class="prevnext" data-prevnext aria-label="Chapter navigation"></nav>
+        </section>
+
+        <footer class="site-footer">
+          <p>Chapter 23 of 24 · Exponential AI Handbook · <a href="../index.html">Back to overview</a></p>
+        </footer>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script>
+    if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path =
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/";
+    }
+  </script>
+  <script src="../assets/app.js"></script>
+</body>
+</html>
